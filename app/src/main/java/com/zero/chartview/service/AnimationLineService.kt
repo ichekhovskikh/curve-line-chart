@@ -42,6 +42,25 @@ class AnimationLineService(
         updateYAxis()
     }
 
+    fun addLine(line: CurveLine) {
+        val current = lines.map { it.curveLine }
+        if (current.contains(line)) return
+
+        lines.add(AnimatingCurveLine(line, true, 0F))
+        appearanceAnimator.start()
+        updateYAxis()
+    }
+
+    fun removeLine(line: CurveLine) {
+        val current = lines.map { it.curveLine }
+        if (!current.contains(line)) return
+
+        lines.find { it.curveLine == line }
+            .apply { lines.add(AnimatingCurveLine(line, false, 0F)) }
+        appearanceAnimator.start()
+        updateYAxis()
+    }
+
     private fun updateYAxis() {
         val current = lines.map { it.curveLine }
         val newMaxY = findMaxYValue(current)

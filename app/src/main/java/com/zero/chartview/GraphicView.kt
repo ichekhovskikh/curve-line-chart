@@ -36,6 +36,14 @@ class GraphicView constructor(
         animationLineService.setLines(lines)
     }
 
+    fun addLine(line: CurveLine) {
+        animationLineService.addLine(line)
+    }
+
+    fun removeLine(line: CurveLine) {
+        animationLineService.removeLine(line)
+    }
+
     fun setRange(range: FloatRange) {
         this.range = range
         invalidate()
