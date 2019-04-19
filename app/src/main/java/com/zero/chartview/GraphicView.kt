@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.View
 import com.zero.chartview.model.AnimatingCurveLine
 import com.zero.chartview.model.CurveLine
+import com.zero.chartview.model.FloatRange
 import com.zero.chartview.service.AnimationLineService
 
 class GraphicView constructor(
@@ -24,6 +25,9 @@ class GraphicView constructor(
     private val paint = Paint()
     private val path = Path()
 
+    private var range: FloatRange = FloatRange(0F, measuredWidth.toFloat())
+
+
     fun getMaxY() = animationLineService.maxY
 
     fun getMinY() = animationLineService.minY
@@ -31,6 +35,13 @@ class GraphicView constructor(
     fun setLines(lines: List<CurveLine>) {
         animationLineService.setLines(lines)
     }
+
+    fun setRange(range: FloatRange) {
+        this.range = range
+        invalidate()
+    }
+
+    fun getRange() = range
 
     override fun onDraw(canvas: Canvas) {
         val lines = animationLineService.lines
@@ -51,11 +62,12 @@ class GraphicView constructor(
 
     private fun transformAxis(points: List<PointF>): List<PointF> {
         val transformPoints = mutableListOf<PointF>()
+        val coefficientY = measuredHeight.toFloat() / (getMaxY() - getMinY())
+        val coefficientX = measuredWidth.toFloat() / (range.endInclusive - range.start)
         points.forEach { point ->
-            val coefficient = measuredHeight.toFloat() / (getMaxY() - getMinY())
-            val value = measuredHeight - ((point.y - getMinY()) * coefficient)
-            
-            transformPoints.add(PointF(point.x, value))
+            val x = (point.x - range.start) * coefficientX
+            val y = measuredHeight - ((point.y - getMinY()) * coefficientY)
+            transformPoints.add(PointF(x, y))
         }
         return transformPoints
     }
