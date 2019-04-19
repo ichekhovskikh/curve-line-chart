@@ -65,9 +65,11 @@ class GraphicView constructor(
         val coefficientY = measuredHeight.toFloat() / (getMaxY() - getMinY())
         val coefficientX = measuredWidth.toFloat() / (range.endInclusive - range.start)
         points.forEach { point ->
-            val x = (point.x - range.start) * coefficientX
-            val y = measuredHeight - ((point.y - getMinY()) * coefficientY)
-            transformPoints.add(PointF(x, y))
+            if(range.contains(point.x)) {
+                val x = (point.x - range.start) * coefficientX
+                val y = measuredHeight - ((point.y - getMinY()) * coefficientY)
+                transformPoints.add(PointF(x, y))
+            }
         }
         return transformPoints
     }
