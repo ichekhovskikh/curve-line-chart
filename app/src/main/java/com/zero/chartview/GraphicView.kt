@@ -8,6 +8,9 @@ import com.zero.chartview.model.AnimatingCurveLine
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.model.FloatRange
 import com.zero.chartview.service.AnimationLineService
+import com.zero.chartview.utils.findMaxXValue
+import com.zero.chartview.utils.findMinXValue
+import javax.inject.Inject
 
 class GraphicView constructor(
     context: Context,
@@ -16,16 +19,21 @@ class GraphicView constructor(
     defStyleRes: Int = 0
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
 
-    companion object {
-        private const val ANIMATION_DURATION_MS = 300L
+    private val paint: Paint
+    private val path: Path
+    private var range: FloatRange
+
+    @Inject
+    lateinit var animationLineService: AnimationLineService
+        protected set
+
+    init {
+        App.appComponent.inject(this)
+        animationLineService.onInvalidate = ::invalidate
+        range = FloatRange(0F, 0F)
+        path = Path()
+        paint = Paint()
     }
-
-    private val animationLineService: AnimationLineService = AnimationLineService(ANIMATION_DURATION_MS, ::invalidate)
-
-    private val paint = Paint()
-    private val path = Path()
-
-    private var range: FloatRange = FloatRange(0F, measuredWidth.toFloat())
 
 
     fun getMaxY() = animationLineService.maxY
@@ -44,6 +52,12 @@ class GraphicView constructor(
         animationLineService.removeLine(line)
     }
 
+    fun setRange(start: Float, endInclusive: Float) {
+        range.start = start
+        range.endInclusive = endInclusive
+        invalidate()
+    }
+
     fun setRange(range: FloatRange) {
         this.range = range
         invalidate()
@@ -52,6 +66,7 @@ class GraphicView constructor(
     fun getRange() = range
 
     override fun onDraw(canvas: Canvas) {
+        initializeRangeIfRequired()
         val lines = animationLineService.lines
         lines.forEach { line ->
             path.rewind()
@@ -65,6 +80,13 @@ class GraphicView constructor(
                 }
             }
             canvas.drawPath(path, paint)
+        }
+    }
+
+    private fun initializeRangeIfRequired() {
+        if (range.isEmpty()) {
+            val curveLines = animationLineService.lines.map { it.curveLine }
+            setRange(findMinXValue(curveLines), findMaxXValue(curveLines))
         }
     }
 

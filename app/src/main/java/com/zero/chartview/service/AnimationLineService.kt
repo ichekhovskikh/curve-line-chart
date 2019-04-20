@@ -9,13 +9,12 @@ import com.zero.chartview.utils.AnimatorAdater
 import com.zero.chartview.utils.findMaxYValue
 import com.zero.chartview.utils.findMinYValue
 
-class AnimationLineService(
-    var duration: Long = 300L,
-    private val onInvalidate: (() -> Unit)? = null
-) {
+class AnimationLineService(var duration: Long = 300L, var onInvalidate: (() -> Unit)? = null) {
 
     var maxY = 0F
+        private set
     var minY = 0F
+        private set
 
     var lines: MutableList<AnimatingCurveLine> = mutableListOf()
         private set
