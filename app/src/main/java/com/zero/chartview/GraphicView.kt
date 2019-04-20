@@ -12,7 +12,7 @@ import com.zero.chartview.utils.findMaxXValue
 import com.zero.chartview.utils.findMinXValue
 import javax.inject.Inject
 
-class GraphicView constructor(
+class GraphicView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
     defStyleAttr: Int = 0,
@@ -21,7 +21,8 @@ class GraphicView constructor(
 
     private val paint: Paint
     private val path: Path
-    private var range: FloatRange
+
+    var range: FloatRange private set
 
     @Inject
     lateinit var animationLineService: AnimationLineService
@@ -35,6 +36,7 @@ class GraphicView constructor(
         paint = Paint()
     }
 
+    fun getLines() = animationLineService.lines.map { it.curveLine }
 
     fun getMaxY() = animationLineService.maxY
 
@@ -52,18 +54,15 @@ class GraphicView constructor(
         animationLineService.removeLine(line)
     }
 
+    fun setYAxis(minY: Float, maxY: Float) {
+        animationLineService.setYAxis(minY, maxY)
+    }
+
     fun setRange(start: Float, endInclusive: Float) {
         range.start = start
         range.endInclusive = endInclusive
         invalidate()
     }
-
-    fun setRange(range: FloatRange) {
-        this.range = range
-        invalidate()
-    }
-
-    fun getRange() = range
 
     override fun onDraw(canvas: Canvas) {
         initializeRangeIfRequired()
@@ -95,7 +94,7 @@ class GraphicView constructor(
         val coefficientY = measuredHeight.toFloat() / (getMaxY() - getMinY())
         val coefficientX = measuredWidth.toFloat() / (range.endInclusive - range.start)
         points.forEach { point ->
-            if(range.contains(point.x)) {
+            if (range.contains(point.x)) {
                 val x = (point.x - range.start) * coefficientX
                 val y = measuredHeight - ((point.y - getMinY()) * coefficientY)
                 transformPoints.add(PointF(x, y))

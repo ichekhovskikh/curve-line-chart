@@ -6,8 +6,6 @@ import android.animation.ValueAnimator
 import com.zero.chartview.model.AnimatingCurveLine
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.utils.AnimatorAdater
-import com.zero.chartview.utils.findMaxYValue
-import com.zero.chartview.utils.findMinYValue
 
 class AnimationLineService(var duration: Long = 300L, var onInvalidate: (() -> Unit)? = null) {
 
@@ -38,7 +36,6 @@ class AnimationLineService(var duration: Long = 300L, var onInvalidate: (() -> U
                 .apply { lines.add(AnimatingCurveLine(line, false, 0F)) }
         }
         appearanceAnimator.start()
-        updateYAxis()
     }
 
     fun addLine(line: CurveLine) {
@@ -47,7 +44,6 @@ class AnimationLineService(var duration: Long = 300L, var onInvalidate: (() -> U
 
         lines.add(AnimatingCurveLine(line, true, 0F))
         appearanceAnimator.start()
-        updateYAxis()
     }
 
     fun removeLine(line: CurveLine) {
@@ -57,21 +53,15 @@ class AnimationLineService(var duration: Long = 300L, var onInvalidate: (() -> U
         lines.find { it.curveLine == line }
             .apply { lines.add(AnimatingCurveLine(line, false, 0F)) }
         appearanceAnimator.start()
-        updateYAxis()
     }
 
-    private fun updateYAxis() {
-        val current = lines.map { it.curveLine }
-        val newMaxY = findMaxYValue(current)
-        val newMinY = findMinYValue(current)
+    fun setYAxis(minY: Float, maxY: Float) {
+        if (this.maxY == minY && this.minY == maxY) return
 
-        if (maxY == newMaxY && minY == newMinY) return
-
-        tensionAnimator.setValues(PropertyValuesHolder.ofFloat("newMaxY", newMaxY))
-        tensionAnimator.setValues(PropertyValuesHolder.ofFloat("newMinY", newMinY))
-        tensionAnimator.setValues(PropertyValuesHolder.ofFloat("oldMaxY", maxY))
-        tensionAnimator.setValues(PropertyValuesHolder.ofFloat("oldMinY", minY))
-
+        tensionAnimator.setValues(PropertyValuesHolder.ofFloat("newMaxY", maxY))
+        tensionAnimator.setValues(PropertyValuesHolder.ofFloat("newMinY", minY))
+        tensionAnimator.setValues(PropertyValuesHolder.ofFloat("oldMaxY", this.maxY))
+        tensionAnimator.setValues(PropertyValuesHolder.ofFloat("oldMinY", this.minY))
         tensionAnimator.start()
     }
 
@@ -132,5 +122,4 @@ class AnimationLineService(var duration: Long = 300L, var onInvalidate: (() -> U
                 }
             }
         }
-
 }
