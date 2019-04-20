@@ -2,12 +2,15 @@ package com.zero.chartview
 
 import android.content.Context
 import android.graphics.*
+import android.support.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.View
+import com.zero.chartview.BuildConfig.DEFAULT_LINE_WIDTH_DP
 import com.zero.chartview.model.AnimatingCurveLine
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.model.FloatRange
 import com.zero.chartview.service.AnimationLineService
+import com.zero.chartview.utils.dpToPx
 import com.zero.chartview.utils.findMaxXValue
 import com.zero.chartview.utils.findMinXValue
 import javax.inject.Inject
@@ -34,6 +37,21 @@ class GraphicView @JvmOverloads constructor(
         range = FloatRange(0F, 0F)
         path = Path()
         paint = Paint()
+
+        var lineWidth = dpToPx(DEFAULT_LINE_WIDTH_DP)
+        context.theme.obtainStyledAttributes(attrs, R.styleable.GraphicView, defStyleAttr, defStyleRes).apply {
+            lineWidth = getDimensionPixelSize(R.styleable.GraphicView_lineWidth, lineWidth)
+            recycle()
+        }
+        initializePaint(lineWidth)
+    }
+
+    private fun initializePaint(lineWidth: Int) {
+        paint.apply {
+            style = Paint.Style.STROKE
+            strokeWidth = lineWidth.toFloat()
+            isAntiAlias = true
+        }
     }
 
     fun getLines() = animationLineService.lines.map { it.curveLine }
@@ -64,12 +82,17 @@ class GraphicView @JvmOverloads constructor(
         invalidate()
     }
 
+    fun onThemeChanged(@ColorInt backgroundColor: Int) {
+        setBackgroundColor(backgroundColor)
+        invalidate()
+    }
+
     override fun onDraw(canvas: Canvas) {
         initializeRangeIfRequired()
         val lines = animationLineService.lines
         lines.forEach { line ->
             path.rewind()
-            paint.color = lineTransparencyColor(line)
+            paint.color = getTransparencyColor(line)
             val transformPoints = transformAxis(line.curveLine.points)
             transformPoints.forEachIndexed { index, point ->
                 if (index == 0) {
@@ -103,7 +126,7 @@ class GraphicView @JvmOverloads constructor(
         return transformPoints
     }
 
-    private fun lineTransparencyColor(line: AnimatingCurveLine): Int {
+    private fun getTransparencyColor(line: AnimatingCurveLine): Int {
         val color = line.curveLine.color
         return Color.argb(lineTransparency(line), Color.red(color), Color.green(color), Color.blue(color))
     }

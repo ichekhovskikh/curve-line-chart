@@ -3,9 +3,10 @@ package com.zero.chartview.service
 import android.animation.Animator
 import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
+import android.view.animation.DecelerateInterpolator
 import com.zero.chartview.model.AnimatingCurveLine
 import com.zero.chartview.model.CurveLine
-import com.zero.chartview.utils.AnimatorAdater
+import com.zero.chartview.utils.AnimatorListenerAdapter
 
 class AnimationLineService(var duration: Long = 300L, var onInvalidate: (() -> Unit)? = null) {
 
@@ -14,7 +15,7 @@ class AnimationLineService(var duration: Long = 300L, var onInvalidate: (() -> U
     var minY = 0F
         private set
 
-    var lines: MutableList<AnimatingCurveLine> = mutableListOf()
+    internal var lines: MutableList<AnimatingCurveLine> = mutableListOf()
         private set
 
     private val appearanceAnimator = createAppearanceAnimator(onEnd = ::onAnimationEnd)
@@ -51,17 +52,19 @@ class AnimationLineService(var duration: Long = 300L, var onInvalidate: (() -> U
         if (!current.contains(line)) return
 
         lines.find { it.curveLine == line }
-            .apply { lines.add(AnimatingCurveLine(line, false, 0F)) }
+            ?.apply {
+                isAppearing = false
+                animationValue = 0f
+            }
         appearanceAnimator.start()
     }
 
     fun setYAxis(minY: Float, maxY: Float) {
-        if (this.maxY == minY && this.minY == maxY) return
+        if (this.maxY == maxY && this.minY == minY) return
 
-        tensionAnimator.setValues(PropertyValuesHolder.ofFloat("newMaxY", maxY))
-        tensionAnimator.setValues(PropertyValuesHolder.ofFloat("newMinY", minY))
-        tensionAnimator.setValues(PropertyValuesHolder.ofFloat("oldMaxY", this.maxY))
-        tensionAnimator.setValues(PropertyValuesHolder.ofFloat("oldMinY", this.minY))
+        val minProperty = PropertyValuesHolder.ofFloat(MIN_Y, this.minY, minY)
+        val maxProperty = PropertyValuesHolder.ofFloat(MAX_Y, this.maxY, maxY)
+        tensionAnimator.setValues(maxProperty, minProperty)
         tensionAnimator.start()
     }
 
@@ -74,7 +77,7 @@ class AnimationLineService(var duration: Long = 300L, var onInvalidate: (() -> U
 
             duration = this@AnimationLineService.duration
 
-            addListener(object : AnimatorAdater() {
+            addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator?) {
                     onEnd?.invoke()
                 }
@@ -92,34 +95,19 @@ class AnimationLineService(var duration: Long = 300L, var onInvalidate: (() -> U
         }
 
     private fun createTensionAnimator() =
-        ValueAnimator.ofFloat(0F, 1F).apply {
-
+        ValueAnimator().apply {
+            interpolator = DecelerateInterpolator()
             duration = this@AnimationLineService.duration
 
             addUpdateListener { animator ->
-                val newMaxY = getAnimatedValue("newMaxY") as Float
-                val oldMaxY = getAnimatedValue("oldMaxY") as Float
-                val value = animator.animatedValue as Float
-
-                val distance = newMaxY - maxY
-                val animatedMaxY = oldMaxY + distance * value
-                if (animatedMaxY != maxY) {
-                    maxY = animatedMaxY
-                    onInvalidate?.invoke()
-                }
-            }
-
-            addUpdateListener { animator ->
-                val newMinY = getAnimatedValue("newMinY") as Float
-                val oldMinY = getAnimatedValue("oldMinY") as Float
-                val value = animator.animatedValue as Float
-
-                val distance = minY - newMinY
-                val animatedMinY = oldMinY - distance * value
-                if (animatedMinY != minY) {
-                    minY = animatedMinY
-                    onInvalidate?.invoke()
-                }
+                minY = animator.getAnimatedValue(MIN_Y) as Float
+                maxY = animator.getAnimatedValue(MAX_Y) as Float
+                onInvalidate?.invoke()
             }
         }
+
+    companion object {
+        private const val MIN_Y = "MIN_Y"
+        private const val MAX_Y = "MAX_Y"
+    }
 }

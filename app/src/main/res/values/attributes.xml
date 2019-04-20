@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ChartView">
+        <attr name="darkTheme" format="boolean" />
+
+        <attr name="lightColorBackground" format="color" />
+        <attr name="lightColorLegend" format="color" />
+        <attr name="lightColorTitle" format="color" />
+        <attr name="lightColorLabel" format="color" />
+        <attr name="lightColorGrid" format="color" />
+
+        <attr name="darkColorBackground" format="color" />
+        <attr name="darkColorLegend" format="color" />
+        <attr name="darkColorTitle" format="color" />
+        <attr name="darkColorLabel" format="color" />
+        <attr name="darkColorGrid" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="GraphicView">
+        <attr name="lineWidth" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="ChartControlView">
+        <attr name="lightColorInactiveControl" format="color" />
+        <attr name="lightColorActiveControl" format="color" />
+
+        <attr name="darkColorInactiveControl" format="color" />
+        <attr name="darkColorActiveControl" format="color" />
+    </declare-styleable>
+</resources>

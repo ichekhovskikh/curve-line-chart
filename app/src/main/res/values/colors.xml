@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorPrimary">#517DA1</color>
+    <color name="colorPrimaryDark">#426381</color>
     <color name="colorAccent">#D81B60</color>
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorLegend">#D3DBE7</color>
+    <color name="colorTitle">#218acf</color>
+    <color name="colorLabel">#FFFFFF</color>
+    <color name="colorGrid">#D3DBE7</color>
+    <color name="colorInactiveControl">#B3F5F5F5</color>
+    <color name="colorActiveControl">#80C8D8E4</color>
+
+    <color name="darkColorPrimary">#212D3B</color>
+    <color name="darkColorPrimaryDark">#1A242E</color>
+    <color name="darkColorAccent">#D81B60</color>
+    <color name="darkColorBackground">#1D2733</color>
+    <color name="darkColorLegend">#131c26</color>
+    <color name="darkColorTitle">#85d5ff</color>
+    <color name="darkColorLabel">#000000</color>
+    <color name="darkColorGrid">#D3DBE7</color>
+    <color name="darkColorInactiveControl">#B3141C32</color>
+    <color name="darkColorActiveControl">#803E5D79</color>
 </resources>
