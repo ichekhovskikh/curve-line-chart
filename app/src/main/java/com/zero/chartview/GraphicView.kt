@@ -10,6 +10,8 @@ import com.zero.chartview.model.FloatRange
 import com.zero.chartview.service.AnimationLineService
 import com.zero.chartview.utils.findMaxXValue
 import com.zero.chartview.utils.findMinXValue
+import com.zero.chartview.utils.xValueToPixel
+import com.zero.chartview.utils.yValueToPixel
 import javax.inject.Inject
 
 class GraphicView @JvmOverloads constructor(
@@ -106,12 +108,10 @@ class GraphicView @JvmOverloads constructor(
 
     private fun transformAxis(points: List<PointF>): List<PointF> {
         val transformPoints = mutableListOf<PointF>()
-        val coefficientY = measuredHeight.toFloat() / (getMaxY() - getMinY())
-        val coefficientX = measuredWidth.toFloat() / (range.endInclusive - range.start)
         points.forEach { point ->
             if (range.contains(point.x)) {
-                val x = (point.x - range.start) * coefficientX
-                val y = measuredHeight - ((point.y - getMinY()) * coefficientY)
+                val x = xValueToPixel(point.x, measuredWidth, range.start, range.endInclusive)
+                val y = yValueToPixel(point.y, measuredHeight, getMinY(), getMaxY())
                 transformPoints.add(PointF(x, y))
             }
         }

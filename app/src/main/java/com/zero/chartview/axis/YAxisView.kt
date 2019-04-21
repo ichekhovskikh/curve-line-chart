@@ -12,6 +12,8 @@ import com.zero.chartview.R
 import com.zero.chartview.model.AnimatingLegendSeries
 import com.zero.chartview.service.AnimationLegendService
 import com.zero.chartview.utils.textHeight
+import com.zero.chartview.utils.yPixelToValue
+import com.zero.chartview.utils.yValueToPixel
 import javax.inject.Inject
 
 class YAxisView @JvmOverloads constructor(
@@ -66,7 +68,7 @@ class YAxisView @JvmOverloads constructor(
     }
 
     private fun createLegendSeries(minY: Float, maxY: Float, labelPositions: List<Float>): AnimatingLegendSeries {
-        val legends = labelPositions.map { pixelToValue(it, minY, maxY) }
+        val legends = labelPositions.map { yPixelToValue(it, measuredHeight, minY, maxY) }
         return AnimatingLegendSeries(legends, minY, maxY, true, 0f)
     }
 
@@ -78,7 +80,7 @@ class YAxisView @JvmOverloads constructor(
     }
 
     private fun updateLegendSeries(legendSeries: AnimatingLegendSeries, legendPositions: List<Float>) {
-        legendSeries.legends = legendPositions.map { pixelToValue(it, legendSeries.minY, legendSeries.maxY) }
+        legendSeries.legends = legendPositions.map { yPixelToValue(it, measuredHeight, legendSeries.minY, legendSeries.maxY) }
     }
 
     private fun getLegendPositions(availableHeight: Int, legendHeight: Float): List<Float> {
@@ -91,7 +93,7 @@ class YAxisView @JvmOverloads constructor(
             gridPaint.color = getTransparencyColor(gridPaint.color, series)
             legendPaint.color = getTransparencyColor(legendPaint.color, series)
             series.legends.forEach { legend ->
-                val yPixel = valueToPixel(legend, animationLegendService.minY, animationLegendService.maxY)
+                val yPixel = yValueToPixel(legend, measuredHeight, animationLegendService.minY, animationLegendService.maxY)
                 canvas.drawLine(0f, yPixel, width.toFloat(), yPixel, gridPaint)
                 canvas.drawText(legend.toString(), 0f, yPixel - legendMargin, legendPaint)
             }
@@ -101,16 +103,6 @@ class YAxisView @JvmOverloads constructor(
     fun onThemeChanged(@ColorInt colorLegend: Int, @ColorInt colorGrid: Int) {
         legendPaint.color = colorLegend
         gridPaint.color = colorGrid
-    }
-
-    private fun pixelToValue(yPixel: Float, minY: Float, maxY: Float): Float {
-        val coefficient = measuredHeight.toFloat() / (maxY - minY)
-        return (measuredHeight - yPixel) / coefficient + minY
-    }
-
-    private fun valueToPixel(yValue: Float, minY: Float, maxY: Float): Float {
-        val coefficient = measuredHeight.toFloat() / (maxY - minY)
-        return measuredHeight - ((yValue - minY) * coefficient)
     }
 
     private fun getTransparencyColor(color: Int, labels: AnimatingLegendSeries): Int {
