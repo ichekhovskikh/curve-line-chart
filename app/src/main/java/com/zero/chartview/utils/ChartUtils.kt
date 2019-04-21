@@ -34,3 +34,13 @@ fun xValueToPixel(xValue: Float, windowWidth: Int, minX: Float, maxX: Float): Fl
     val coefficient = windowWidth.toFloat() / (maxX - minX)
     return (xValue - minX) * coefficient
 }
+
+fun createCorrespondingLegends(coordinates: List<Float>): Map<Float, String> {
+    val correspondingLegends = hashMapOf<Float, String>()
+    coordinates.forEach { coordinate ->
+        if (!correspondingLegends.containsKey(coordinate)) {
+            correspondingLegends[coordinate] = coordinate.toString()
+        }
+    }
+    return correspondingLegends
+}

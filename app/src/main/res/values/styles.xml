@@ -10,7 +10,13 @@
 
     <dimen name="line_width_default">2dp</dimen>
     <integer name="legend_line_count_default">6</integer>
-    <dimen name="legend_label_margin_default">6dp</dimen>
+    <dimen name="ordinate_legend_label_margin_default">6dp</dimen>
     <dimen name="legend_text_size_default">13sp</dimen>
     <dimen name="grid_line_width_default">1dp</dimen>
+
+    <dimen name="abscissa_legend_label_width_default">30dp</dimen>
+    <dimen name="abscissa_legend_label_margin_default">4dp</dimen>
+    <dimen name="abscissa_legend_margin_top_default">4dp</dimen>
+    <dimen name="abscissa_legend_padding_right_default">16dp</dimen>
+    <dimen name="abscissa_legend_padding_left_default">16dp</dimen>
 </resources>

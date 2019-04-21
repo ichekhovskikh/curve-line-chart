@@ -5,6 +5,7 @@ import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
+import com.zero.chartview.axis.XAxisView
 import com.zero.chartview.axis.YAxisView
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.service.AnimationThemeService
@@ -21,12 +22,14 @@ class ChartView @JvmOverloads constructor(
 
     private val graph: GraphicView = GraphicView(context, attrs, defStyleAttr, defStyleRes)
     private val yAxis: YAxisView = YAxisView(context, attrs, defStyleAttr, defStyleRes)
+    private val xAxis: XAxisView = XAxisView(context, attrs, defStyleAttr, defStyleRes)
 
     @Inject
     lateinit var animationThemeService: AnimationThemeService
         protected set
 
     init {
+        addView(xAxis)
         addView(yAxis)
         addView(graph)
 
@@ -65,6 +68,7 @@ class ChartView @JvmOverloads constructor(
 
     fun setRange(start: Float, endInclusive: Float) {
         graph.setRange(start, endInclusive)
+        xAxis.setRange(start, endInclusive)
     }
 
     fun setLines(lines: List<CurveLine>) {
@@ -96,6 +100,7 @@ class ChartView @JvmOverloads constructor(
         else Themeable.ThemeStyle.LIGHT
 
     private fun onThemeChanged(colors: Themeable.ThemeColor) {
+        xAxis.onThemeChanged(colors.colorLegend)
         yAxis.onThemeChanged(colors.colorLegend, colors.colorGrid)
         setBackgroundColor(colors.colorBackground)
         invalidate()

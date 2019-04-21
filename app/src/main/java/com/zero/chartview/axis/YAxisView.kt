@@ -24,7 +24,7 @@ class YAxisView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
 
     private var legendCount = resources.getInteger(R.integer.legend_line_count_default)
-    private var legendMargin = resources.getDimension(R.dimen.legend_label_margin_default)
+    private var legendMargin = resources.getDimension(R.dimen.ordinate_legend_label_margin_default)
 
     private val legendPaint = Paint()
     private val gridPaint = Paint()
@@ -42,7 +42,7 @@ class YAxisView @JvmOverloads constructor(
         var textSize = resources.getDimension(R.dimen.legend_text_size_default)
         context.theme.obtainStyledAttributes(attrs, R.styleable.YAxisView, defStyleAttr, defStyleRes).apply {
             legendCount = getInteger(R.styleable.YAxisView_legendLineCount, legendCount)
-            legendMargin = getDimension(R.styleable.YAxisView_legendLabelMargin, legendMargin)
+            legendMargin = getDimension(R.styleable.YAxisView_ordinateLegendLabelMargin, legendMargin)
             textSize = getDimension(R.styleable.YAxisView_legendTextSize, textSize)
             gridLineWidth = getDimension(R.styleable.YAxisView_gridLineWidth, gridLineWidth)
             recycle()

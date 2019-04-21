@@ -8,7 +8,12 @@
         <attr name="gridLineWidth" format="dimension" />
         <attr name="legendLineCount" format="integer" />
         <attr name="legendTextSize" format="dimension" />
-        <attr name="legendLabelMargin" format="dimension" />
+        <attr name="ordinateLegendLabelMargin" format="dimension" />
+
+        <attr name="abscissaLegendPaddingLeft"  format="dimension" />
+        <attr name="abscissaLegendPaddingRight"  format="dimension" />
+        <attr name="abscissaLegendLabelMargin"  format="dimension" />
+        <attr name="abscissaLegendMarginTop"  format="dimension" />
 
         <attr name="lightColorBackground" format="color" />
         <attr name="lightColorLegend" format="color" />
@@ -27,11 +32,19 @@
         <attr name="lineWidth" />
     </declare-styleable>
 
+    <declare-styleable name="XAxisView" parent="ChartView">
+        <attr name="legendTextSize" />
+        <attr name="abscissaLegendPaddingLeft" />
+        <attr name="abscissaLegendPaddingRight" />
+        <attr name="abscissaLegendLabelMargin" />
+        <attr name="abscissaLegendMarginTop" />
+    </declare-styleable>
+
     <declare-styleable name="YAxisView" parent="ChartView">
+        <attr name="legendTextSize" />
         <attr name="gridLineWidth" />
         <attr name="legendLineCount" />
-        <attr name="legendTextSize" />
-        <attr name="legendLabelMargin" />
+        <attr name="ordinateLegendLabelMargin" />
     </declare-styleable>
 
     <declare-styleable name="ChartControlView">
