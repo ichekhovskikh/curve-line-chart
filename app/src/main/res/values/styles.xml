@@ -8,4 +8,9 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <dimen name="line_width_default">2dp</dimen>
+    <integer name="legend_line_count_default">6</integer>
+    <dimen name="legend_label_margin_default">6dp</dimen>
+    <dimen name="legend_text_size_default">13sp</dimen>
+    <dimen name="grid_line_width_default">1dp</dimen>
 </resources>

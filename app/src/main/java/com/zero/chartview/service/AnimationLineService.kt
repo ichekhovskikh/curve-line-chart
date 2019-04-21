@@ -15,43 +15,45 @@ class AnimationLineService(var duration: Long = 300L, var onInvalidate: (() -> U
     var minY = 0F
         private set
 
-    internal var lines: MutableList<AnimatingCurveLine> = mutableListOf()
+    internal var animationLines: MutableList<AnimatingCurveLine> = mutableListOf()
         private set
 
     private val appearanceAnimator = createAppearanceAnimator(onEnd = ::onAnimationEnd)
     private val tensionAnimator = createTensionAnimator()
 
+    fun getLines() = animationLines.map { it.curveLine }
+
     fun setLines(newLines: List<CurveLine>) {
-        val current = lines.map { it.curveLine }
+        val current = animationLines.map { it.curveLine }
 
         if (newLines == current) return
 
         val appearing = newLines.minus(current)
         appearing.forEach { line ->
-            lines.add(AnimatingCurveLine(line, true, 0F))
+            animationLines.add(AnimatingCurveLine(line, true, 0F))
         }
 
         val disappearing = current.minus(newLines)
         disappearing.forEach { line ->
-            lines.find { it.curveLine == line }
-                .apply { lines.add(AnimatingCurveLine(line, false, 0F)) }
+            animationLines.find { it.curveLine == line }
+                .apply { animationLines.add(AnimatingCurveLine(line, false, 0F)) }
         }
         appearanceAnimator.start()
     }
 
     fun addLine(line: CurveLine) {
-        val current = lines.map { it.curveLine }
+        val current = animationLines.map { it.curveLine }
         if (current.contains(line)) return
 
-        lines.add(AnimatingCurveLine(line, true, 0F))
+        animationLines.add(AnimatingCurveLine(line, true, 0F))
         appearanceAnimator.start()
     }
 
     fun removeLine(line: CurveLine) {
-        val current = lines.map { it.curveLine }
+        val current = animationLines.map { it.curveLine }
         if (!current.contains(line)) return
 
-        lines.find { it.curveLine == line }
+        animationLines.find { it.curveLine == line }
             ?.apply {
                 isAppearing = false
                 animationValue = 0f
@@ -69,7 +71,7 @@ class AnimationLineService(var duration: Long = 300L, var onInvalidate: (() -> U
     }
 
     private fun onAnimationEnd() {
-        lines.removeAll { !it.isAppearing }
+        animationLines.removeAll { !it.isAppearing }
     }
 
     private fun createAppearanceAnimator(onEnd: (() -> Unit)? = null) =
@@ -85,7 +87,7 @@ class AnimationLineService(var duration: Long = 300L, var onInvalidate: (() -> U
 
             addUpdateListener { animator ->
                 val animatorValue = animator.animatedValue as Float
-                lines.forEach { line ->
+                animationLines.forEach { line ->
                     if (line.animationValue <= animatorValue) {
                         line.animationValue = animatorValue
                         onInvalidate?.invoke()

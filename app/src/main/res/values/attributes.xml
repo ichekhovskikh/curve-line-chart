@@ -3,6 +3,13 @@
     <declare-styleable name="ChartView">
         <attr name="darkTheme" format="boolean" />
 
+        <attr name="lineWidth" format="dimension" />
+
+        <attr name="gridLineWidth" format="dimension" />
+        <attr name="legendLineCount" format="integer" />
+        <attr name="legendTextSize" format="dimension" />
+        <attr name="legendLabelMargin" format="dimension" />
+
         <attr name="lightColorBackground" format="color" />
         <attr name="lightColorLegend" format="color" />
         <attr name="lightColorTitle" format="color" />
@@ -16,8 +23,15 @@
         <attr name="darkColorGrid" format="color" />
     </declare-styleable>
 
-    <declare-styleable name="GraphicView">
-        <attr name="lineWidth" format="dimension" />
+    <declare-styleable name="GraphicView" parent="ChartView">
+        <attr name="lineWidth" />
+    </declare-styleable>
+
+    <declare-styleable name="YAxisView" parent="ChartView">
+        <attr name="gridLineWidth" />
+        <attr name="legendLineCount" />
+        <attr name="legendTextSize" />
+        <attr name="legendLabelMargin" />
     </declare-styleable>
 
     <declare-styleable name="ChartControlView">

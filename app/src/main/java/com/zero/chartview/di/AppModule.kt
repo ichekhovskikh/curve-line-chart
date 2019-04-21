@@ -1,6 +1,7 @@
 package com.zero.chartview.di
 
 import com.zero.chartview.BuildConfig
+import com.zero.chartview.service.AnimationLegendService
 import com.zero.chartview.service.AnimationLineService
 import com.zero.chartview.service.AnimationThemeService
 import dagger.Module
@@ -17,4 +18,8 @@ class AppModule {
     @Provides
     @Singleton
     fun provideAnimationThemeService(): AnimationThemeService = AnimationThemeService(BuildConfig.ANIMATION_DURATION_MS)
+
+    @Provides
+    @Singleton
+    fun provideAnimationLegendService(): AnimationLegendService = AnimationLegendService(BuildConfig.ANIMATION_DURATION_MS)
 }

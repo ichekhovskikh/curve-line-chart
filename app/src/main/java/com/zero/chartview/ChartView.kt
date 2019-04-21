@@ -5,6 +5,7 @@ import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
+import com.zero.chartview.axis.YAxisView
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.service.AnimationThemeService
 import com.zero.chartview.utils.findMaxYValue
@@ -19,12 +20,14 @@ class ChartView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes), Themeable {
 
     private val graph: GraphicView = GraphicView(context, attrs, defStyleAttr, defStyleRes)
+    private val yAxis: YAxisView = YAxisView(context, attrs, defStyleAttr, defStyleRes)
 
     @Inject
     lateinit var animationThemeService: AnimationThemeService
         protected set
 
     init {
+        addView(yAxis)
         addView(graph)
 
         App.appComponent.inject(this)
@@ -85,6 +88,7 @@ class ChartView @JvmOverloads constructor(
         val maxY = findMaxYValue(lines)
         val minY = findMinYValue(lines)
         graph.setYAxis(minY, maxY)
+        yAxis.setYAxis(minY, maxY)
     }
 
     private fun getThemeStyleDefault(typedArray: TypedArray) =
@@ -92,7 +96,7 @@ class ChartView @JvmOverloads constructor(
         else Themeable.ThemeStyle.LIGHT
 
     private fun onThemeChanged(colors: Themeable.ThemeColor) {
-        graph.onThemeChanged(colors.colorBackground)
+        yAxis.onThemeChanged(colors.colorLegend, colors.colorGrid)
         setBackgroundColor(colors.colorBackground)
         invalidate()
     }

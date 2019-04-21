@@ -2,15 +2,12 @@ package com.zero.chartview
 
 import android.content.Context
 import android.graphics.*
-import android.support.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.View
-import com.zero.chartview.BuildConfig.DEFAULT_LINE_WIDTH_DP
 import com.zero.chartview.model.AnimatingCurveLine
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.model.FloatRange
 import com.zero.chartview.service.AnimationLineService
-import com.zero.chartview.utils.dpToPx
 import com.zero.chartview.utils.findMaxXValue
 import com.zero.chartview.utils.findMinXValue
 import javax.inject.Inject
@@ -25,7 +22,7 @@ class GraphicView @JvmOverloads constructor(
     private val paint: Paint
     private val path: Path
 
-    var range: FloatRange private set
+    private var range: FloatRange
 
     @Inject
     lateinit var animationLineService: AnimationLineService
@@ -38,7 +35,7 @@ class GraphicView @JvmOverloads constructor(
         path = Path()
         paint = Paint()
 
-        var lineWidth = dpToPx(DEFAULT_LINE_WIDTH_DP)
+        var lineWidth = resources.getDimensionPixelSize(R.dimen.line_width_default)
         context.theme.obtainStyledAttributes(attrs, R.styleable.GraphicView, defStyleAttr, defStyleRes).apply {
             lineWidth = getDimensionPixelSize(R.styleable.GraphicView_lineWidth, lineWidth)
             recycle()
@@ -54,11 +51,7 @@ class GraphicView @JvmOverloads constructor(
         }
     }
 
-    fun getLines() = animationLineService.lines.map { it.curveLine }
-
-    fun getMaxY() = animationLineService.maxY
-
-    fun getMinY() = animationLineService.minY
+    fun getLines() = animationLineService.getLines()
 
     fun setLines(lines: List<CurveLine>) {
         animationLineService.setLines(lines)
@@ -82,14 +75,9 @@ class GraphicView @JvmOverloads constructor(
         invalidate()
     }
 
-    fun onThemeChanged(@ColorInt backgroundColor: Int) {
-        setBackgroundColor(backgroundColor)
-        invalidate()
-    }
-
     override fun onDraw(canvas: Canvas) {
         initializeRangeIfRequired()
-        val lines = animationLineService.lines
+        val lines = animationLineService.animationLines
         lines.forEach { line ->
             path.rewind()
             paint.color = getTransparencyColor(line)
@@ -105,9 +93,13 @@ class GraphicView @JvmOverloads constructor(
         }
     }
 
+    private fun getMaxY() = animationLineService.maxY
+
+    private fun getMinY() = animationLineService.minY
+
     private fun initializeRangeIfRequired() {
         if (range.isEmpty()) {
-            val curveLines = animationLineService.lines.map { it.curveLine }
+            val curveLines = animationLineService.getLines()
             setRange(findMinXValue(curveLines), findMaxXValue(curveLines))
         }
     }
