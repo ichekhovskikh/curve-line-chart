@@ -8,6 +8,7 @@ import android.view.View
 import com.zero.chartview.R
 import com.zero.chartview.model.FloatRange
 
+@Suppress("IMPLICIT_CAST_TO_ANY")
 class XAxisView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
@@ -41,7 +42,7 @@ class XAxisView @JvmOverloads constructor(
     }
 
     fun setCoordinates(coordinates: List<Float>) {
-        this.coordinates = coordinates
+        this.coordinates = coordinates.sorted()
     }
 
     fun setCorrespondingLegends(correspondingLegends: Map<Float, String>) {
@@ -53,6 +54,27 @@ class XAxisView @JvmOverloads constructor(
         range.endInclusive = endInclusive
         invalidate()
     }
+
+    private fun calculateLegends(range: FloatRange): List<String> {
+        val legends = mutableListOf<String>()
+        var start = range.start
+        var end = textWidth + 2 * labelMargin
+        val rangeCoordinates = mutableListOf<Float>()
+        coordinates.forEach {  coordinate ->
+            if (coordinate >= start && coordinate < end) {
+                rangeCoordinates.add(coordinate)
+            } else if (coordinate > end) {
+                start = end
+                end += textWidth + 2 * labelMargin
+                val averageCoordinate = getAverageCoordinate(rangeCoordinates)
+                legends.add(correspondingLegends[averageCoordinate] ?: "")
+                rangeCoordinates.clear()
+            }
+        }
+        return legends
+    }
+
+    private fun getAverageCoordinate(list: List<Float>) = if (list.isEmpty()) "" else list[list.size / 2]
 
     fun onThemeChanged(@ColorInt colorLegend: Int) {
         legendPaint.color = colorLegend
