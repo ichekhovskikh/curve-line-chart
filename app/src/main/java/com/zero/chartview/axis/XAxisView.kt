@@ -60,21 +60,28 @@ class XAxisView @JvmOverloads constructor(
         var start = range.start
         var end = textWidth + 2 * labelMargin
         val rangeCoordinates = mutableListOf<Float>()
-        coordinates.forEach {  coordinate ->
-            if (coordinate >= start && coordinate < end) {
+        var index = 0
+        while (index < coordinates.size && coordinates[index] <= range.endInclusive) {
+            val coordinate = coordinates[index]
+            if (coordinate in start..end) {
                 rangeCoordinates.add(coordinate)
             } else if (coordinate > end) {
                 start = end
                 end += textWidth + 2 * labelMargin
-                val averageCoordinate = getAverageCoordinate(rangeCoordinates)
-                legends.add(correspondingLegends[averageCoordinate] ?: "")
+                legends.add(getAverageLegend(rangeCoordinates))
                 rangeCoordinates.clear()
+                index--
             }
+            index++
         }
+        legends.add(getAverageLegend(rangeCoordinates))
         return legends
     }
 
-    private fun getAverageCoordinate(list: List<Float>) = if (list.isEmpty()) "" else list[list.size / 2]
+    private fun getAverageLegend(list: List<Float>): String {
+        val averageCoordinate = if (list.isEmpty()) "" else list[list.size / 2]
+        return correspondingLegends[averageCoordinate] ?: ""
+    }
 
     fun onThemeChanged(@ColorInt colorLegend: Int) {
         legendPaint.color = colorLegend
