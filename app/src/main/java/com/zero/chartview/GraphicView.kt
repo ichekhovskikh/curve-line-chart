@@ -102,7 +102,8 @@ class GraphicView @JvmOverloads constructor(
     private fun initializeRangeIfRequired() {
         if (range.isEmpty()) {
             val curveLines = animationLineService.getLines()
-            setRange(findMinXValue(curveLines), findMaxXValue(curveLines))
+            range.start = findMinXValue(curveLines)
+            range.endInclusive = findMaxXValue(curveLines)
         }
     }
 

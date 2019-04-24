@@ -9,8 +9,10 @@ import com.zero.chartview.axis.XAxisView
 import com.zero.chartview.axis.YAxisView
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.service.AnimationThemeService
+import com.zero.chartview.utils.createCorrespondingLegends
 import com.zero.chartview.utils.findMaxYValue
 import com.zero.chartview.utils.findMinYValue
+import com.zero.chartview.utils.getAbscissas
 import javax.inject.Inject
 
 class ChartView @JvmOverloads constructor(
@@ -71,28 +73,53 @@ class ChartView @JvmOverloads constructor(
         xAxis.setRange(start, endInclusive)
     }
 
-    fun setLines(lines: List<CurveLine>) {
+    fun setLines(lines: List<CurveLine>, correspondingLegends: Map<Float, String> = emptyMap()) {
         graph.setLines(lines)
-        updateYAxis(lines)
+        updateAxis(lines, correspondingLegends)
     }
 
-    fun addLine(line: CurveLine) {
+    fun addLine(line: CurveLine, correspondingLegends: Map<Float, String> = emptyMap()) {
         val lines = graph.getLines()
         graph.addLine(line)
-        updateYAxis(lines + line)
+        updateAxis(lines + line, correspondingLegends)
     }
 
-    fun removeLine(line: CurveLine) {
+    fun removeLine(line: CurveLine, correspondingLegends: Map<Float, String> = emptyMap()) {
         val lines = graph.getLines()
         graph.removeLine(line)
-        updateYAxis(lines - line)
+        updateAxis(lines - line, correspondingLegends)
     }
 
-    private fun updateYAxis(lines: List<CurveLine>) {
+    private fun updateAxis(lines: List<CurveLine>, correspondingLegends: Map<Float, String>) {
         val maxY = findMaxYValue(lines)
         val minY = findMinYValue(lines)
         graph.setYAxis(minY, maxY)
         yAxis.setYAxis(minY, maxY)
+        val abscissas = getAbscissas(lines)
+        xAxis.setCoordinates(abscissas)
+        if (correspondingLegends.isEmpty()) {
+            xAxis.setCorrespondingLegends(createCorrespondingLegends(abscissas))
+        } else {
+            xAxis.setCorrespondingLegends(correspondingLegends)
+        }
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        measureChildWithMargins(
+            graph,
+            widthMeasureSpec,
+            0,
+            heightMeasureSpec,
+            xAxis.getLegendWidth()
+        )
+        measureChildWithMargins(
+            yAxis,
+            widthMeasureSpec,
+            0,
+            heightMeasureSpec,
+            xAxis.getLegendWidth()
+        )
     }
 
     private fun getThemeStyleDefault(typedArray: TypedArray) =

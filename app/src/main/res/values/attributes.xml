@@ -10,10 +10,8 @@
         <attr name="legendTextSize" format="dimension" />
         <attr name="ordinateLegendLabelMargin" format="dimension" />
 
-        <attr name="abscissaLegendPaddingLeft"  format="dimension" />
-        <attr name="abscissaLegendPaddingRight"  format="dimension" />
-        <attr name="abscissaLegendLabelMargin"  format="dimension" />
         <attr name="abscissaLegendMarginTop"  format="dimension" />
+        <attr name="abscissaLegendCount"  format="integer" />
 
         <attr name="lightColorBackground" format="color" />
         <attr name="lightColorLegend" format="color" />
@@ -34,10 +32,8 @@
 
     <declare-styleable name="XAxisView" parent="ChartView">
         <attr name="legendTextSize" />
-        <attr name="abscissaLegendPaddingLeft" />
-        <attr name="abscissaLegendPaddingRight" />
-        <attr name="abscissaLegendLabelMargin" />
         <attr name="abscissaLegendMarginTop" />
+        <attr name="abscissaLegendCount" />
     </declare-styleable>
 
     <declare-styleable name="YAxisView" parent="ChartView">

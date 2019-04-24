@@ -11,6 +11,7 @@ import com.zero.chartview.App
 import com.zero.chartview.R
 import com.zero.chartview.model.AnimatingLegendSeries
 import com.zero.chartview.service.AnimationLegendService
+import com.zero.chartview.utils.formatLegend
 import com.zero.chartview.utils.textHeight
 import com.zero.chartview.utils.yPixelToValue
 import com.zero.chartview.utils.yValueToPixel
@@ -95,7 +96,7 @@ class YAxisView @JvmOverloads constructor(
             series.legends.forEach { legend ->
                 val yPixel = yValueToPixel(legend, measuredHeight, animationLegendService.minY, animationLegendService.maxY)
                 canvas.drawLine(0f, yPixel, width.toFloat(), yPixel, gridPaint)
-                canvas.drawText(legend.toString(), 0f, yPixel - legendMargin, legendPaint)
+                canvas.drawText(formatLegend(legend), 0f, yPixel - legendMargin, legendPaint)
             }
         }
     }
