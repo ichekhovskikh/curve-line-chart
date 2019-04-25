@@ -2,18 +2,16 @@ package com.zero.chartview
 
 import android.content.Context
 import android.content.res.TypedArray
+import android.support.annotation.ColorInt
 import android.util.AttributeSet
-import android.view.View
 import android.widget.FrameLayout
 import com.zero.chartview.axis.XAxisView
 import com.zero.chartview.axis.YAxisView
 import com.zero.chartview.model.CurveLine
-import com.zero.chartview.service.AnimationThemeService
 import com.zero.chartview.utils.createCorrespondingLegends
 import com.zero.chartview.utils.findMaxYValue
 import com.zero.chartview.utils.findMinYValue
 import com.zero.chartview.utils.getAbscissas
-import javax.inject.Inject
 
 class ChartView @JvmOverloads constructor(
     context: Context,
@@ -26,9 +24,7 @@ class ChartView @JvmOverloads constructor(
     private val yAxis: YAxisView = YAxisView(context, attrs, defStyleAttr, defStyleRes)
     private val xAxis: XAxisView = XAxisView(context, attrs, defStyleAttr, defStyleRes)
 
-    @Inject
-    lateinit var animationThemeService: AnimationThemeService
-        protected set
+    private lateinit var themeColor: Themeable.ThemeColor
 
     init {
         addView(xAxis)
@@ -36,36 +32,11 @@ class ChartView @JvmOverloads constructor(
         addView(graph)
 
         App.appComponent.inject(this)
-        animationThemeService.onInvalidate = ::onThemeChanged
 
         val typedArray = context.theme.obtainStyledAttributes(attrs, R.styleable.ChartView, defStyleAttr, defStyleRes)
-        setLightStyles(typedArray)
-        setDarkStyles(typedArray)
-        val themeStyle = getThemeStyleDefault(typedArray)
+        val themeDefault = getThemeColorDefault(typedArray)
         typedArray.recycle()
-        updateTheme(themeStyle)
-    }
-
-    override lateinit var lightTheme: Themeable.ThemeColor
-
-    override lateinit var darkTheme: Themeable.ThemeColor
-
-    override lateinit var currentTheme: Themeable.ThemeColor
-
-    override fun setTheme(colors: Themeable.ThemeColor) {
-        if (::currentTheme.isInitialized) {
-            animationThemeService.updateTheme(currentTheme, colors)
-        } else {
-            onThemeChanged(colors)
-        }
-        currentTheme = colors
-    }
-
-    override fun addView(child: View?) {
-        if (child is ChartControlView) {
-            //TODO Observe ChartControlView
-        }
-        super.addView(child)
+        setThemeColor(themeDefault)
     }
 
     fun setRange(start: Float, endInclusive: Float) {
@@ -122,56 +93,44 @@ class ChartView @JvmOverloads constructor(
         )
     }
 
-    private fun getThemeStyleDefault(typedArray: TypedArray) =
-        if (typedArray.getBoolean(R.styleable.ChartView_darkTheme, false)) Themeable.ThemeStyle.DARK
-        else Themeable.ThemeStyle.LIGHT
+    override fun getThemeColor() = themeColor
 
-    private fun onThemeChanged(colors: Themeable.ThemeColor) {
-        xAxis.onThemeChanged(colors.colorLegend)
-        yAxis.onThemeChanged(colors.colorLegend, colors.colorGrid)
-        setBackgroundColor(colors.colorBackground)
-        invalidate()
+    override fun setThemeColor(colors: Themeable.ThemeColor) {
+        themeColor = colors
+        onThemeColorChanged()
     }
 
-    private fun setLightStyles(typedArray: TypedArray) {
-        typedArray.apply {
-            val lightColorBackground =
-                getColor(R.styleable.ChartView_lightColorBackground, resources.getColor(R.color.colorBackground))
-            val lightColorLegend =
-                getColor(R.styleable.ChartView_lightColorLegend, resources.getColor(R.color.colorLegend))
-            val lightColorTitle =
-                getColor(R.styleable.ChartView_lightColorTitle, resources.getColor(R.color.colorTitle))
-            val lightColorLabel =
-                getColor(R.styleable.ChartView_lightColorLabel, resources.getColor(R.color.colorLabel))
-            val lightColorGrid = getColor(R.styleable.ChartView_lightColorGrid, resources.getColor(R.color.colorGrid))
-            setLightThemeColor(
-                lightColorBackground,
-                lightColorLegend,
-                lightColorTitle,
-                lightColorLabel,
-                lightColorGrid
-            )
-        }
+    override fun setBackgroundColor(@ColorInt backgroundColor: Int) {
+        themeColor.colorBackground = backgroundColor
+        super.setBackgroundColor(backgroundColor)
     }
 
-    private fun setDarkStyles(typedArray: TypedArray) {
+    fun setLegendColor(@ColorInt legendColor: Int) {
+        themeColor.colorLegend = legendColor
+        xAxis.setLegendColor(themeColor.colorLegend)
+        yAxis.setLegendColor(themeColor.colorLegend)
+
+    }
+
+    fun setGridColor(@ColorInt gridColor: Int) {
+        themeColor.colorGrid = gridColor
+        yAxis.setGridColor(themeColor.colorGrid)
+    }
+
+    private fun onThemeColorChanged() {
+        yAxis.setGridColor(themeColor.colorGrid)
+        xAxis.setLegendColor(themeColor.colorLegend)
+        yAxis.setLegendColor(themeColor.colorLegend)
+        super.setBackgroundColor(themeColor.colorBackground)
+    }
+
+    private fun getThemeColorDefault(typedArray: TypedArray): Themeable.ThemeColor {
         typedArray.apply {
-            val darkColorBackground =
-                getColor(R.styleable.ChartView_darkColorBackground, resources.getColor(R.color.darkColorBackground))
-            val darkColorLegend =
-                getColor(R.styleable.ChartView_darkColorLegend, resources.getColor(R.color.darkColorLegend))
-            val darkColorTitle =
-                getColor(R.styleable.ChartView_darkColorTitle, resources.getColor(R.color.darkColorTitle))
-            val darkColorLabel =
-                getColor(R.styleable.ChartView_darkColorLabel, resources.getColor(R.color.darkColorLabel))
-            val darkColorGrid = getColor(R.styleable.ChartView_darkColorGrid, resources.getColor(R.color.darkColorGrid))
-            setDarkThemeColor(
-                darkColorBackground,
-                darkColorLegend,
-                darkColorTitle,
-                darkColorLabel,
-                darkColorGrid
-            )
+            val colorBackground =
+                getColor(R.styleable.ChartView_colorBackground, resources.getColor(R.color.colorBackground))
+            val colorLegend = getColor(R.styleable.ChartView_colorLegend, resources.getColor(R.color.colorLegend))
+            val colorGrid = getColor(R.styleable.ChartView_colorGrid, resources.getColor(R.color.colorGrid))
+            return Themeable.ThemeColor(colorBackground, colorLegend, colorGrid)
         }
     }
 }

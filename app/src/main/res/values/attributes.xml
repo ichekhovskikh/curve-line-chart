@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="ChartView">
-        <attr name="darkTheme" format="boolean" />
-
         <attr name="lineWidth" format="dimension" />
 
         <attr name="gridLineWidth" format="dimension" />
@@ -13,17 +11,9 @@
         <attr name="abscissaLegendMarginTop"  format="dimension" />
         <attr name="abscissaLegendCount"  format="integer" />
 
-        <attr name="lightColorBackground" format="color" />
-        <attr name="lightColorLegend" format="color" />
-        <attr name="lightColorTitle" format="color" />
-        <attr name="lightColorLabel" format="color" />
-        <attr name="lightColorGrid" format="color" />
-
-        <attr name="darkColorBackground" format="color" />
-        <attr name="darkColorLegend" format="color" />
-        <attr name="darkColorTitle" format="color" />
-        <attr name="darkColorLabel" format="color" />
-        <attr name="darkColorGrid" format="color" />
+        <attr name="colorBackground" format="color" />
+        <attr name="colorLegend" format="color" />
+        <attr name="colorGrid" format="color" />
     </declare-styleable>
 
     <declare-styleable name="GraphicView" parent="ChartView">
@@ -44,10 +34,19 @@
     </declare-styleable>
 
     <declare-styleable name="ChartControlView">
-        <attr name="lightColorInactiveControl" format="color" />
-        <attr name="lightColorActiveControl" format="color" />
+        <attr name="colorBackground" format="color" />
+        <attr name="colorFrameControl" format="color" />
+        <attr name="colorFogControl" format="color" />
+        <attr name="frameThicknessHorizontal" format="dimension" />
+        <attr name="frameThicknessVertical" format="dimension" />
+        <attr name="frameMinWidthPercent" format="float" />
+        <attr name="frameMaxWidthPercent" format="float" />
+    </declare-styleable>
 
-        <attr name="darkColorInactiveControl" format="color" />
-        <attr name="darkColorActiveControl" format="color" />
+    <declare-styleable name="SelectorView" parent="ChartControlView">
+        <attr name="frameThicknessHorizontal" format="dimension" />
+        <attr name="frameThicknessVertical" format="dimension" />
+        <attr name="frameMinWidthPercent" format="dimension"/>
+        <attr name="frameMaxWidthPercent" format="dimension"/>
     </declare-styleable>
 </resources>

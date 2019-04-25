@@ -101,15 +101,18 @@ class YAxisView @JvmOverloads constructor(
         }
     }
 
-    fun onThemeChanged(@ColorInt colorLegend: Int, @ColorInt colorGrid: Int) {
-        legendPaint.color = colorLegend
-        gridPaint.color = colorGrid
-    }
-
     private fun getTransparencyColor(color: Int, labels: AnimatingLegendSeries): Int {
         return Color.argb(seriesTransparency(labels), Color.red(color), Color.green(color), Color.blue(color))
     }
 
     private fun seriesTransparency(labels: AnimatingLegendSeries) =
         (255 * if (labels.isAppearing) labels.animationValue else 1 - labels.animationValue).toInt()
+
+    fun setGridColor(@ColorInt gridColor: Int) {
+        gridPaint.color = gridColor
+    }
+
+    fun setLegendColor(@ColorInt legendColor: Int) {
+        legendPaint.color = legendColor
+    }
 }
