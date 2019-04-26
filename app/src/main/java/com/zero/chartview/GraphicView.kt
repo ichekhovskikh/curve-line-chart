@@ -8,10 +8,7 @@ import com.zero.chartview.model.AnimatingCurveLine
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.model.FloatRange
 import com.zero.chartview.service.AnimationLineService
-import com.zero.chartview.utils.findMaxXValue
-import com.zero.chartview.utils.findMinXValue
-import com.zero.chartview.utils.xValueToPixel
-import com.zero.chartview.utils.yValueToPixel
+import com.zero.chartview.utils.*
 import javax.inject.Inject
 
 class GraphicView @JvmOverloads constructor(
@@ -33,7 +30,7 @@ class GraphicView @JvmOverloads constructor(
     init {
         App.appComponent.inject(this)
         animationLineService.onInvalidate = ::invalidate
-        range = FloatRange(0F, 0F)
+        range = FloatRange(0F, 1F)
         path = Path()
         paint = Paint()
 
@@ -72,18 +69,19 @@ class GraphicView @JvmOverloads constructor(
     }
 
     fun setRange(start: Float, endInclusive: Float) {
-        range.start = start
-        range.endInclusive = endInclusive
+        range.start = Math.max(start, 0f)
+        range.endInclusive = Math.min(endInclusive, 1f)
         invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
-        initializeRangeIfRequired()
+        val abscissas = getAbscissas(animationLineService.getLines())
+        val valueRange = convertPercentToValue(abscissas, range)
         val lines = animationLineService.animationLines
         lines.forEach { line ->
             path.rewind()
             paint.color = getTransparencyColor(line)
-            val transformPoints = transformAxis(line.curveLine.points)
+            val transformPoints = transformAxis(line.curveLine.points, valueRange)
             transformPoints.forEachIndexed { index, point ->
                 if (index == 0) {
                     path.moveTo(point.x, point.y)
@@ -99,19 +97,11 @@ class GraphicView @JvmOverloads constructor(
 
     private fun getMinY() = animationLineService.minY
 
-    private fun initializeRangeIfRequired() {
-        if (range.isEmpty()) {
-            val curveLines = animationLineService.getLines()
-            range.start = findMinXValue(curveLines)
-            range.endInclusive = findMaxXValue(curveLines)
-        }
-    }
-
-    private fun transformAxis(points: List<PointF>): List<PointF> {
+    private fun transformAxis(points: List<PointF>, valueRange: FloatRange): List<PointF> {
         val transformPoints = mutableListOf<PointF>()
         points.forEach { point ->
-            if (range.contains(point.x)) {
-                val x = xValueToPixel(point.x, measuredWidth, range.start, range.endInclusive)
+            if (valueRange.contains(point.x)) {
+                val x = xValueToPixel(point.x, measuredWidth, valueRange.start, valueRange.endInclusive)
                 val y = yValueToPixel(point.y, measuredHeight, getMinY(), getMaxY())
                 transformPoints.add(PointF(x, y))
             }

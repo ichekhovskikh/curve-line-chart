@@ -9,6 +9,7 @@ import android.util.AttributeSet
 import android.view.View
 import com.zero.chartview.R
 import com.zero.chartview.model.FloatRange
+import com.zero.chartview.utils.convertPercentToValue
 import com.zero.chartview.utils.formatLegend
 import com.zero.chartview.utils.xValueToPixel
 import kotlin.math.floor
@@ -29,7 +30,7 @@ class XAxisView @JvmOverloads constructor(
 
     private lateinit var correspondingLegends: Map<Float, String>
     private lateinit var coordinates: List<Float>
-    private var range: FloatRange = FloatRange(0F, 0F)
+    private var range: FloatRange = FloatRange(0F, 1F)
 
     init {
         var textSize = resources.getDimension(R.dimen.legend_text_size_default)
@@ -53,31 +54,24 @@ class XAxisView @JvmOverloads constructor(
     }
 
     fun setRange(start: Float, endInclusive: Float) {
-        range.start = start
-        range.endInclusive = endInclusive
+        range.start = Math.max(start, 0f)
+        range.endInclusive = Math.min(endInclusive, 1f)
         invalidate()
-    }
-
-    private fun initializeRangeIfRequired() {
-        if (range.isEmpty()) {
-            range.start = coordinates.first()
-            range.endInclusive = coordinates.last()
-        }
     }
 
     override fun onDraw(canvas: Canvas) {
         if (!::coordinates.isInitialized) return
-        initializeRangeIfRequired()
-        val step = calculateStep()
+        val valueRange = convertPercentToValue(coordinates, range)
+        val step = calculateStep(valueRange)
         val positions = getDrawPositions(step)
         val color = legendPaint.color
         positions.forEachIndexed { index, position ->
             val averageCoordinate = getCorrespondingWithBias(position, step)
             val legendText = getLegendText(averageCoordinate)
             val textHalfWidth = legendPaint.measureText(legendText) / 2
-            val pixel = xValueToPixel(position - textHalfWidth, measuredWidth, range.start, range.endInclusive)
+            val pixel = xValueToPixel(position - textHalfWidth, measuredWidth, valueRange.start, valueRange.endInclusive)
             if (index % 2 != 0) {
-                legendPaint.color = getTransparencyColor(color)
+                legendPaint.color = getTransparencyColor(color, valueRange)
             } else {
                 legendPaint.color = color
             }
@@ -101,15 +95,15 @@ class XAxisView @JvmOverloads constructor(
         return if (list.isEmpty()) null else list[list.size / 2]
     }
 
-    private fun calculateStep(): Float {
-        val exponent = log2((coordinates.last() - coordinates.first()) / range.distance())
+    private fun calculateStep(valueRange: FloatRange): Float {
+        val exponent = log2((coordinates.last() - coordinates.first()) / valueRange.distance())
         return (fullRangeStep() / Math.pow(2.0, floor(exponent).toDouble())).toFloat()
     }
 
     private fun fullRangeStep() = (coordinates.last() - coordinates.first()) / (legendCount * 2)
 
-    private fun getTransparencyColor(color: Int): Int {
-        val currentExponent = log2((coordinates.last() - coordinates.first()) / range.distance())
+    private fun getTransparencyColor(color: Int, valueRange: FloatRange): Int {
+        val currentExponent = log2((coordinates.last() - coordinates.first()) / valueRange.distance())
         val weight = Math.abs(floor(currentExponent) - currentExponent)
         return Color.argb(255 * weight.toInt(), Color.red(color), Color.green(color), Color.blue(color))
     }

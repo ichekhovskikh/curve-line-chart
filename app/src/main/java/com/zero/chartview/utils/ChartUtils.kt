@@ -2,6 +2,7 @@ package com.zero.chartview.utils
 
 import android.graphics.PointF
 import com.zero.chartview.model.CurveLine
+import com.zero.chartview.model.FloatRange
 import java.text.DecimalFormat
 
 fun findMaxYValue(lines: List<CurveLine>): Float =
@@ -15,6 +16,13 @@ fun findMaxXValue(lines: List<CurveLine>): Float =
 
 fun findMinXValue(lines: List<CurveLine>): Float =
     lines.mapNotNull { it.points.minBy(PointF::x) }.minBy(PointF::x)?.x ?: 0F
+
+fun convertPercentToValue(abscissas: List<Float>, range: FloatRange): FloatRange {
+    val minValue = abscissas.min()!!
+    val maxValue = abscissas.max()!!
+    val length = maxValue - minValue
+    return FloatRange(minValue + range.start * length, minValue + range.endInclusive * length)
+}
 
 fun yPixelToValue(yPixel: Float, windowHeight: Int, minY: Float, maxY: Float): Float {
     val weight = windowHeight.toFloat() / (maxY - minY)
