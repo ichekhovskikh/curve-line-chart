@@ -22,4 +22,6 @@
     <dimen name="frame_thickness_vertical_default">6dp</dimen>
     <dimen name="frame_min_width_percent_default">0.1</dimen>
     <dimen name="frame_max_width_percent_default">1.0</dimen>
+
+    <dimen name="additional_curtain_touch_width">6dp</dimen>
 </resources>

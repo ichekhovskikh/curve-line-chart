@@ -4,13 +4,15 @@ import android.annotation.SuppressLint
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
+import android.graphics.Canvas
 import android.graphics.Paint
 import android.support.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import com.zero.chartview.model.FloatRange
-import kotlin.math.roundToInt
+import com.zero.chartview.utils.xPixelToValue
+import com.zero.chartview.utils.xValueToPixel
 
 class SelectorView @JvmOverloads constructor(
     context: Context,
@@ -19,16 +21,17 @@ class SelectorView @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
 
-    private val framePaint = Paint()
-    private val fogPaint = Paint()
-
     private var frameThicknessHorizontal: Float = resources.getDimension(R.dimen.frame_thickness_horizontal_default)
     private var frameThicknessVertical: Float = resources.getDimension(R.dimen.frame_thickness_vertical_default)
     private var frameMaxWidthPercent: Float = resources.getDimension(R.dimen.frame_max_width_percent_default)
     private var frameMinWidthPercent: Float = resources.getDimension(R.dimen.frame_min_width_percent_default)
+    private var additionalTouchWidth: Float = resources.getDimension(R.dimen.additional_curtain_touch_width)
+    private var downTouchPosition = 0f
+
+    private val framePaint = Paint()
+    private val fogPaint = Paint()
 
     private var activeComponent = ComponentType.NOTHING
-
     private lateinit var range: MutableLiveData<FloatRange>
 
     init {
@@ -46,14 +49,17 @@ class SelectorView @JvmOverloads constructor(
 
     fun setRange(start: Float, endInclusive: Float) {
         val length = endInclusive - start
-        if (length > frameMaxWidthPercent || length < frameMinWidthPercent) {
-            return
+        if (length in frameMinWidthPercent..frameMaxWidthPercent) {
+            range.value = FloatRange(Math.max(start, 0f), Math.min(endInclusive, 1f))
+            invalidate()
         }
-        range.value = FloatRange(Math.max(start, 0f), Math.min(endInclusive, 1f))
-        invalidate()
     }
 
     fun getRange(): LiveData<FloatRange> = range
+
+    override fun onDraw(canvas: Canvas) {
+        //TODO draw
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean =
@@ -75,11 +81,56 @@ class SelectorView @JvmOverloads constructor(
         }
 
     private fun onActionDown(event: MotionEvent) {
-        //TODO save clicked component tag and set position
+        val abscissa = event.x
+        val startPixel = xValueToPixel(range.value!!.start, measuredWidth, 0f, 1f)
+        val endInclusivePixel = xValueToPixel(range.value!!.endInclusive, measuredWidth, 0f, 1f)
+
+        val leftCurtainEnd = startPixel + frameThicknessVertical
+        val rightCurtainStart = endInclusivePixel - frameThicknessVertical
+
+        activeComponent = when {
+            abscissa <= leftCurtainEnd + additionalTouchWidth -> {
+                setLeftCurtainPosition(abscissa)
+                ComponentType.LEFT_CURTAIN
+            }
+            abscissa >= rightCurtainStart - additionalTouchWidth -> {
+                setRightCurtainPosition(abscissa)
+                ComponentType.RIGHT_CURTAIN
+            }
+            else -> {
+                downTouchPosition = abscissa
+                ComponentType.FRAME
+            }
+        }
     }
 
     private fun onActionMove(event: MotionEvent) {
-        //TODO set position
+        when (activeComponent) {
+            ComponentType.LEFT_CURTAIN -> setLeftCurtainPosition(event.x)
+            ComponentType.RIGHT_CURTAIN -> setRightCurtainPosition(event.x)
+            ComponentType.FRAME -> moveFrame(event.x)
+            ComponentType.NOTHING -> {
+                //Nothing
+            }
+        }
+    }
+
+    private fun setLeftCurtainPosition(abscissa: Float) {
+        val startPixel = abscissa + frameThicknessVertical / 2
+        val start = xPixelToValue(startPixel, measuredWidth, 0f, 1f)
+        setRange(start, range.value!!.endInclusive)
+    }
+
+    private fun setRightCurtainPosition(abscissa: Float) {
+        val endInclusivePixel = abscissa - frameThicknessVertical / 2
+        val endInclusive = xPixelToValue(endInclusivePixel, measuredWidth, 0f, 1f)
+        setRange(range.value!!.start, endInclusive)
+    }
+
+    private fun moveFrame(abscissa: Float) {
+        val incrementPixel = abscissa - downTouchPosition
+        val increment = xPixelToValue(incrementPixel, measuredWidth, 0f, 1f)
+        setRange(range.value!!.start + increment, range.value!!.endInclusive + increment)
     }
 
     fun setFrameControlColor(@ColorInt frameControlColor: Int) {
