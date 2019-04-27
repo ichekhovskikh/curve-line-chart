@@ -8,6 +8,8 @@ import android.widget.FrameLayout
 import com.zero.chartview.axis.XAxisView
 import com.zero.chartview.axis.YAxisView
 import com.zero.chartview.model.CurveLine
+import com.zero.chartview.popup.ChartPopupView
+import com.zero.chartview.popup.PopupWindow
 import com.zero.chartview.utils.*
 
 class ChartView @JvmOverloads constructor(
@@ -17,9 +19,11 @@ class ChartView @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes), Themeable {
 
-    private val graph: GraphicView = GraphicView(context, attrs, defStyleAttr, defStyleRes)
-    private val yAxis: YAxisView = YAxisView(context, attrs, defStyleAttr, defStyleRes)
-    private val xAxis: XAxisView = XAxisView(context, attrs, defStyleAttr, defStyleRes)
+    private val graph = GraphicView(context, attrs, defStyleAttr, defStyleRes)
+    private val yAxis = YAxisView(context, attrs, defStyleAttr, defStyleRes)
+    private val xAxis = XAxisView(context, attrs, defStyleAttr, defStyleRes)
+    private val popup = ChartPopupView(context, attrs, defStyleAttr, defStyleRes)
+    private val window = PopupWindow(context, attrs, defStyleAttr, defStyleRes)
 
     private lateinit var themeColor: Themeable.ThemeColor
 
@@ -27,6 +31,9 @@ class ChartView @JvmOverloads constructor(
         addView(xAxis)
         addView(yAxis)
         addView(graph)
+        addView(popup)
+        addView(window)
+        popup.popupWindow = window
 
         val typedArray = context.theme.obtainStyledAttributes(attrs, R.styleable.ChartView, defStyleAttr, defStyleRes)
         val themeDefault = getThemeColorDefault(typedArray)
@@ -37,17 +44,20 @@ class ChartView @JvmOverloads constructor(
     fun setRange(start: Float, endInclusive: Float) {
         graph.setRange(start, endInclusive)
         xAxis.setRange(start, endInclusive)
+        popup.setRange(start, endInclusive)
         updateAxis(graph.getLines(), emptyMap())
     }
 
     fun setLines(lines: List<CurveLine>, correspondingLegends: Map<Float, String> = emptyMap()) {
         graph.setLines(lines)
+        popup.setLines(lines)
         updateAxis(lines, correspondingLegends)
     }
 
     fun addLine(line: CurveLine, correspondingLegends: Map<Float, String> = emptyMap()) {
         val lines = graph.getLines()
         graph.addLine(line)
+        popup.setLines(lines + line)
         updateAxis(lines + line, correspondingLegends)
     }
 
@@ -59,6 +69,7 @@ class ChartView @JvmOverloads constructor(
     fun removeLine(line: CurveLine) {
         val lines = graph.getLines()
         graph.removeLine(line)
+        popup.setLines(lines - line)
         updateAxis(lines - line, emptyMap())
     }
 
@@ -72,6 +83,7 @@ class ChartView @JvmOverloads constructor(
             xAxis.setCorrespondingLegends(createCorrespondingLegends(abscissas))
         } else {
             xAxis.setCorrespondingLegends(correspondingLegends)
+            popup.setCorrespondingLegends(correspondingLegends)
         }
     }
 
@@ -86,6 +98,13 @@ class ChartView @JvmOverloads constructor(
         )
         measureChildWithMargins(
             yAxis,
+            widthMeasureSpec,
+            0,
+            heightMeasureSpec,
+            xAxis.getLegendWidth()
+        )
+        measureChildWithMargins(
+            popup,
             widthMeasureSpec,
             0,
             heightMeasureSpec,

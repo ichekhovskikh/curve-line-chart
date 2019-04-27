@@ -28,4 +28,7 @@
     <dimen name="popup_line_width">1dp</dimen>
     <dimen name="point_inner_radius">3dp</dimen>
     <dimen name="point_outer_radius">5dp</dimen>
+
+    <dimen name="dy_stop_tracking_touch">50dp</dimen>
+    <fraction name="epsilon_x_tracking_touch">2%</fraction>
 </resources>

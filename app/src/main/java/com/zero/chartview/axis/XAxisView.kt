@@ -48,6 +48,7 @@ class XAxisView @JvmOverloads constructor(
 
     fun setCoordinates(coordinates: List<Float>) {
         this.coordinates = coordinates.sorted()
+        invalidate()
     }
 
     fun setCorrespondingLegends(correspondingLegends: Map<Float, String>) {
