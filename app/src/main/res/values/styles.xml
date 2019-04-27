@@ -24,4 +24,8 @@
     <fraction name="frame_max_width_percent_default">100%</fraction>
 
     <dimen name="additional_curtain_touch_width">6dp</dimen>
+
+    <dimen name="popup_line_width">1dp</dimen>
+    <dimen name="point_inner_radius">3dp</dimen>
+    <dimen name="point_outer_radius">5dp</dimen>
 </resources>
