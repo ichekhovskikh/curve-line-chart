@@ -6,8 +6,7 @@ import android.support.annotation.ColorInt
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import com.zero.chartview.model.CurveLine
-import com.zero.chartview.utils.findMaxYValue
-import com.zero.chartview.utils.findMinYValue
+import com.zero.chartview.utils.findMinMaxYValueRanged
 
 class ChartControlView @JvmOverloads constructor(
     context: Context,
@@ -49,6 +48,11 @@ class ChartControlView @JvmOverloads constructor(
         updateAxis(lines + line)
     }
 
+    fun removeLine(index: Int) {
+        val lines = graph.getLines()
+        removeLine(lines[index])
+    }
+
     fun removeLine(line: CurveLine) {
         val lines = graph.getLines()
         graph.removeLine(line)
@@ -56,8 +60,7 @@ class ChartControlView @JvmOverloads constructor(
     }
 
     private fun updateAxis(lines: List<CurveLine>) {
-        val maxY = findMaxYValue(lines)
-        val minY = findMinYValue(lines)
+        val (minY, maxY) = findMinMaxYValueRanged(lines, graph.range)
         //TODO setMinMaxX
         graph.setYAxis(minY, maxY)
     }
@@ -77,16 +80,20 @@ class ChartControlView @JvmOverloads constructor(
     fun setFrameControlColor(@ColorInt frameControlColor: Int) {
         themeColor.colorFrameControl = frameControlColor
         selectorView.setFrameControlColor(themeColor.colorFrameControl)
+        invalidate()
     }
 
     fun setFogControlColor(@ColorInt fogControlColor: Int) {
         themeColor.colorFogControl = fogControlColor
         selectorView.setFogControlColor(themeColor.colorFogControl)
+        invalidate()
     }
 
     private fun onThemeColorChanged() {
+        selectorView.setFrameControlColor(themeColor.colorFrameControl)
+        selectorView.setFogControlColor(themeColor.colorFogControl)
         super.setBackgroundColor(themeColor.colorBackground)
-        selectorView.setThemeColor(themeColor.colorFrameControl, themeColor.colorFogControl)
+        invalidate()
     }
 
     private fun getThemeColorDefault(typedArray: TypedArray): Themeable.ThemeColor {

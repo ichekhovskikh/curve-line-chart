@@ -9,7 +9,6 @@ import com.zero.chartview.model.CurveLine
 import com.zero.chartview.model.FloatRange
 import com.zero.chartview.service.AnimationLineService
 import com.zero.chartview.utils.*
-import javax.inject.Inject
 
 class GraphicView @JvmOverloads constructor(
     context: Context,
@@ -18,21 +17,17 @@ class GraphicView @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
 
-    private val paint: Paint
-    private val path: Path
+    private val paint = Paint()
+    private val path = Path()
 
-    private var range: FloatRange
+    var range = FloatRange(0F, 1F)
+    private set
 
-    @Inject
-    lateinit var animationLineService: AnimationLineService
-        protected set
+    var animationLineService = AnimationLineService(BuildConfig.ANIMATION_DURATION_MS)
+        private set
 
     init {
-        App.appComponent.inject(this)
         animationLineService.onInvalidate = ::invalidate
-        range = FloatRange(0F, 1F)
-        path = Path()
-        paint = Paint()
 
         var lineWidth = resources.getDimensionPixelSize(R.dimen.line_width_default)
         context.theme.obtainStyledAttributes(attrs, R.styleable.GraphicView, defStyleAttr, defStyleRes).apply {
@@ -75,7 +70,11 @@ class GraphicView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        val abscissas = getAbscissas(animationLineService.getLines())
+        val curveLines = animationLineService.getLines()
+        if (curveLines.isEmpty()) {
+            return
+        }
+        val abscissas = getAbscissas(curveLines)
         val valueRange = convertPercentToValue(abscissas, range)
         val lines = animationLineService.animationLines
         lines.forEach { line ->

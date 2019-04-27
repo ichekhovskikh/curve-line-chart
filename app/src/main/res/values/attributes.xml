@@ -39,8 +39,8 @@
         <attr name="colorFogControl" format="color"/>
         <attr name="frameThicknessHorizontal" format="dimension"/>
         <attr name="frameThicknessVertical" format="dimension"/>
-        <attr name="frameMinWidthPercent" format="float"/>
-        <attr name="frameMaxWidthPercent" format="float"/>
+        <attr name="frameMinWidthPercent" format="fraction"/>
+        <attr name="frameMaxWidthPercent" format="fraction"/>
     </declare-styleable>
 
     <declare-styleable name="SelectorView" parent="ChartControlView">

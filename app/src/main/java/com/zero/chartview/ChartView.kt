@@ -8,10 +8,7 @@ import android.widget.FrameLayout
 import com.zero.chartview.axis.XAxisView
 import com.zero.chartview.axis.YAxisView
 import com.zero.chartview.model.CurveLine
-import com.zero.chartview.utils.createCorrespondingLegends
-import com.zero.chartview.utils.findMaxYValue
-import com.zero.chartview.utils.findMinYValue
-import com.zero.chartview.utils.getAbscissas
+import com.zero.chartview.utils.*
 
 class ChartView @JvmOverloads constructor(
     context: Context,
@@ -31,8 +28,6 @@ class ChartView @JvmOverloads constructor(
         addView(yAxis)
         addView(graph)
 
-        App.appComponent.inject(this)
-
         val typedArray = context.theme.obtainStyledAttributes(attrs, R.styleable.ChartView, defStyleAttr, defStyleRes)
         val themeDefault = getThemeColorDefault(typedArray)
         typedArray.recycle()
@@ -42,6 +37,7 @@ class ChartView @JvmOverloads constructor(
     fun setRange(start: Float, endInclusive: Float) {
         graph.setRange(start, endInclusive)
         xAxis.setRange(start, endInclusive)
+        updateAxis(graph.getLines(), emptyMap())
     }
 
     fun setLines(lines: List<CurveLine>, correspondingLegends: Map<Float, String> = emptyMap()) {
@@ -55,18 +51,22 @@ class ChartView @JvmOverloads constructor(
         updateAxis(lines + line, correspondingLegends)
     }
 
-    fun removeLine(line: CurveLine, correspondingLegends: Map<Float, String> = emptyMap()) {
+    fun removeLine(index: Int) {
+        val lines = graph.getLines()
+        removeLine(lines[index])
+    }
+
+    fun removeLine(line: CurveLine) {
         val lines = graph.getLines()
         graph.removeLine(line)
-        updateAxis(lines - line, correspondingLegends)
+        updateAxis(lines - line, emptyMap())
     }
 
     private fun updateAxis(lines: List<CurveLine>, correspondingLegends: Map<Float, String>) {
-        val maxY = findMaxYValue(lines)
-        val minY = findMinYValue(lines)
+        val (minY, maxY) = findMinMaxYValueRanged(lines, graph.range)
+        val abscissas = getAbscissas(lines)
         graph.setYAxis(minY, maxY)
         yAxis.setYAxis(minY, maxY)
-        val abscissas = getAbscissas(lines)
         xAxis.setCoordinates(abscissas)
         if (correspondingLegends.isEmpty()) {
             xAxis.setCorrespondingLegends(createCorrespondingLegends(abscissas))
@@ -109,12 +109,13 @@ class ChartView @JvmOverloads constructor(
         themeColor.colorLegend = legendColor
         xAxis.setLegendColor(themeColor.colorLegend)
         yAxis.setLegendColor(themeColor.colorLegend)
-
+        invalidate()
     }
 
     fun setGridColor(@ColorInt gridColor: Int) {
         themeColor.colorGrid = gridColor
         yAxis.setGridColor(themeColor.colorGrid)
+        invalidate()
     }
 
     private fun onThemeColorChanged() {
@@ -122,6 +123,7 @@ class ChartView @JvmOverloads constructor(
         xAxis.setLegendColor(themeColor.colorLegend)
         yAxis.setLegendColor(themeColor.colorLegend)
         super.setBackgroundColor(themeColor.colorBackground)
+        invalidate()
     }
 
     private fun getThemeColorDefault(typedArray: TypedArray): Themeable.ThemeColor {

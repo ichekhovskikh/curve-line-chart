@@ -7,7 +7,7 @@ import android.graphics.Paint
 import android.support.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.View
-import com.zero.chartview.App
+import com.zero.chartview.BuildConfig
 import com.zero.chartview.R
 import com.zero.chartview.model.AnimatingLegendSeries
 import com.zero.chartview.service.AnimationLegendService
@@ -15,7 +15,6 @@ import com.zero.chartview.utils.formatLegend
 import com.zero.chartview.utils.textHeight
 import com.zero.chartview.utils.yPixelToValue
 import com.zero.chartview.utils.yValueToPixel
-import javax.inject.Inject
 
 class YAxisView @JvmOverloads constructor(
     context: Context,
@@ -32,12 +31,10 @@ class YAxisView @JvmOverloads constructor(
 
     private var legendPositions: List<Float> = emptyList()
 
-    @Inject
-    lateinit var animationLegendService: AnimationLegendService
-        protected set
+    var animationLegendService = AnimationLegendService(BuildConfig.ANIMATION_DURATION_MS)
+        private set
 
     init {
-        App.appComponent.inject(this)
         animationLegendService.onInvalidate = ::invalidate
         var gridLineWidth = resources.getDimension(R.dimen.grid_line_width_default)
         var textSize = resources.getDimension(R.dimen.legend_text_size_default)
@@ -53,6 +50,8 @@ class YAxisView @JvmOverloads constructor(
 
     private fun initializePaint(textSize: Float, gridLineWidth: Float) {
         legendPaint.textSize = textSize
+        legendPaint.color = resources.getColor(R.color.colorLegend)
+        gridPaint.color = resources.getColor(R.color.colorGrid)
         gridPaint.style = Paint.Style.STROKE
         gridPaint.strokeWidth = gridLineWidth
     }
@@ -81,7 +80,8 @@ class YAxisView @JvmOverloads constructor(
     }
 
     private fun updateLegendSeries(legendSeries: AnimatingLegendSeries, legendPositions: List<Float>) {
-        legendSeries.legends = legendPositions.map { yPixelToValue(it, measuredHeight, legendSeries.minY, legendSeries.maxY) }
+        legendSeries.legends =
+            legendPositions.map { yPixelToValue(it, measuredHeight, legendSeries.minY, legendSeries.maxY) }
     }
 
     private fun getLegendPositions(availableHeight: Int, legendHeight: Float): List<Float> {
@@ -94,7 +94,8 @@ class YAxisView @JvmOverloads constructor(
             gridPaint.color = getTransparencyColor(gridPaint.color, series)
             legendPaint.color = getTransparencyColor(legendPaint.color, series)
             series.legends.forEach { legend ->
-                val yPixel = yValueToPixel(legend, measuredHeight, animationLegendService.minY, animationLegendService.maxY)
+                val yPixel =
+                    yValueToPixel(legend, measuredHeight, animationLegendService.minY, animationLegendService.maxY)
                 canvas.drawLine(0f, yPixel, width.toFloat(), yPixel, gridPaint)
                 canvas.drawText(formatLegend(legend), 0f, yPixel - legendMargin, legendPaint)
             }

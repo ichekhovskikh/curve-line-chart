@@ -23,6 +23,7 @@ class XAxisView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
 
     private val legendPaint = Paint()
+    @ColorInt private var legendColor = resources.getColor(R.color.colorLegend)
 
     private var textMarginTop = resources.getDimension(R.dimen.abscissa_legend_margin_top_default)
     private var textLength = resources.getInteger(R.integer.abscissa_legend_label_length_default)
@@ -64,16 +65,15 @@ class XAxisView @JvmOverloads constructor(
         val valueRange = convertPercentToValue(coordinates, range)
         val step = calculateStep(valueRange)
         val positions = getDrawPositions(step)
-        val color = legendPaint.color
         positions.forEachIndexed { index, position ->
             val averageCoordinate = getCorrespondingWithBias(position, step)
             val legendText = getLegendText(averageCoordinate)
             val textHalfWidth = legendPaint.measureText(legendText) / 2
             val pixel = xValueToPixel(position - textHalfWidth, measuredWidth, valueRange.start, valueRange.endInclusive)
             if (index % 2 != 0) {
-                legendPaint.color = getTransparencyColor(color, valueRange)
+                legendPaint.color = getTransparencyColor(legendColor, valueRange)
             } else {
-                legendPaint.color = color
+                legendPaint.color = legendColor
             }
             canvas.drawText(legendText, pixel, measuredHeight.toFloat(), legendPaint)
         }
@@ -105,7 +105,7 @@ class XAxisView @JvmOverloads constructor(
     private fun getTransparencyColor(color: Int, valueRange: FloatRange): Int {
         val currentExponent = log2((coordinates.last() - coordinates.first()) / valueRange.distance())
         val weight = Math.abs(floor(currentExponent) - currentExponent)
-        return Color.argb(255 * weight.toInt(), Color.red(color), Color.green(color), Color.blue(color))
+        return Color.argb((255 * weight).toInt(), Color.red(color), Color.green(color), Color.blue(color))
     }
 
     private fun getLegendText(averageCoordinate: Float?): String {
@@ -120,6 +120,6 @@ class XAxisView @JvmOverloads constructor(
     }
 
     fun setLegendColor(@ColorInt legendColor: Int) {
-        legendPaint.color = legendColor
+        this.legendColor = legendColor
     }
 }

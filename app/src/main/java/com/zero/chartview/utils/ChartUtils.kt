@@ -5,11 +5,19 @@ import com.zero.chartview.model.CurveLine
 import com.zero.chartview.model.FloatRange
 import java.text.DecimalFormat
 
-fun findMaxYValue(lines: List<CurveLine>): Float =
-    lines.mapNotNull { it.points.maxBy(PointF::y) }.maxBy(PointF::y)?.y ?: 0F
-
-fun findMinYValue(lines: List<CurveLine>): Float =
-    lines.mapNotNull { it.points.minBy(PointF::y) }.minBy(PointF::y)?.y ?: 0F
+fun findMinMaxYValueRanged(lines: List<CurveLine>, range: FloatRange): Pair<Float, Float> {
+    val points = mutableListOf<PointF>()
+    lines.forEach { line -> points.addAll(line.points) }
+    val maxX = points.maxBy(PointF::x)?.x ?: 0f
+    val minX = points.minBy(PointF::x)?.x ?: 0f
+    val length = maxX - minX
+    val startX = minX + length * range.start
+    val endX = minX + length * range.endInclusive
+    val rangedPoints = points.filter { it.x in startX..endX }
+    val minY = rangedPoints.minBy(PointF::y)?.y ?: 0f
+    val maxY = rangedPoints.maxBy(PointF::y)?.y ?: 0f
+    return minY to maxY
+}
 
 fun findMaxXValue(lines: List<CurveLine>): Float =
     lines.mapNotNull { it.points.maxBy(PointF::x) }.maxBy(PointF::x)?.x ?: 0F
