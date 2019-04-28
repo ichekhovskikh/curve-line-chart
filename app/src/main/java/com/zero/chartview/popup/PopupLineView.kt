@@ -50,12 +50,17 @@ class PopupLineView @JvmOverloads constructor(
     fun setRange(start: Float, endInclusive: Float) {
         range.start = Math.max(start, 0f)
         range.endInclusive = Math.min(endInclusive, 1f)
+        popupWindow?.visibility = GONE
+        touchX = null
         invalidate()
     }
 
     fun setLines(lines: List<CurveLine>) {
         this.lines = lines
         popupWindow?.setLines(lines)
+        popupWindow?.visibility = GONE
+        touchX = null
+        invalidate()
     }
 
     fun setCorrespondingLegends(correspondingLegends: Map<Float, String>) {
@@ -69,7 +74,6 @@ class PopupLineView @JvmOverloads constructor(
                 parent.requestDisallowInterceptTouchEvent(true)
                 touchX = event.x
                 touchY = event.y
-                invalidate()
             }
             MotionEvent.ACTION_MOVE -> {
                 if (Math.abs(event.y - touchY) > dyStopTrackingTouch) {
@@ -80,15 +84,12 @@ class PopupLineView @JvmOverloads constructor(
                     return false
                 }
                 touchX = event.x
-                invalidate()
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 parent.requestDisallowInterceptTouchEvent(false)
-                popupWindow?.visibility = GONE
-                touchX = null
-                invalidate()
             }
         }
+        invalidate()
         return true
     }
 
