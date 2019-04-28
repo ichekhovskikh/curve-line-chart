@@ -1,8 +1,6 @@
 package com.zero.chartview
 
 import android.annotation.SuppressLint
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -37,7 +35,11 @@ class SelectorView @JvmOverloads constructor(
     private val frameOuterContour = RectF()
 
     private var activeComponent = ComponentType.NOTHING
-    private var range = MutableLiveData<FloatRange>()
+    private val rangeChangedInvokers = mutableListOf<(FloatRange) -> Unit>()
+
+    var range = FloatRange(0f, frameMaxWidthPercent)
+        private set
+
 
     init {
         context.theme.obtainStyledAttributes(attrs, R.styleable.SelectorView, defStyleAttr, defStyleRes).apply {
@@ -49,7 +51,6 @@ class SelectorView @JvmOverloads constructor(
             frameMinWidthPercent = getDimension(R.styleable.SelectorView_frameMinWidthPercent, frameMinWidthPercent)
             recycle()
         }
-        range.value = FloatRange(0f, frameMaxWidthPercent)
         initializePaint()
     }
 
@@ -63,12 +64,23 @@ class SelectorView @JvmOverloads constructor(
     fun setRange(start: Float, endInclusive: Float) {
         val length = endInclusive - start
         if (length in frameMinWidthPercent..frameMaxWidthPercent) {
-            range.value = FloatRange(Math.max(start, 0f), Math.min(endInclusive, 1f))
+            range = FloatRange(Math.max(start, 0f), Math.min(endInclusive, 1f))
             invalidate()
+            rangeChanged()
         }
     }
 
-    fun getRange(): LiveData<FloatRange> = range
+    fun addRangeChangedInvoker(invoker: (FloatRange) -> Unit) {
+        rangeChangedInvokers.add(invoker)
+    }
+
+    fun removeRangeChangedInvoker(invoker: (FloatRange) -> Unit) {
+        rangeChangedInvokers.remove(invoker)
+    }
+
+    private fun rangeChanged() {
+        rangeChangedInvokers.forEach { it.invoke(range) }
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean =
@@ -91,8 +103,8 @@ class SelectorView @JvmOverloads constructor(
 
     private fun onActionDown(event: MotionEvent) {
         val abscissa = event.x
-        val startPixel = xValueToPixel(range.value!!.start, measuredWidth, 0f, 1f)
-        val endInclusivePixel = xValueToPixel(range.value!!.endInclusive, measuredWidth, 0f, 1f)
+        val startPixel = xValueToPixel(range.start, measuredWidth, 0f, 1f)
+        val endInclusivePixel = xValueToPixel(range.endInclusive, measuredWidth, 0f, 1f)
 
         val leftCurtainEnd = startPixel + frameThicknessVertical
         val rightCurtainStart = endInclusivePixel - frameThicknessVertical
@@ -126,19 +138,19 @@ class SelectorView @JvmOverloads constructor(
 
     private fun setLeftCurtainPosition(abscissa: Float) {
         val start = xPixelToValue(abscissa, measuredWidth, 0f, 1f)
-        setRange(Math.max(start, 0f), range.value!!.endInclusive)
+        setRange(Math.max(start, 0f), range.endInclusive)
     }
 
     private fun setRightCurtainPosition(abscissa: Float) {
         val endInclusive = xPixelToValue(abscissa, measuredWidth, 0f, 1f)
-        setRange(range.value!!.start, Math.min(endInclusive, 1f))
+        setRange(range.start, Math.min(endInclusive, 1f))
     }
 
     private fun moveFrame(abscissa: Float) {
         val incrementPixel = abscissa - downTouchPosition
         val increment = xPixelToValue(incrementPixel, measuredWidth, 0f, 1f)
-        val start = range.value!!.start + increment
-        val endInclusive = range.value!!.endInclusive + increment
+        val start = range.start + increment
+        val endInclusive = range.endInclusive + increment
         if (start >= 0f && endInclusive <= 1f) {
             downTouchPosition = abscissa
             setRange(start, endInclusive)
@@ -159,8 +171,8 @@ class SelectorView @JvmOverloads constructor(
     }
 
     private fun setFrameSize() {
-        val startPixel = xValueToPixel(range.value!!.start, measuredWidth, 0f, 1f)
-        val endInclusivePixel = xValueToPixel(range.value!!.endInclusive, measuredWidth, 0f, 1f)
+        val startPixel = xValueToPixel(range.start, measuredWidth, 0f, 1f)
+        val endInclusivePixel = xValueToPixel(range.endInclusive, measuredWidth, 0f, 1f)
 
         frameOuterContour.set(
             Math.max(startPixel - frameThicknessVertical / 2, 0f),

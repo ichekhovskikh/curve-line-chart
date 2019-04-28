@@ -6,6 +6,7 @@ import android.support.annotation.ColorInt
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import com.zero.chartview.model.CurveLine
+import com.zero.chartview.model.FloatRange
 import com.zero.chartview.utils.findMinMaxYValueRanged
 
 class ChartControlView @JvmOverloads constructor(
@@ -35,7 +36,13 @@ class ChartControlView @JvmOverloads constructor(
         selectorView.setRange(start, endInclusive)
     }
 
-    fun getLiveDataRange() = selectorView.getRange()
+    fun addRangeChangedInvoker(invoker: (FloatRange) -> Unit) {
+        selectorView.addRangeChangedInvoker(invoker)
+    }
+
+    fun removeRangeChangedInvoker(invoker: (FloatRange) -> Unit) {
+        selectorView.removeRangeChangedInvoker(invoker)
+    }
 
     fun setLines(lines: List<CurveLine>) {
         graph.setLines(lines)

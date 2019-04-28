@@ -10,4 +10,6 @@
     <color name="colorFogControl">#14416990</color>
     <color name="colorPopupLine">#EBF0F3</color>
     <color name="colorPointInner">#FFFFFF</color>
+    <color name="colorTitle">#2980C9</color>
+    <color name="colorLabel">#000000</color>
 </resources>

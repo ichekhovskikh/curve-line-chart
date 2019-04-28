@@ -50,4 +50,10 @@
         <attr name="frameMinWidthPercent"/>
         <attr name="frameMaxWidthPercent"/>
     </declare-styleable>
+
+    <declare-styleable name="ChartLayout">
+        <attr name="colorBackground"/>
+        <attr name="colorTitle" format="color"/>
+        <attr name="colorLabel" format="color"/>
+    </declare-styleable>
 </resources>

@@ -37,7 +37,9 @@ class AnimationLineService(var duration: Long = 300L, var onInvalidate: (() -> U
         val disappearing = current.minus(newLines)
         disappearing.forEach { line ->
             animationLines.find { it.curveLine == line }
-                .apply { animationLines.add(AnimatingCurveLine(line, false, 0F)) }
+                ?.apply {
+                    isAppearing = false
+                    animationValue = 0f }
         }
         appearanceAnimator.start()
     }

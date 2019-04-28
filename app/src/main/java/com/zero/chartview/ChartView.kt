@@ -25,6 +25,7 @@ class ChartView @JvmOverloads constructor(
     private val popup = PopupLineView(context, attrs, defStyleAttr, defStyleRes)
     private val window = PopupWindow(context, attrs, defStyleAttr, defStyleRes)
 
+    private val linesChangedInvokers = mutableListOf<(List<CurveLine>) -> Unit>()
     private lateinit var themeColor: Themeable.ThemeColor
 
     init {
@@ -52,13 +53,15 @@ class ChartView @JvmOverloads constructor(
         graph.setLines(lines)
         popup.setLines(lines)
         updateAxis(lines, correspondingLegends)
+        linesChanged(lines)
     }
 
     fun addLine(line: CurveLine, correspondingLegends: Map<Float, String>? = null) {
-        val lines = graph.getLines()
+        val lines = graph.getLines() + line
         graph.addLine(line)
-        popup.setLines(lines + line)
-        updateAxis(lines + line, correspondingLegends)
+        popup.setLines(lines)
+        updateAxis(lines, correspondingLegends)
+        linesChanged(lines)
     }
 
     fun removeLine(index: Int) {
@@ -67,10 +70,23 @@ class ChartView @JvmOverloads constructor(
     }
 
     fun removeLine(line: CurveLine) {
-        val lines = graph.getLines()
+        val lines = graph.getLines() - line
         graph.removeLine(line)
-        popup.setLines(lines - line)
-        updateAxis(lines - line)
+        popup.setLines(lines)
+        updateAxis(lines)
+        linesChanged(lines)
+    }
+
+    fun addLinesChangedInvoker(invoker: (List<CurveLine>) -> Unit) {
+        linesChangedInvokers.add(invoker)
+    }
+
+    fun removeRangeChangedInvoker(invoker: (List<CurveLine>) -> Unit) {
+        linesChangedInvokers.remove(invoker)
+    }
+
+    private fun linesChanged(lines: List<CurveLine>) {
+        linesChangedInvokers.forEach { it.invoke(lines) }
     }
 
     private fun updateAxis(lines: List<CurveLine>) {
