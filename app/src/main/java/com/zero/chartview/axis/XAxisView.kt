@@ -116,7 +116,9 @@ class XAxisView @JvmOverloads constructor(
         return legendText
     }
 
-    fun setLegendColor(@ColorInt legendColor: Int) {
-        this.legendColor = legendColor
+    fun setLegendColor(@ColorInt legendColor: Int?) {
+        if (legendColor != null && legendColor != this.legendColor) {
+            this.legendColor = legendColor
+        }
     }
 }

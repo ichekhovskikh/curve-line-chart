@@ -79,20 +79,23 @@ class ChartControlView @JvmOverloads constructor(
     fun setFrameControlColor(@ColorInt frameControlColor: Int) {
         themeColor.colorFrameControl = frameControlColor
         selectorView.setFrameControlColor(themeColor.colorFrameControl)
-        invalidate()
+        selectorView.invalidate()
     }
 
     fun setFogControlColor(@ColorInt fogControlColor: Int) {
         themeColor.colorFogControl = fogControlColor
         selectorView.setFogControlColor(themeColor.colorFogControl)
-        invalidate()
+        selectorView.invalidate()
     }
 
     private fun onThemeColorChanged() {
         selectorView.setFrameControlColor(themeColor.colorFrameControl)
         selectorView.setFogControlColor(themeColor.colorFogControl)
-        super.setBackgroundColor(themeColor.colorBackground)
-        invalidate()
+        val colorBackground = themeColor.colorBackground
+        if (colorBackground != null) {
+            super.setBackgroundColor(colorBackground)
+        }
+        selectorView.invalidate()
     }
 
     private fun getThemeColorDefault(typedArray: TypedArray): Themeable.ThemeColor {

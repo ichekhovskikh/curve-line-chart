@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.PointF
+import android.support.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -23,7 +24,7 @@ class PopupLineView @JvmOverloads constructor(
 
     private var pointInnerRadius = resources.getDimension(R.dimen.point_inner_radius)
     private var pointOuterRadius = resources.getDimension(R.dimen.point_outer_radius)
-    private val pointColor = resources.getColor(R.color.colorPointInner)
+    private var pointColor = resources.getColor(R.color.colorPointInner)
 
     private val linePaint = Paint()
     private val pointPaint = Paint()
@@ -41,7 +42,7 @@ class PopupLineView @JvmOverloads constructor(
     private var touchY: Float = 0f
 
     init {
-        linePaint.color = resources.getColor(R.color.colorLegendLine)
+        linePaint.color = resources.getColor(R.color.colorPopupLine)
         linePaint.strokeWidth = resources.getDimension(R.dimen.popup_line_width)
         pointPaint.style = Paint.Style.FILL
     }
@@ -139,6 +140,18 @@ class PopupLineView @JvmOverloads constructor(
     private fun getIntersectionLegend(point: PointF) =
         if (::correspondingLegends.isInitialized) correspondingLegends[point.x] ?: ""
         else formatLegend(point.x)
+
+    fun setPointColor(@ColorInt pointColor: Int?) {
+        if (pointColor != null && pointColor != this.pointColor) {
+            this.pointColor = pointColor
+        }
+    }
+
+    fun setPopupLineColor(@ColorInt popupLineColor: Int?) {
+        if (popupLineColor != null && popupLineColor != linePaint.color) {
+            linePaint.color = popupLineColor
+        }
+    }
 
     data class ChartPoint(
         var name: String,

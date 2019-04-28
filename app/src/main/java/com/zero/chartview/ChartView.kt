@@ -135,28 +135,45 @@ class ChartView @JvmOverloads constructor(
 
     override fun setBackgroundColor(@ColorInt backgroundColor: Int) {
         themeColor.colorBackground = backgroundColor
+        popup.setPointColor(backgroundColor)
+        window.setBackgroundColor(backgroundColor)
         super.setBackgroundColor(backgroundColor)
     }
 
     fun setLegendColor(@ColorInt legendColor: Int) {
         themeColor.colorLegend = legendColor
-        xAxis.setLegendColor(themeColor.colorLegend)
-        yAxis.setLegendColor(themeColor.colorLegend)
-        invalidate()
+        xAxis.setLegendColor(legendColor)
+        yAxis.setLegendColor(legendColor)
+        xAxis.invalidate()
+        yAxis.invalidate()
     }
 
     fun setGridColor(@ColorInt gridColor: Int) {
         themeColor.colorGrid = gridColor
-        yAxis.setGridColor(themeColor.colorGrid)
-        invalidate()
+        yAxis.setGridColor(gridColor)
+        yAxis.invalidate()
+    }
+
+    fun setPopupLineColor(@ColorInt popupLineColor: Int) {
+        themeColor.colorPopupLine = popupLineColor
+        popup.setPopupLineColor(popupLineColor)
+        popup.invalidate()
     }
 
     private fun onThemeColorChanged() {
         yAxis.setGridColor(themeColor.colorGrid)
         xAxis.setLegendColor(themeColor.colorLegend)
         yAxis.setLegendColor(themeColor.colorLegend)
-        super.setBackgroundColor(themeColor.colorBackground)
-        invalidate()
+        popup.setPopupLineColor(themeColor.colorPopupLine)
+        val colorBackground = themeColor.colorBackground
+        if (colorBackground != null) {
+            popup.setPointColor(colorBackground)
+            window.setBackgroundColor(colorBackground)
+            super.setBackgroundColor(colorBackground)
+        }
+        xAxis.invalidate()
+        yAxis.invalidate()
+        popup.invalidate()
     }
 
     private fun getThemeColorDefault(typedArray: TypedArray): Themeable.ThemeColor {
@@ -165,7 +182,9 @@ class ChartView @JvmOverloads constructor(
                 getColor(R.styleable.ChartView_colorBackground, resources.getColor(R.color.colorBackground))
             val colorLegend = getColor(R.styleable.ChartView_colorLegend, resources.getColor(R.color.colorLegend))
             val colorGrid = getColor(R.styleable.ChartView_colorGrid, resources.getColor(R.color.colorGrid))
-            return Themeable.ThemeColor(colorBackground, colorLegend, colorGrid)
+            val popupLineColor =
+                getColor(R.styleable.ChartView_colorPopupLine, resources.getColor(R.color.colorPopupLine))
+            return Themeable.ThemeColor(colorBackground, colorLegend, colorGrid, popupLineColor)
         }
     }
 }

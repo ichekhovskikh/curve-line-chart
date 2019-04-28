@@ -14,6 +14,7 @@
         <attr name="colorBackground" format="color"/>
         <attr name="colorLegend" format="color"/>
         <attr name="colorGrid" format="color"/>
+        <attr name="colorPopupLine" format="color"/>
     </declare-styleable>
 
     <declare-styleable name="GraphicView" parent="ChartView">

@@ -176,12 +176,16 @@ class SelectorView @JvmOverloads constructor(
         )
     }
 
-    fun setFrameControlColor(@ColorInt frameControlColor: Int) {
-        framePaint.color = frameControlColor
+    fun setFrameControlColor(@ColorInt frameControlColor: Int?) {
+        if (frameControlColor != null && frameControlColor != framePaint.color) {
+            framePaint.color = frameControlColor
+        }
     }
 
-    fun setFogControlColor(@ColorInt fogControlColor: Int) {
-        fogPaint.color = fogControlColor
+    fun setFogControlColor(@ColorInt fogControlColor: Int?) {
+        if (fogControlColor != null && fogControlColor != fogPaint.color) {
+            fogPaint.color = fogControlColor
+        }
     }
 
     enum class ComponentType {

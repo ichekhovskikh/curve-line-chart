@@ -7,12 +7,13 @@ interface Themeable {
     fun setThemeColor(colors: ThemeColor)
 
     data class ThemeColor(
-        var colorBackground: Int = 0,
-        var colorLegend: Int = 0,
-        var colorGrid: Int = 0,
-        var colorFrameControl: Int = 0,
-        var colorFogControl: Int = 0,
-        var colorLabel: Int = 0,
-        var colorTitle: Int = 0
+        var colorBackground: Int? = null,
+        var colorLegend: Int? = null,
+        var colorGrid: Int? = null,
+        var colorPopupLine: Int? = null,
+        var colorFrameControl: Int? = null,
+        var colorFogControl: Int? = null,
+        var colorLabel: Int? = null,
+        var colorTitle: Int? = null
     )
 }

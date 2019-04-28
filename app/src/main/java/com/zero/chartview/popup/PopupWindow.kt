@@ -22,6 +22,7 @@ class PopupWindow @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
 
+    private val windowView: View
     private val coordinateViews = mutableListOf<View>()
 
     private var animationOut = AnimationUtils.loadAnimation(context, android.R.anim.slide_out_right)
@@ -29,7 +30,8 @@ class PopupWindow @JvmOverloads constructor(
 
     init {
         visibility = View.INVISIBLE
-        val windowView = LayoutInflater.from(context).inflate(R.layout.popup_window, this, false)
+        windowView = LayoutInflater.from(context).inflate(R.layout.popup_window, this, false)
+        windowView.setBackgroundColor(resources.getColor(R.color.colorBackground))
         addView(windowView)
     }
 
@@ -94,5 +96,9 @@ class PopupWindow @JvmOverloads constructor(
             })
             view.startAnimation(view.animation)
         }
+    }
+
+    override fun setBackgroundColor(color: Int) {
+        windowView.setBackgroundColor(color)
     }
 }
