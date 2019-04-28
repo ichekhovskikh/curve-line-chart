@@ -15,10 +15,10 @@ class ChartControlView @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes), Themeable {
 
-    private lateinit var themeColor: Themeable.ThemeColor
-
     private val graph: GraphicView = GraphicView(context, attrs, defStyleAttr, defStyleRes)
     private var selectorView = SelectorView(context, attrs, defStyleAttr, defStyleRes)
+
+    private lateinit var themeColor: Themeable.ThemeColor
 
     init {
         addView(graph)
@@ -61,7 +61,6 @@ class ChartControlView @JvmOverloads constructor(
 
     private fun updateAxis(lines: List<CurveLine>) {
         val (minY, maxY) = findMinMaxYValueRanged(lines, graph.range)
-        //TODO setMinMaxX
         graph.setYAxis(minY, maxY)
     }
 

@@ -22,6 +22,7 @@ class AnimationLegendService(var duration: Long = 300L, var onInvalidate: (() ->
     fun setYAxis(minY: Float, maxY: Float) {
         if (this.maxY == maxY && this.minY == minY) return
 
+        tensionAnimator.cancel()
         val transparency = PropertyValuesHolder.ofFloat(TRANSPARENCY_VALUE, 0.8f, 1f)
         val minProperty = PropertyValuesHolder.ofFloat(MIN_Y, this.minY, minY)
         val maxProperty = PropertyValuesHolder.ofFloat(MAX_Y, this.maxY, maxY)
@@ -35,6 +36,7 @@ class AnimationLegendService(var duration: Long = 300L, var onInvalidate: (() ->
 
     private fun createTensionAnimator(onEnd: (() -> Unit)? = null) =
         ValueAnimator().apply {
+            interpolator = DecelerateInterpolator()
             duration = this@AnimationLegendService.duration
 
             addListener(object : AnimatorListenerAdapter() {

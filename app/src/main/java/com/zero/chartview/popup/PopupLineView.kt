@@ -14,7 +14,7 @@ import com.zero.chartview.model.FloatRange
 import com.zero.chartview.utils.*
 import kotlin.math.abs
 
-class ChartPopupView @JvmOverloads constructor(
+class PopupLineView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
     defStyleAttr: Int = 0,
@@ -40,8 +40,6 @@ class ChartPopupView @JvmOverloads constructor(
     private var touchX: Float? = null
     private var touchY: Float = 0f
 
-    var showCorrespondingLegends = false
-
     init {
         linePaint.color = resources.getColor(R.color.colorLegendLine)
         linePaint.strokeWidth = resources.getDimension(R.dimen.popup_line_width)
@@ -51,6 +49,7 @@ class ChartPopupView @JvmOverloads constructor(
     fun setRange(start: Float, endInclusive: Float) {
         range.start = Math.max(start, 0f)
         range.endInclusive = Math.min(endInclusive, 1f)
+        invalidate()
     }
 
     fun setLines(lines: List<CurveLine>) {
@@ -93,21 +92,21 @@ class ChartPopupView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        touchX?.let { x ->
-            val minX = findMinXValue(lines)
-            val maxX = findMaxXValue(lines)
-            val minY = findMinYValue(lines)
-            val maxY = findMaxYValue(lines)
-            val intersectionPoints = getIntersectionPoint(x, minX, maxX)
+        touchX?.also { x ->
+            val (startValue, endValue) = convertPercentToValue(lines, range)
+            val (minY, maxY) = findMinMaxYValueRanged(lines, range)
+            val intersectionPoints = getIntersectionPoint(x, startValue, endValue)
             if (intersectionPoints.isNotEmpty()) {
-                val intersectionXValue = intersectionPoints[0].x
-                val xDrawPixel = xValueToPixel(intersectionXValue, measuredWidth, minX, maxX)
+                val intersectionXValue = intersectionPoints.first().x
+                val xDrawPixel = xValueToPixel(intersectionXValue, measuredWidth, startValue, endValue)
                 canvas.drawLine(xDrawPixel, 0F, xDrawPixel, height.toFloat(), linePaint)
                 intersectionPoints.forEach {
                     val yDrawPixel = yValueToPixel(it.y, measuredHeight, minY, maxY)
                     drawIntersectionPoint(canvas, xDrawPixel, yDrawPixel, it.color)
                 }
                 popupWindow?.fill(touchX, intersectionPoints)
+            } else {
+                popupWindow?.visibility = GONE
             }
         }
     }
@@ -138,8 +137,8 @@ class ChartPopupView @JvmOverloads constructor(
     }
 
     private fun getIntersectionLegend(point: PointF) =
-        if (::correspondingLegends.isInitialized && showCorrespondingLegends) correspondingLegends[point.x].toString()
-        else point.y.toString()
+        if (::correspondingLegends.isInitialized) correspondingLegends[point.x] ?: ""
+        else formatLegend(point.x)
 
     data class ChartPoint(
         var name: String,

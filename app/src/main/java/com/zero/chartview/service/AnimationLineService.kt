@@ -28,6 +28,7 @@ class AnimationLineService(var duration: Long = 300L, var onInvalidate: (() -> U
 
         if (newLines == current) return
 
+        appearanceAnimator.cancel()
         val appearing = newLines.minus(current)
         appearing.forEach { line ->
             animationLines.add(AnimatingCurveLine(line, true, 0F))
@@ -45,6 +46,7 @@ class AnimationLineService(var duration: Long = 300L, var onInvalidate: (() -> U
         val current = animationLines.map { it.curveLine }
         if (current.contains(line)) return
 
+        appearanceAnimator.cancel()
         animationLines.add(AnimatingCurveLine(line, true, 0F))
         appearanceAnimator.start()
     }
@@ -53,6 +55,7 @@ class AnimationLineService(var duration: Long = 300L, var onInvalidate: (() -> U
         val current = animationLines.map { it.curveLine }
         if (!current.contains(line)) return
 
+        appearanceAnimator.cancel()
         animationLines.find { it.curveLine == line }
             ?.apply {
                 isAppearing = false
@@ -64,6 +67,7 @@ class AnimationLineService(var duration: Long = 300L, var onInvalidate: (() -> U
     fun setYAxis(minY: Float, maxY: Float) {
         if (this.maxY == maxY && this.minY == minY) return
 
+        tensionAnimator.cancel()
         val minProperty = PropertyValuesHolder.ofFloat(MIN_Y, this.minY, minY)
         val maxProperty = PropertyValuesHolder.ofFloat(MAX_Y, this.maxY, maxY)
         tensionAnimator.setValues(maxProperty, minProperty)

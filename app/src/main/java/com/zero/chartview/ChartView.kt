@@ -8,7 +8,7 @@ import android.widget.FrameLayout
 import com.zero.chartview.axis.XAxisView
 import com.zero.chartview.axis.YAxisView
 import com.zero.chartview.model.CurveLine
-import com.zero.chartview.popup.ChartPopupView
+import com.zero.chartview.popup.PopupLineView
 import com.zero.chartview.popup.PopupWindow
 import com.zero.chartview.utils.*
 
@@ -22,7 +22,7 @@ class ChartView @JvmOverloads constructor(
     private val graph = GraphicView(context, attrs, defStyleAttr, defStyleRes)
     private val yAxis = YAxisView(context, attrs, defStyleAttr, defStyleRes)
     private val xAxis = XAxisView(context, attrs, defStyleAttr, defStyleRes)
-    private val popup = ChartPopupView(context, attrs, defStyleAttr, defStyleRes)
+    private val popup = PopupLineView(context, attrs, defStyleAttr, defStyleRes)
     private val window = PopupWindow(context, attrs, defStyleAttr, defStyleRes)
 
     private lateinit var themeColor: Themeable.ThemeColor
@@ -45,16 +45,16 @@ class ChartView @JvmOverloads constructor(
         graph.setRange(start, endInclusive)
         xAxis.setRange(start, endInclusive)
         popup.setRange(start, endInclusive)
-        updateAxis(graph.getLines(), emptyMap())
+        updateAxis(graph.getLines())
     }
 
-    fun setLines(lines: List<CurveLine>, correspondingLegends: Map<Float, String> = emptyMap()) {
+    fun setLines(lines: List<CurveLine>, correspondingLegends: Map<Float, String>? = null) {
         graph.setLines(lines)
         popup.setLines(lines)
         updateAxis(lines, correspondingLegends)
     }
 
-    fun addLine(line: CurveLine, correspondingLegends: Map<Float, String> = emptyMap()) {
+    fun addLine(line: CurveLine, correspondingLegends: Map<Float, String>? = null) {
         val lines = graph.getLines()
         graph.addLine(line)
         popup.setLines(lines + line)
@@ -70,17 +70,31 @@ class ChartView @JvmOverloads constructor(
         val lines = graph.getLines()
         graph.removeLine(line)
         popup.setLines(lines - line)
-        updateAxis(lines - line, emptyMap())
+        updateAxis(lines - line)
     }
 
-    private fun updateAxis(lines: List<CurveLine>, correspondingLegends: Map<Float, String>) {
+    private fun updateAxis(lines: List<CurveLine>) {
         val (minY, maxY) = findMinMaxYValueRanged(lines, graph.range)
         val abscissas = getAbscissas(lines)
         graph.setYAxis(minY, maxY)
         yAxis.setYAxis(minY, maxY)
         xAxis.setCoordinates(abscissas)
-        if (correspondingLegends.isEmpty()) {
-            xAxis.setCorrespondingLegends(createCorrespondingLegends(abscissas))
+    }
+
+    private fun updateAxis(lines: List<CurveLine>, correspondingLegends: Map<Float, String>?) {
+        val (minY, maxY) = findMinMaxYValueRanged(lines, graph.range)
+        val abscissas = getAbscissas(lines)
+        graph.setYAxis(minY, maxY)
+        yAxis.setYAxis(minY, maxY)
+        xAxis.setCoordinates(abscissas)
+        updateCorrespondingLegends(abscissas, correspondingLegends)
+    }
+
+    private fun updateCorrespondingLegends(abscissas: List<Float>, correspondingLegends: Map<Float, String>?) {
+        if (correspondingLegends == null) {
+            val legends = createCorrespondingLegends(abscissas)
+            xAxis.setCorrespondingLegends(legends)
+            popup.setCorrespondingLegends(legends)
         } else {
             xAxis.setCorrespondingLegends(correspondingLegends)
             popup.setCorrespondingLegends(correspondingLegends)

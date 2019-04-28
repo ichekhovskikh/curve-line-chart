@@ -21,7 +21,7 @@ class GraphicView @JvmOverloads constructor(
     private val path = Path()
 
     var range = FloatRange(0F, 1F)
-    private set
+        private set
 
     var animationLineService = AnimationLineService(BuildConfig.ANIMATION_DURATION_MS)
         private set
@@ -105,7 +105,22 @@ class GraphicView @JvmOverloads constructor(
                 transformPoints.add(PointF(x, y))
             }
         }
+        addBoundaryPoints(transformPoints, points, valueRange)
         return transformPoints
+    }
+
+    private fun addBoundaryPoints(pixelPoints: MutableList<PointF>, valuePoints: List<PointF>, valueRange: FloatRange) {
+        val (leftBoundary, rightBoundary) = getBoundaryPoints(valuePoints, valueRange)
+        leftBoundary?.also {
+            val x = xValueToPixel(it.x, measuredWidth, valueRange.start, valueRange.endInclusive)
+            val y = yValueToPixel(it.y, measuredHeight, getMinY(), getMaxY())
+            pixelPoints.add(0, PointF(x, y))
+        }
+        rightBoundary?.also {
+            val x = xValueToPixel(it.x, measuredWidth, valueRange.start, valueRange.endInclusive)
+            val y = yValueToPixel(it.y, measuredHeight, getMinY(), getMaxY())
+            pixelPoints.add(PointF(x, y))
+        }
     }
 
     private fun getTransparencyColor(line: AnimatingCurveLine): Int {

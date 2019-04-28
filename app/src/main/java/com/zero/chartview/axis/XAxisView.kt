@@ -10,7 +10,6 @@ import android.view.View
 import com.zero.chartview.R
 import com.zero.chartview.model.FloatRange
 import com.zero.chartview.utils.convertPercentToValue
-import com.zero.chartview.utils.formatLegend
 import com.zero.chartview.utils.xValueToPixel
 import kotlin.math.floor
 import kotlin.math.log2
@@ -111,11 +110,8 @@ class XAxisView @JvmOverloads constructor(
 
     private fun getLegendText(averageCoordinate: Float?): String {
         var legendText = correspondingLegends[averageCoordinate] ?: ""
-        val numeric = legendText.toFloatOrNull()
-        if (numeric != null) {
-            legendText = formatLegend(numeric)
-        } else if (legendText.length > textLength) {
-            legendText.substring(0, textLength)
+        if (legendText.length > textLength) {
+            legendText = legendText.substring(0, textLength)
         }
         return legendText
     }

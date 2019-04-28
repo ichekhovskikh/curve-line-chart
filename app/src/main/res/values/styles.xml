@@ -30,5 +30,5 @@
     <dimen name="point_outer_radius">5dp</dimen>
 
     <dimen name="dy_stop_tracking_touch">50dp</dimen>
-    <fraction name="epsilon_x_tracking_touch">2%</fraction>
+    <fraction name="epsilon_x_tracking_touch">3%</fraction>
 </resources>

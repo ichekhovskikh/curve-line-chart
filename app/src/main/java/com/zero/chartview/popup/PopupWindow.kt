@@ -13,6 +13,7 @@ import com.zero.chartview.utils.getByName
 import kotlinx.android.synthetic.main.popup_window.view.*
 import android.view.animation.AnimationUtils
 import com.zero.chartview.utils.AnimatorListenerAdapter
+import com.zero.chartview.utils.formatLegend
 
 class PopupWindow @JvmOverloads constructor(
     context: Context,
@@ -50,27 +51,18 @@ class PopupWindow @JvmOverloads constructor(
         }
     }
 
-    fun fill(xPixel: Float?, chartPoints: List<ChartPopupView.ChartPoint>) {
-        coordinateViews.forEachIndexed { index, view ->
+    fun fill(xPixel: Float?, pointsLine: List<PopupLineView.ChartPoint>) {
+        coordinateViews.forEach { view ->
             val nameView: TextView = view.findViewById(R.id.name)
-            val chartPoint = chartPoints.getByName(nameView.text.toString())
+            val chartPoint = pointsLine.getByName(nameView.text.toString())
             if (chartPoint != null) {
                 val xValueView: TextView = view.findViewById(R.id.xValue)
                 val yValueView: TextView = view.findViewById(R.id.yValue)
-                xValueView.text = chartPoint.x.toString()
-                yValueView.text = chartPoint.correspondingLegend
-                if (view.visibility != View.VISIBLE) {
-                    view.startAnimation(animationIn)
-                    view.visibility = View.VISIBLE
-                }
-            } else if (view.visibility == View.VISIBLE) {
-                animationOut.setAnimationListener(object: AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animation?) {
-                        view.visibility = View.GONE
-                    }
-                })
-                view.startAnimation(animationOut)
+                xValueView.text = chartPoint.correspondingLegend
+                yValueView.text = formatLegend(chartPoint.y)
             }
+            val isAppearing = chartPoint != null
+            startAnimation(view, isAppearing)
         }
         setPopupPosition(xPixel)
         visibility = View.VISIBLE
@@ -84,6 +76,23 @@ class PopupWindow @JvmOverloads constructor(
             x = 0f
         } else if (xPixel != null) {
             x = xPixel - halfPopupWidth
+        }
+        y = 0f
+    }
+
+    private fun startAnimation(view: View, isAppearing: Boolean) {
+        if (isAppearing && view.visibility != View.VISIBLE) {
+            view.startAnimation(animationIn)
+            view.visibility = View.VISIBLE
+        } else if (!isAppearing && view.visibility == View.VISIBLE && view.animation == null) {
+            view.animation = animationOut
+            view.animation.setAnimationListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animation?) {
+                    view.visibility = View.GONE
+                    view.animation = null
+                }
+            })
+            view.startAnimation(view.animation)
         }
     }
 }
