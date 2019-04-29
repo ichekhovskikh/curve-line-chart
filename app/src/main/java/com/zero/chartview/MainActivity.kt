@@ -10,24 +10,17 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        control.addRangeChangedInvoker {
-            chart.setRange(it.start, it.endInclusive)
-        }
-        chart.addLinesChangedInvoker {
-            control.setLines(it)
-        }
-        chart.setLines(testLines)
+
+        chartLayout.setLines(testLines)
 
         var flag = true
         button.setOnClickListener {
             if (flag) {
                 flag = false
-                chart.removeLine(0)
-                chart.setBackgroundColor(resources.getColor(android.R.color.holo_green_dark))
+                chartLayout.removeLine(testLines[0])
             } else {
                 flag = true
-                chart.setLines(testLines)
-                chart.setBackgroundColor(resources.getColor(android.R.color.holo_red_dark))
+                chartLayout.addLine(testLines[0])
             }
         }
     }

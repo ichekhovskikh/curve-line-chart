@@ -49,6 +49,8 @@ class ChartView @JvmOverloads constructor(
         updateAxis(graph.getLines())
     }
 
+    fun getLines() = graph.getLines()
+
     fun setLines(lines: List<CurveLine>, correspondingLegends: Map<Float, String>? = null) {
         graph.setLines(lines)
         popup.setLines(lines)

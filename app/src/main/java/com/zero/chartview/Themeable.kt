@@ -12,8 +12,6 @@ interface Themeable {
         var colorGrid: Int? = null,
         var colorPopupLine: Int? = null,
         var colorFrameControl: Int? = null,
-        var colorFogControl: Int? = null,
-        var colorLabel: Int? = null,
-        var colorTitle: Int? = null
+        var colorFogControl: Int? = null
     )
 }

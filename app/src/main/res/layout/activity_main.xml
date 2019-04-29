@@ -8,16 +8,23 @@
         android:gravity="center_horizontal"
         tools:context=".MainActivity">
 
-    <com.zero.chartview.ChartView
-            android:id="@+id/chart"
+    <com.zero.chartview.ChartLayout
+            android:id="@+id/chartLayout"
             android:layout_width="match_parent"
-            android:layout_height="300dp"/>
+            android:layout_height="wrap_content">
 
-    <com.zero.chartview.ChartControlView
-            android:id="@+id/control"
-            android:layout_marginTop="20dp"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"/>
+        <com.zero.chartview.ChartView
+                android:id="@+id/chart"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"/>
+
+        <com.zero.chartview.ChartControlView
+                android:id="@+id/control"
+                android:layout_marginTop="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"/>
+
+    </com.zero.chartview.ChartLayout>
 
     <Button
             android:id="@+id/button"

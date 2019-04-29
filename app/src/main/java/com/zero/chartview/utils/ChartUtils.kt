@@ -10,6 +10,7 @@ import java.text.DecimalFormat
 fun findMinMaxYValueRanged(lines: List<CurveLine>, range: FloatRange): Pair<Float, Float> {
     val points = mutableListOf<PointF>()
     lines.forEach { line -> points.addAll(line.points) }
+    points.sortBy { it.x }
     val valueRange = convertPercentToValue(points.map { it.x }, range)
     val (leftBoundary, rightBoundary) = getBoundaryPoints(points, valueRange)
     leftBoundary?.let { points.add(it) }
