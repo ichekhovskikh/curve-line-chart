@@ -24,7 +24,7 @@ internal class PopupLineView @JvmOverloads constructor(
 
     private var pointInnerRadius = resources.getDimension(R.dimen.point_inner_radius)
     private var pointOuterRadius = resources.getDimension(R.dimen.point_outer_radius)
-    private var pointColor = resources.getColor(R.color.colorPointInner)
+    private var pointColor = resources.getColor(R.color.colorBackground)
 
     private val linePaint = Paint()
     private val pointPaint = Paint()
