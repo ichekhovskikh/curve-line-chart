@@ -142,14 +142,14 @@ internal class PopupLineView @JvmOverloads constructor(
         if (::correspondingLegends.isInitialized) correspondingLegends[point.x] ?: ""
         else formatLegend(point.x)
 
-    fun setPointColor(@ColorInt pointColor: Int?) {
-        if (pointColor != null && pointColor != this.pointColor) {
+    fun setPointColor(@ColorInt pointColor: Int) {
+        if (pointColor != this.pointColor) {
             this.pointColor = pointColor
         }
     }
 
-    fun setPopupLineColor(@ColorInt popupLineColor: Int?) {
-        if (popupLineColor != null && popupLineColor != linePaint.color) {
+    fun setPopupLineColor(@ColorInt popupLineColor: Int) {
+        if (popupLineColor != linePaint.color) {
             linePaint.color = popupLineColor
         }
     }

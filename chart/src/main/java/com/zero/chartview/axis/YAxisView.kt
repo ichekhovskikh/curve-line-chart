@@ -109,14 +109,14 @@ internal class YAxisView @JvmOverloads constructor(
     private fun seriesTransparency(labels: AnimatingLegendSeries) =
         (255 * if (labels.isAppearing) labels.animationValue else 1 - labels.animationValue).toInt()
 
-    fun setGridColor(@ColorInt gridColor: Int?) {
-        if (gridColor != null && gridColor != gridPaint.color) {
+    fun setGridColor(@ColorInt gridColor: Int) {
+        if (gridColor != gridPaint.color) {
             gridPaint.color = gridColor
         }
     }
 
-    fun setLegendColor(@ColorInt legendColor: Int?) {
-        if (legendColor != null && legendColor != legendPaint.color) {
+    fun setLegendColor(@ColorInt legendColor: Int) {
+        if (legendColor != legendPaint.color) {
             legendPaint.color = legendColor
         }
     }

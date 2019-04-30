@@ -7,7 +7,7 @@ import android.view.animation.DecelerateInterpolator
 import com.zero.chartview.model.AnimatingLegendSeries
 import com.zero.chartview.utils.AnimatorListenerAdapter
 
-internal class AnimationLegendService(var duration: Long = 300L, var onInvalidate: (() -> Unit)? = null) {
+internal class AnimationLegendService(val duration: Long = 300L, var onInvalidate: (() -> Unit)? = null) {
 
     var maxY = 0F
         private set

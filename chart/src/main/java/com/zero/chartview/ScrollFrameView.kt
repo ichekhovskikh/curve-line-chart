@@ -188,14 +188,14 @@ class ScrollFrameView @JvmOverloads constructor(
         )
     }
 
-    fun setFrameControlColor(@ColorInt frameControlColor: Int?) {
-        if (frameControlColor != null && frameControlColor != framePaint.color) {
+    fun setFrameControlColor(@ColorInt frameControlColor: Int) {
+        if (frameControlColor != framePaint.color) {
             framePaint.color = frameControlColor
         }
     }
 
-    fun setFogControlColor(@ColorInt fogControlColor: Int?) {
-        if (fogControlColor != null && fogControlColor != fogPaint.color) {
+    fun setFogControlColor(@ColorInt fogControlColor: Int) {
+        if (fogControlColor != fogPaint.color) {
             fogPaint.color = fogControlColor
         }
     }

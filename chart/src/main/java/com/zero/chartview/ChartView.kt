@@ -183,12 +183,9 @@ class ChartView @JvmOverloads constructor(
         xAxis.setLegendColor(themeColor.colorLegend)
         yAxis.setLegendColor(themeColor.colorLegend)
         popup.setPopupLineColor(themeColor.colorPopupLine)
-        val colorBackground = themeColor.colorBackground
-        if (colorBackground != null) {
-            popup.setPointColor(colorBackground)
-            window.setBackgroundColor(colorBackground)
-            super.setBackgroundColor(colorBackground)
-        }
+        popup.setPointColor(themeColor.colorPopupLine)
+        window.setBackgroundColor(themeColor.colorPopupLine)
+        super.setBackgroundColor(themeColor.colorPopupLine)
         xAxis.invalidate()
         yAxis.invalidate()
         popup.invalidate()
@@ -200,9 +197,9 @@ class ChartView @JvmOverloads constructor(
                 getColor(R.styleable.ChartView_colorBackground, resources.getColor(R.color.colorBackground))
             val colorLegend = getColor(R.styleable.ChartView_colorLegend, resources.getColor(R.color.colorLegend))
             val colorGrid = getColor(R.styleable.ChartView_colorGrid, resources.getColor(R.color.colorGrid))
-            val popupLineColor =
+            val colorPopupLine =
                 getColor(R.styleable.ChartView_colorPopupLine, resources.getColor(R.color.colorPopupLine))
-            return Themeable.ThemeColor(colorBackground, colorLegend, colorGrid, popupLineColor)
+            return Themeable.ThemeColor(colorBackground, colorLegend, colorGrid, colorPopupLine)
         }
     }
 }

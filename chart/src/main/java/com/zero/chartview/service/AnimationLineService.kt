@@ -8,7 +8,7 @@ import com.zero.chartview.model.AnimatingCurveLine
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.utils.AnimatorListenerAdapter
 
-internal class AnimationLineService(var duration: Long = 300L, var onInvalidate: (() -> Unit)? = null) {
+internal class AnimationLineService(val duration: Long = 300L, var onInvalidate: (() -> Unit)? = null) {
 
     var maxY = 0F
         private set

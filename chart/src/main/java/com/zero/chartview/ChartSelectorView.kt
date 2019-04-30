@@ -98,10 +98,7 @@ class ChartSelectorView @JvmOverloads constructor(
     private fun onThemeColorChanged() {
         scrollFrame.setFrameControlColor(themeColor.colorFrameControl)
         scrollFrame.setFogControlColor(themeColor.colorFogControl)
-        val colorBackground = themeColor.colorBackground
-        if (colorBackground != null) {
-            super.setBackgroundColor(colorBackground)
-        }
+        super.setBackgroundColor(themeColor.colorBackground)
         scrollFrame.invalidate()
     }
 

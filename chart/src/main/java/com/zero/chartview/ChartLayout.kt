@@ -87,10 +87,7 @@ class ChartLayout @JvmOverloads constructor(
         themeColor = colors
         chart?.setThemeColor(colors)
         selector?.setThemeColor(colors)
-        val colorBackground = colors.colorBackground
-        if (colorBackground != null) {
-            setBackgroundColor(colorBackground)
-        }
+        setBackgroundColor(colors.colorBackground)
     }
 
     private fun getThemeColorDefault(typedArray: TypedArray): Themeable.ThemeColor {
