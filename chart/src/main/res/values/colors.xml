@@ -6,7 +6,7 @@
     <color name="colorBackground">#FFFFFF</color>
     <color name="colorLegend">#9DA4AC</color>
     <color name="colorGrid">#D3DBE7</color>
-    <color name="colorFrameControl">#38416990</color>
-    <color name="colorFogControl">#14416990</color>
+    <color name="colorFrameSelector">#38416990</color>
+    <color name="colorFogSelector">#14416990</color>
     <color name="colorPopupLine">#EBF0F3</color>
 </resources>

@@ -4,10 +4,10 @@ import com.zero.sample.Stainable
 
 class ColoringService(private val stainable: Stainable) {
 
-    var lightColors = Stainable.ThemeColor()
+    var lightColors = Stainable.ThemeColors()
         private set
 
-    var darkColors = Stainable.ThemeColor()
+    var darkColors = Stainable.ThemeColors()
         private set
 
     fun setLightThemeColor(
@@ -15,18 +15,18 @@ class ColoringService(private val stainable: Stainable) {
         colorLegend: Int = lightColors.colorLegend,
         colorGrid: Int = lightColors.colorGrid,
         colorPopupLine: Int = lightColors.colorPopupLine,
-        colorFrameControl: Int = lightColors.colorFrameControl,
-        colorFogControl: Int = lightColors.colorFogControl,
+        colorFrameSelector: Int = lightColors.colorFrameSelector,
+        colorFogSelector: Int = lightColors.colorFogSelector,
         colorTitle: Int = lightColors.colorTitle,
         colorLabel: Int = lightColors.colorLabel
     ) {
-        lightColors = Stainable.ThemeColor(
+        lightColors = Stainable.ThemeColors(
             colorBackground,
             colorLegend,
             colorGrid,
             colorPopupLine,
-            colorFrameControl,
-            colorFogControl,
+            colorFrameSelector,
+            colorFogSelector,
             colorTitle,
             colorLabel
         )
@@ -37,18 +37,18 @@ class ColoringService(private val stainable: Stainable) {
         colorLegend: Int = darkColors.colorLegend,
         colorGrid: Int = darkColors.colorGrid,
         colorPopupLine: Int = darkColors.colorPopupLine,
-        colorFrameControl: Int = darkColors.colorFrameControl,
-        colorFogControl: Int = darkColors.colorFogControl,
+        colorFrameSelector: Int = darkColors.colorFrameSelector,
+        colorFogSelector: Int = darkColors.colorFogSelector,
         colorTitle: Int = darkColors.colorTitle,
         colorLabel: Int = darkColors.colorLabel
     ) {
-        darkColors = Stainable.ThemeColor(
+        darkColors = Stainable.ThemeColors(
             colorBackground,
             colorLegend,
             colorGrid,
             colorPopupLine,
-            colorFrameControl,
-            colorFogControl,
+            colorFrameSelector,
+            colorFogSelector,
             colorTitle,
             colorLabel
         )
@@ -62,8 +62,8 @@ class ColoringService(private val stainable: Stainable) {
         }
     }
 
-    private fun setColors(colors: Stainable.ThemeColor) {
-        stainable.updateColors(colors)
+    private fun setColors(colors: Stainable.ThemeColors) {
+        stainable.setThemeColors(colors)
     }
 
     enum class ThemeStyle {

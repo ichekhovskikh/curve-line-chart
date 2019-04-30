@@ -16,7 +16,7 @@ class ChartLayout @JvmOverloads constructor(
     private var chart: ChartView? = null
     private var selector: ChartSelectorView? = null
 
-    private lateinit var themeColor: Themeable.ThemeColor
+    private lateinit var chartColors: Themeable.ChartColors
 
     init {
         orientation = VERTICAL
@@ -25,7 +25,7 @@ class ChartLayout @JvmOverloads constructor(
         val typedArray = context.theme.obtainStyledAttributes(attrs, R.styleable.ChartLayout, defStyleAttr, defStyleRes)
         val themeDefault = getThemeColorDefault(typedArray)
         typedArray.recycle()
-        setThemeColor(themeDefault)
+        setChartColors(themeDefault)
     }
 
     override fun onFinishInflate() {
@@ -68,33 +68,33 @@ class ChartLayout @JvmOverloads constructor(
         chart?.removeLine(line)
     }
 
-    override fun getThemeColor(): Themeable.ThemeColor {
-        val chartColors = chart?.getThemeColor()
-        val controlColors = selector?.getThemeColor()
+    override fun getChartColors(): Themeable.ChartColors {
+        val chartColors = chart?.getChartColors()
+        val controlColors = selector?.getChartColors()
         chartColors?.apply {
-            themeColor.colorLegend = colorLegend
-            themeColor.colorGrid = colorGrid
-            themeColor.colorPopupLine = colorPopupLine
+            this@ChartLayout.chartColors.colorLegend = colorLegend
+            this@ChartLayout.chartColors.colorGrid = colorGrid
+            this@ChartLayout.chartColors.colorPopupLine = colorPopupLine
         }
         controlColors?.apply {
-            themeColor.colorFrameControl = colorFrameControl
-            themeColor.colorFogControl = colorFogControl
+            this@ChartLayout.chartColors.colorFrameSelector = colorFrameSelector
+            this@ChartLayout.chartColors.colorFogSelector = colorFogSelector
         }
-        return themeColor
+        return this.chartColors
     }
 
-    override fun setThemeColor(colors: Themeable.ThemeColor) {
-        themeColor = colors
-        chart?.setThemeColor(colors)
-        selector?.setThemeColor(colors)
+    override fun setChartColors(colors: Themeable.ChartColors) {
+        chartColors = colors
+        chart?.setChartColors(colors)
+        selector?.setChartColors(colors)
         setBackgroundColor(colors.colorBackground)
     }
 
-    private fun getThemeColorDefault(typedArray: TypedArray): Themeable.ThemeColor {
+    private fun getThemeColorDefault(typedArray: TypedArray): Themeable.ChartColors {
         typedArray.apply {
             val colorBackground =
                 getColor(R.styleable.ChartLayout_colorBackground, resources.getColor(R.color.colorBackground))
-            return Themeable.ThemeColor(colorBackground = colorBackground)
+            return Themeable.ChartColors(colorBackground = colorBackground)
         }
     }
 }

@@ -26,7 +26,7 @@ class ChartView @JvmOverloads constructor(
     private val window = PopupWindow(context, attrs, defStyleAttr, defStyleRes)
 
     private val linesChangedInvokers = mutableListOf<(List<CurveLine>) -> Unit>()
-    private lateinit var themeColor: Themeable.ThemeColor
+    private lateinit var chartColors: Themeable.ChartColors
 
     init {
         addView(xAxis)
@@ -39,7 +39,7 @@ class ChartView @JvmOverloads constructor(
         val typedArray = context.theme.obtainStyledAttributes(attrs, R.styleable.ChartView, defStyleAttr, defStyleRes)
         val themeDefault = getThemeColorDefault(typedArray)
         typedArray.recycle()
-        setThemeColor(themeDefault)
+        setChartColors(themeDefault)
     }
 
     fun setRange(start: Float, endInclusive: Float) {
@@ -144,22 +144,22 @@ class ChartView @JvmOverloads constructor(
         )
     }
 
-    override fun getThemeColor() = themeColor
+    override fun getChartColors() = chartColors
 
-    override fun setThemeColor(colors: Themeable.ThemeColor) {
-        themeColor = colors
+    override fun setChartColors(colors: Themeable.ChartColors) {
+        chartColors = colors
         onThemeColorChanged()
     }
 
     override fun setBackgroundColor(@ColorInt backgroundColor: Int) {
-        themeColor.colorBackground = backgroundColor
+        chartColors.colorBackground = backgroundColor
         popup.setPointColor(backgroundColor)
         window.setBackgroundColor(backgroundColor)
         super.setBackgroundColor(backgroundColor)
     }
 
     fun setLegendColor(@ColorInt legendColor: Int) {
-        themeColor.colorLegend = legendColor
+        chartColors.colorLegend = legendColor
         xAxis.setLegendColor(legendColor)
         yAxis.setLegendColor(legendColor)
         xAxis.invalidate()
@@ -167,31 +167,31 @@ class ChartView @JvmOverloads constructor(
     }
 
     fun setGridColor(@ColorInt gridColor: Int) {
-        themeColor.colorGrid = gridColor
+        chartColors.colorGrid = gridColor
         yAxis.setGridColor(gridColor)
         yAxis.invalidate()
     }
 
     fun setPopupLineColor(@ColorInt popupLineColor: Int) {
-        themeColor.colorPopupLine = popupLineColor
+        chartColors.colorPopupLine = popupLineColor
         popup.setPopupLineColor(popupLineColor)
         popup.invalidate()
     }
 
     private fun onThemeColorChanged() {
-        yAxis.setGridColor(themeColor.colorGrid)
-        xAxis.setLegendColor(themeColor.colorLegend)
-        yAxis.setLegendColor(themeColor.colorLegend)
-        popup.setPopupLineColor(themeColor.colorPopupLine)
-        popup.setPointColor(themeColor.colorPopupLine)
-        window.setBackgroundColor(themeColor.colorPopupLine)
-        super.setBackgroundColor(themeColor.colorPopupLine)
+        yAxis.setGridColor(chartColors.colorGrid)
+        xAxis.setLegendColor(chartColors.colorLegend)
+        yAxis.setLegendColor(chartColors.colorLegend)
+        popup.setPopupLineColor(chartColors.colorPopupLine)
+        popup.setPointColor(chartColors.colorBackground)
+        window.setBackgroundColor(chartColors.colorBackground)
+        super.setBackgroundColor(chartColors.colorBackground)
         xAxis.invalidate()
         yAxis.invalidate()
         popup.invalidate()
     }
 
-    private fun getThemeColorDefault(typedArray: TypedArray): Themeable.ThemeColor {
+    private fun getThemeColorDefault(typedArray: TypedArray): Themeable.ChartColors {
         typedArray.apply {
             val colorBackground =
                 getColor(R.styleable.ChartView_colorBackground, resources.getColor(R.color.colorBackground))
@@ -199,7 +199,7 @@ class ChartView @JvmOverloads constructor(
             val colorGrid = getColor(R.styleable.ChartView_colorGrid, resources.getColor(R.color.colorGrid))
             val colorPopupLine =
                 getColor(R.styleable.ChartView_colorPopupLine, resources.getColor(R.color.colorPopupLine))
-            return Themeable.ThemeColor(colorBackground, colorLegend, colorGrid, colorPopupLine)
+            return Themeable.ChartColors(colorBackground, colorLegend, colorGrid, colorPopupLine)
         }
     }
 }

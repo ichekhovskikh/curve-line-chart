@@ -57,8 +57,8 @@ class ScrollFrameView @JvmOverloads constructor(
     private fun initializePaint() {
         fogPaint.style = Paint.Style.FILL
         framePaint.style = Paint.Style.FILL
-        fogPaint.color = resources.getColor(R.color.colorFogControl)
-        framePaint.color = resources.getColor(R.color.colorFrameControl)
+        fogPaint.color = resources.getColor(R.color.colorFogSelector)
+        framePaint.color = resources.getColor(R.color.colorFrameSelector)
     }
 
     fun setRange(start: Float, endInclusive: Float) {
@@ -188,15 +188,15 @@ class ScrollFrameView @JvmOverloads constructor(
         )
     }
 
-    fun setFrameControlColor(@ColorInt frameControlColor: Int) {
-        if (frameControlColor != framePaint.color) {
-            framePaint.color = frameControlColor
+    fun setFrameSelectorColor(@ColorInt frameSelectorColor: Int) {
+        if (frameSelectorColor != framePaint.color) {
+            framePaint.color = frameSelectorColor
         }
     }
 
-    fun setFogControlColor(@ColorInt fogControlColor: Int) {
-        if (fogControlColor != fogPaint.color) {
-            fogPaint.color = fogControlColor
+    fun setFogSelectorColor(@ColorInt fogSelectorColor: Int) {
+        if (fogSelectorColor != fogPaint.color) {
+            fogPaint.color = fogSelectorColor
         }
     }
 

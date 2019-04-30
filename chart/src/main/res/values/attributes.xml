@@ -36,8 +36,8 @@
 
     <declare-styleable name="ChartSelectorView">
         <attr name="colorBackground"/>
-        <attr name="colorFrameControl" format="color"/>
-        <attr name="colorFogControl" format="color"/>
+        <attr name="colorFrameSelector" format="color"/>
+        <attr name="colorFogSelector" format="color"/>
         <attr name="frameThicknessHorizontal" format="dimension"/>
         <attr name="frameThicknessVertical" format="dimension"/>
         <attr name="frameMinWidthPercent" format="fraction"/>

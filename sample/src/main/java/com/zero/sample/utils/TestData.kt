@@ -1,4 +1,4 @@
-package com.zero.sample
+package com.zero.sample.utils
 
 import android.graphics.Color
 import android.graphics.PointF

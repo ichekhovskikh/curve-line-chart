@@ -19,7 +19,7 @@ class ChartSelectorView @JvmOverloads constructor(
     private val graph: GraphicsView = GraphicsView(context, attrs, defStyleAttr, defStyleRes)
     private var scrollFrame = ScrollFrameView(context, attrs, defStyleAttr, defStyleRes)
 
-    private lateinit var themeColor: Themeable.ThemeColor
+    private lateinit var chartColors: Themeable.ChartColors
 
     init {
         addView(graph)
@@ -29,7 +29,7 @@ class ChartSelectorView @JvmOverloads constructor(
             context.theme.obtainStyledAttributes(attrs, R.styleable.ChartSelectorView, defStyleAttr, defStyleRes)
         val themeDefault = getThemeColorDefault(typedArray)
         typedArray.recycle()
-        setThemeColor(themeDefault)
+        setChartColors(themeDefault)
     }
 
     fun setRange(start: Float, endInclusive: Float) {
@@ -71,49 +71,49 @@ class ChartSelectorView @JvmOverloads constructor(
         graph.setYAxis(minY, maxY)
     }
 
-    override fun getThemeColor() = themeColor
+    override fun getChartColors() = chartColors
 
-    override fun setThemeColor(colors: Themeable.ThemeColor) {
-        themeColor = colors
+    override fun setChartColors(colors: Themeable.ChartColors) {
+        chartColors = colors
         onThemeColorChanged()
     }
 
     override fun setBackgroundColor(@ColorInt backgroundColor: Int) {
-        themeColor.colorBackground = backgroundColor
+        chartColors.colorBackground = backgroundColor
         super.setBackgroundColor(backgroundColor)
     }
 
-    fun setFrameControlColor(@ColorInt frameControlColor: Int) {
-        themeColor.colorFrameControl = frameControlColor
-        scrollFrame.setFrameControlColor(themeColor.colorFrameControl)
+    fun setFrameSelectorColor(@ColorInt frameSelectorColor: Int) {
+        chartColors.colorFrameSelector = frameSelectorColor
+        scrollFrame.setFrameSelectorColor(chartColors.colorFrameSelector)
         scrollFrame.invalidate()
     }
 
-    fun setFogControlColor(@ColorInt fogControlColor: Int) {
-        themeColor.colorFogControl = fogControlColor
-        scrollFrame.setFogControlColor(themeColor.colorFogControl)
+    fun setFogCSelectorColor(@ColorInt fogSelectorColor: Int) {
+        chartColors.colorFogSelector = fogSelectorColor
+        scrollFrame.setFogSelectorColor(chartColors.colorFogSelector)
         scrollFrame.invalidate()
     }
 
     private fun onThemeColorChanged() {
-        scrollFrame.setFrameControlColor(themeColor.colorFrameControl)
-        scrollFrame.setFogControlColor(themeColor.colorFogControl)
-        super.setBackgroundColor(themeColor.colorBackground)
+        scrollFrame.setFrameSelectorColor(chartColors.colorFrameSelector)
+        scrollFrame.setFogSelectorColor(chartColors.colorFogSelector)
+        super.setBackgroundColor(chartColors.colorBackground)
         scrollFrame.invalidate()
     }
 
-    private fun getThemeColorDefault(typedArray: TypedArray): Themeable.ThemeColor {
+    private fun getThemeColorDefault(typedArray: TypedArray): Themeable.ChartColors {
         typedArray.apply {
             val colorBackground =
                 getColor(R.styleable.ChartSelectorView_colorBackground, resources.getColor(R.color.colorBackground))
-            val colorFrameControl =
-                getColor(R.styleable.ChartSelectorView_colorFrameControl, resources.getColor(R.color.colorFrameControl))
-            val colorFogControl =
-                getColor(R.styleable.ChartSelectorView_colorFogControl, resources.getColor(R.color.colorFogControl))
-            return Themeable.ThemeColor(
+            val colorFrameSelector =
+                getColor(R.styleable.ChartSelectorView_colorFrameSelector, resources.getColor(R.color.colorFrameSelector))
+            val colorFogSelector =
+                getColor(R.styleable.ChartSelectorView_colorFogSelector, resources.getColor(R.color.colorFogSelector))
+            return Themeable.ChartColors(
                 colorBackground = colorBackground,
-                colorFrameControl = colorFrameControl,
-                colorFogControl = colorFogControl
+                colorFrameSelector = colorFrameSelector,
+                colorFogSelector = colorFogSelector
             )
         }
     }

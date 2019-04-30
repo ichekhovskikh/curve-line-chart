@@ -6,8 +6,8 @@
     <color name="colorBackground">#FFFFFF</color>
     <color name="colorLegend">#9DA4AC</color>
     <color name="colorGrid">#D3DBE7</color>
-    <color name="colorFrameControl">#38416990</color>
-    <color name="colorFogControl">#14416990</color>
+    <color name="colorFrameSelector">#38416990</color>
+    <color name="colorFogSelector">#14416990</color>
     <color name="colorPopupLine">#EBF0F3</color>
 
     <color name="colorTitle">#218acf</color>
@@ -19,8 +19,8 @@
     <color name="darkColorBackground">#1D2733</color>
     <color name="darkColorLegend">#5B6F81</color>
     <color name="darkColorGrid">#131c26</color>
-    <color name="darkColorFrameControl">#803E5D79</color>
-    <color name="darkColorFogControl">#B3141C32</color>
+    <color name="darkColorFrameSelector">#803E5D79</color>
+    <color name="darkColorFogSelector">#B3141C32</color>
     <color name="darkColorPopupLine">#B3141C32</color>
 
     <color name="darkColorTitle">#85d5ff</color>
