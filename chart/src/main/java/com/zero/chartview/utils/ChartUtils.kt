@@ -29,8 +29,8 @@ fun convertPercentToValue(lines: List<CurveLine>, range: FloatRange): Pair<Float
 }
 
 fun convertPercentToValue(abscissas: List<Float>, range: FloatRange): FloatRange {
-    val minValue = abscissas.min()!!
-    val maxValue = abscissas.max()!!
+    val minValue = abscissas.min() ?: 0f
+    val maxValue = abscissas.max() ?: 0f
     val length = maxValue - minValue
     return FloatRange(minValue + range.start * length, minValue + range.endInclusive * length)
 }

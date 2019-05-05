@@ -44,11 +44,17 @@
                 android:layout_height="300dp"/>
 
         <com.zero.chartview.ChartSelectorView
-                android:id="@+id/control"
+                android:id="@+id/selector"
                 android:layout_marginTop="20dp"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"/>
 
     </com.zero.chartview.ChartLayout>
+
+    <com.zero.sample.ChartLabelsView
+            android:id="@+id/labels"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"/>
 
 </LinearLayout>

@@ -61,7 +61,7 @@ internal class XAxisView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        if (!::coordinates.isInitialized) return
+        if (!::coordinates.isInitialized || coordinates.isEmpty()) return
         val valueRange = convertPercentToValue(coordinates, range)
         val step = calculateStep(valueRange)
         val positions = getDrawPositions(step)

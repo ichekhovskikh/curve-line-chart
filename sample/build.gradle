@@ -31,5 +31,5 @@ dependencies {
     testImplementation "junit:junit:$junit_version"
     androidTestImplementation "com.android.support.test:runner:$test_runner_version"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:$test_espresso_version"
-    compile project(path: ':chart')
+    implementation project(path: ':chart')
 }

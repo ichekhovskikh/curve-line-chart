@@ -1,13 +1,11 @@
 package com.zero.sample
 
 import android.annotation.SuppressLint
-import android.content.res.ColorStateList
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import com.zero.chartview.BuildConfig
+import com.zero.chartview.model.CurveLine
 import com.zero.sample.service.AnimationThemeService
 import com.zero.sample.service.ColoringService
 import com.zero.sample.utils.convertChartColorsToThemeColors
@@ -35,6 +33,7 @@ class MainActivity : AppCompatActivity(), Stainable {
         setThemeColorsDefault()
         createThemeButtonListener()
         initLabels()
+        addLabels(testLines)
     }
 
     private fun createThemeButtonListener() {
@@ -50,14 +49,17 @@ class MainActivity : AppCompatActivity(), Stainable {
     }
 
     private fun initLabels() {
-        //TODO
-        chartLayout.setLines(testLines)
+        labels.chart = chartLayout
+    }
+
+    fun addLabels(lines: List<CurveLine>) {
+        lines.forEach { labels.addLineLabel(it) }
     }
 
     override fun getCurrentColors(): Stainable.ThemeColors {
         val currentColors = convertChartColorsToThemeColors(chartLayout.getChartColors())
         currentColors.colorTitle = titleView.textColors.defaultColor
-        currentColors.colorLabel = 0 //TODO
+        currentColors.colorLabel = labels.getTextColor()
         return currentColors
     }
 
@@ -70,7 +72,7 @@ class MainActivity : AppCompatActivity(), Stainable {
         chartLayout.setChartColors(chartColors)
         view.setBackgroundColor(colors.colorBackground)
         titleView.setTextColor(colors.colorTitle)
-        /* currentColors.colorLabel = 0 //TODO */
+        labels.setTextColor(colors.colorLabel)
     }
 
     private fun setThemeColorsDefault() {
