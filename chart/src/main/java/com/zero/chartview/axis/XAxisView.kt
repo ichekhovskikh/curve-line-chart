@@ -9,7 +9,7 @@ import android.util.AttributeSet
 import android.view.View
 import com.zero.chartview.R
 import com.zero.chartview.extensions.applyStyledAttributes
-import com.zero.chartview.extensions.asValueRange
+import com.zero.chartview.extensions.interpolateByValues
 import com.zero.chartview.extensions.distance
 import com.zero.chartview.model.FloatRange
 import com.zero.chartview.model.PercentRange
@@ -63,16 +63,16 @@ internal class XAxisView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         if (!::abscissas.isInitialized || abscissas.isEmpty()) return
-        val valueRange = range.asValueRange(abscissas)
-        val step = calculateStep(valueRange)
+        val interpolatedRange = range.interpolateByValues(abscissas)
+        val step = calculateStep(interpolatedRange)
         val positions = getDrawPositions(step)
         positions.forEachIndexed { index, position ->
             val averageCoordinate = getCorrespondingWithBias(position, step)
             val legendText = getLegendText(averageCoordinate)
             val textHalfWidth = legendPaint.measureText(legendText) / 2
-            val pixel = xValueToPixel(position - textHalfWidth, measuredWidth, valueRange.start, valueRange.endInclusive)
+            val pixel = xValueToPixel(position - textHalfWidth, measuredWidth, interpolatedRange.start, interpolatedRange.endInclusive)
             if (index % 2 != 0) {
-                legendPaint.color = getTransparencyColor(legendColor, valueRange)
+                legendPaint.color = getTransparencyColor(legendColor, interpolatedRange)
             } else {
                 legendPaint.color = legendColor
             }
@@ -96,15 +96,15 @@ internal class XAxisView @JvmOverloads constructor(
         return if (list.isEmpty()) null else list[list.size / 2]
     }
 
-    private fun calculateStep(valueRange: FloatRange): Float {
-        val exponent = log2((abscissas.last() - abscissas.first()) / valueRange.distance)
+    private fun calculateStep(interpolatedRange: FloatRange): Float {
+        val exponent = log2((abscissas.last() - abscissas.first()) / interpolatedRange.distance)
         return (fullRangeStep() / Math.pow(2.0, floor(exponent).toDouble())).toFloat()
     }
 
     private fun fullRangeStep() = (abscissas.last() - abscissas.first()) / (legendCount * 2)
 
-    private fun getTransparencyColor(color: Int, valueRange: FloatRange): Int {
-        val currentExponent = log2((abscissas.last() - abscissas.first()) / valueRange.distance)
+    private fun getTransparencyColor(color: Int, interpolatedRange: FloatRange): Int {
+        val currentExponent = log2((abscissas.last() - abscissas.first()) / interpolatedRange.distance)
         val weight = Math.abs(floor(currentExponent) - currentExponent)
         return Color.argb((255 * weight).toInt(), Color.red(color), Color.green(color), Color.blue(color))
     }

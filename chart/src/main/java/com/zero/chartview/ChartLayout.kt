@@ -39,7 +39,7 @@ class ChartLayout @JvmOverloads constructor(
                 }
             } else if (child is ChartSelectorView) {
                 selector = child
-                child.addRangeChangedInvoker { range ->
+                child.addOnRangeChangedListener { range ->
                     chart?.setRange(range.start, range.endInclusive)
                 }
             }

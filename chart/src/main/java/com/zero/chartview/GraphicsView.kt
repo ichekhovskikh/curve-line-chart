@@ -9,6 +9,7 @@ import com.zero.chartview.model.CurveLine
 import com.zero.chartview.model.PercentRange
 import com.zero.chartview.delegate.CurveLineDelegate
 import com.zero.chartview.extensions.*
+import com.zero.chartview.model.Size
 
 internal class GraphicsView @JvmOverloads constructor(
     context: Context,
@@ -65,7 +66,12 @@ internal class GraphicsView @JvmOverloads constructor(
         delegate.setOnYAxisChangedListener(onYAxisChangedListener)
     }
 
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        delegate.viewSize = measuredWidth on measuredHeight
+    }
+
     override fun onDraw(canvas: Canvas) {
-        delegate.drawLines(canvas, paint, measuredWidth on measuredHeight)
+        delegate.drawLines(canvas, paint)
     }
 }

@@ -34,12 +34,12 @@ class ChartSelectorView @JvmOverloads constructor(
         scrollFrame.setRange(start, endInclusive)
     }
 
-    fun addRangeChangedInvoker(invoker: (FloatRange) -> Unit) {
-        scrollFrame.addRangeChangedInvoker(invoker)
+    fun addOnRangeChangedListener(listener: (FloatRange) -> Unit) {
+        scrollFrame.addOnRangeChangedListener(listener)
     }
 
-    fun removeRangeChangedInvoker(invoker: (FloatRange) -> Unit) {
-        scrollFrame.removeRangeChangedInvoker(invoker)
+    fun removeOnRangeChangedListener(listener: (FloatRange) -> Unit) {
+        scrollFrame.removeOnRangeChangedListener(listener)
     }
 
     fun setLines(lines: List<CurveLine>) {

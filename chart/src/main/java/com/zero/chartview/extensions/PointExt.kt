@@ -5,27 +5,27 @@ import com.zero.chartview.model.FloatRange
 import com.zero.chartview.model.LeftRight
 import com.zero.chartview.tools.getYValue
 
-internal fun List<PointF>.getAbscissaBoundaries(valueRange: FloatRange): LeftRight {
+internal fun List<PointF>.getAbscissaBoundaries(interpolatedRange: FloatRange): LeftRight {
     var left: PointF? = null
     var right: PointF? = null
     val sortedPoints = sortedBy { it.x }
     sortedPoints.forEachIndexed { index, point ->
         when {
-            sortedPoints.isFirstLeftOverRangePoint(index, valueRange) -> {
+            sortedPoints.isFirstLeftOverRangePoint(index, interpolatedRange) -> {
                 val yValue = getYValue(
-                    valueRange.start,
+                    interpolatedRange.start,
                     sortedPoints[index],
                     sortedPoints[index + 1]
                 )
-                left = PointF(valueRange.start, yValue)
+                left = PointF(interpolatedRange.start, yValue)
             }
-            sortedPoints.isFirstRightOverRangePoint(index, valueRange) -> {
+            sortedPoints.isFirstRightOverRangePoint(index, interpolatedRange) -> {
                 val yValue = getYValue(
-                    valueRange.endInclusive,
+                    interpolatedRange.endInclusive,
                     sortedPoints[index - 1],
                     sortedPoints[index]
                 )
-                right = PointF(valueRange.endInclusive, yValue)
+                right = PointF(interpolatedRange.endInclusive, yValue)
             }
         }
     }

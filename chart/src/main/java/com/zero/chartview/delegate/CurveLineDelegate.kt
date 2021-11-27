@@ -22,15 +22,19 @@ internal class CurveLineDelegate(var onUpdate: (() -> Unit)? = null) {
     var range = FloatRange(0f, 1f)
         private set
 
+    var viewSize = Size()
+        set(value) {
+            field = value
+            onUpdate?.invoke()
+        }
+
     val lines get() = animatingLines.map { it.curveLine }
-
-    private var onYAxisChangedListener: ((minY: Float, maxY: Float) -> Unit)? = null
-
-    private val valueRange get() = range.asValueRange(lines.abscissas)
 
     private val path = Path()
 
     private val animatingLines = mutableListOf<AnimatingCurveLine>()
+
+    private var onYAxisChangedListener: ((minY: Float, maxY: Float) -> Unit)? = null
 
     private val appearanceAnimator = AppearanceAnimator { value ->
         animatingLines.forEach { line ->
@@ -45,6 +49,11 @@ internal class CurveLineDelegate(var onUpdate: (() -> Unit)? = null) {
         this.minY = startY
         this.maxY = endY
         this.range = FloatRange(startX, endX)
+
+        val interpolatedRange = range.interpolateByValues(lines.abscissas)
+        animatingLines.forEach { line ->
+            line.interpolatedPoints = transformAxis(line.curveLine.points, interpolatedRange)
+        }
         onUpdate?.invoke()
     }
 
@@ -73,7 +82,7 @@ internal class CurveLineDelegate(var onUpdate: (() -> Unit)? = null) {
             animatingLines.find { it.curveLine == line }?.setDisappearing()
         }
         appearanceAnimator.start()
-        updateAxis(newLines = lines)
+        updateAxis(newLines = newLines)
     }
 
     fun addLine(line: CurveLine) {
@@ -83,7 +92,7 @@ internal class CurveLineDelegate(var onUpdate: (() -> Unit)? = null) {
         appearanceAnimator.cancel()
         animatingLines.add(AppearingCurveLine(line))
         appearanceAnimator.start()
-        updateAxis(newLines = lines)
+        updateAxis(newLines = current + line)
     }
 
     fun removeLine(line: CurveLine) {
@@ -93,7 +102,7 @@ internal class CurveLineDelegate(var onUpdate: (() -> Unit)? = null) {
         appearanceAnimator.cancel()
         animatingLines.find { it.curveLine == line }?.setDisappearing()
         appearanceAnimator.start()
-        updateAxis(newLines = lines)
+        updateAxis(newLines = current - line)
     }
 
     private fun updateAxis(
@@ -116,15 +125,11 @@ internal class CurveLineDelegate(var onUpdate: (() -> Unit)? = null) {
         this.onYAxisChangedListener = onYAxisChangedListener
     }
 
-    fun drawLines(canvas: Canvas, paint: Paint, window: Size) {
-        if (animatingLines.isEmpty()) return
-        val valueRange = valueRange
-
+    fun drawLines(canvas: Canvas, paint: Paint) {
         animatingLines.forEach { line ->
             path.rewind()
             paint.color = line.animatingColor
-            val transformPoints = transformAxis(line.curveLine.points, valueRange, window)
-            transformPoints.forEachIndexed { index, point ->
+            line.interpolatedPoints.forEachIndexed { index, point ->
                 when (index) {
                     0 -> path.moveTo(point.x, point.y)
                     else -> path.lineTo(point.x, point.y)
@@ -134,33 +139,28 @@ internal class CurveLineDelegate(var onUpdate: (() -> Unit)? = null) {
         }
     }
 
-    private fun transformAxis(
-        points: List<PointF>,
-        valueRange: FloatRange,
-        window: Size
-    ): List<PointF> {
-        val transformedPoints = mutableListOf<PointF>()
+    private fun transformAxis(points: List<PointF>, interpolatedRange: FloatRange): List<PointF> {
+        val interpolatedPoints = mutableListOf<PointF>()
         points.forEach { point ->
-            if (valueRange.contains(point.x)) {
-                transformedPoints.add(point.toPixelPoint(valueRange, window))
+            if (interpolatedRange.contains(point.x)) {
+                interpolatedPoints.add(point.toPixelPoint(interpolatedRange))
             }
         }
-        return transformedPoints.apply { addAbscissaBoundaries(points, valueRange, window) }
+        return interpolatedPoints.apply { addAbscissaBoundaries(points, interpolatedRange) }
     }
 
     private fun MutableList<PointF>.addAbscissaBoundaries(
         valuePoints: List<PointF>,
-        valueRange: FloatRange,
-        window: Size
+        interpolatedRange: FloatRange
     ) {
-        val (leftBoundary, rightBoundary) = valuePoints.getAbscissaBoundaries(valueRange)
-        leftBoundary?.let { add(0, it.toPixelPoint(valueRange, window)) }
-        rightBoundary?.let { add(it.toPixelPoint(valueRange, window)) }
+        val (leftBoundary, rightBoundary) = valuePoints.getAbscissaBoundaries(interpolatedRange)
+        leftBoundary?.let { add(0, it.toPixelPoint(interpolatedRange)) }
+        rightBoundary?.let { add(it.toPixelPoint(interpolatedRange)) }
     }
 
-    private fun PointF.toPixelPoint(valueRange: FloatRange, window: Size): PointF {
-        val x = xValueToPixel(x, window.width, valueRange.start, valueRange.endInclusive)
-        val y = yValueToPixel(y, window.height, minY, maxY)
+    private fun PointF.toPixelPoint(interpolatedRange: FloatRange): PointF {
+        val x = xValueToPixel(x, viewSize.width, interpolatedRange.start, interpolatedRange.endInclusive)
+        val y = yValueToPixel(y, viewSize.height, minY, maxY)
         return PointF(x, y)
     }
 }

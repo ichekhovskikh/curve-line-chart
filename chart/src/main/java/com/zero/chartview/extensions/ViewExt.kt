@@ -7,7 +7,7 @@ import android.support.annotation.StyleableRes
 import android.util.AttributeSet
 import android.view.View
 
-fun View.applyStyledAttributes(
+internal fun View.applyStyledAttributes(
     set: AttributeSet,
     @StyleableRes attrs: IntArray,
     @AttrRes defStyleAttr: Int,

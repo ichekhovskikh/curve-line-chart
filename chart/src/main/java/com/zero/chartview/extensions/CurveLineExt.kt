@@ -10,12 +10,12 @@ val List<CurveLine>.abscissas: List<Float>
 
 internal fun List<CurveLine>.getMinMaxY(range: FloatRange): MinMax {
     val points = flatMap { it.points }.toMutableList()
-    val valueRange = range.asPointAbscissaRange(points)
-    val (leftBoundary, rightBoundary) = points.getAbscissaBoundaries(valueRange)
+    val interpolatedRange = range.interpolatePointAbscissas(points)
+    val (leftBoundary, rightBoundary) = points.getAbscissaBoundaries(interpolatedRange)
     leftBoundary?.let(points::add)
     rightBoundary?.let(points::add)
     val pointsIntoRange = points.filter {
-        it.x in valueRange.start..valueRange.endInclusive
+        it.x in interpolatedRange.start..interpolatedRange.endInclusive
     }
     return MinMax(
         min = pointsIntoRange.minBy(PointF::y)?.y.orZero,
