@@ -8,7 +8,7 @@ import android.widget.FrameLayout
 import com.zero.chartview.axis.XAxisView
 import com.zero.chartview.axis.YAxisView
 import com.zero.chartview.extensions.abscissas
-import com.zero.chartview.extensions.getMinMaxY
+import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.popup.PopupLineView
 import com.zero.chartview.popup.PopupWindow
@@ -37,18 +37,17 @@ class ChartView @JvmOverloads constructor(
         addView(popup)
         addView(window)
         popup.popupWindow = window
+        graph.setOnYAxisChangedListener(yAxis::setYAxis)
 
-        val typedArray = context.theme.obtainStyledAttributes(attrs, R.styleable.ChartView, defStyleAttr, defStyleRes)
-        val themeDefault = getThemeColorDefault(typedArray)
-        typedArray.recycle()
-        setChartColors(themeDefault)
+        applyStyledAttributes(attrs, R.styleable.ChartView, defStyleAttr, defStyleRes) {
+            setChartColors(getThemeColorDefault(this))
+        }
     }
 
-    fun setRange(start: Float, endInclusive: Float) {
-        graph.setRange(start, endInclusive)
+    fun setRange(start: Float, endInclusive: Float, smoothScroll: Boolean = false) {
+        graph.setRange(start, endInclusive, smoothScroll)
         xAxis.setRange(start, endInclusive)
         popup.setRange(start, endInclusive)
-        updateAxis(graph.getLines())
     }
 
     fun getLines() = graph.getLines()
@@ -56,7 +55,7 @@ class ChartView @JvmOverloads constructor(
     fun setLines(lines: List<CurveLine>, correspondingLegends: Map<Float, String>? = null) {
         graph.setLines(lines)
         popup.setLines(lines)
-        updateAxis(lines, correspondingLegends)
+        updateCorrespondingLegends(lines.abscissas, correspondingLegends)
         onLinesChanged(lines)
     }
 
@@ -64,7 +63,7 @@ class ChartView @JvmOverloads constructor(
         val lines = graph.getLines() + line
         graph.addLine(line)
         popup.setLines(lines)
-        updateAxis(lines, correspondingLegends)
+        updateCorrespondingLegends(lines.abscissas, correspondingLegends)
         onLinesChanged(lines)
     }
 
@@ -77,7 +76,6 @@ class ChartView @JvmOverloads constructor(
         val lines = graph.getLines() - line
         graph.removeLine(line)
         popup.setLines(lines)
-        updateAxis(lines)
         onLinesChanged(lines)
     }
 
@@ -90,24 +88,8 @@ class ChartView @JvmOverloads constructor(
     }
 
     private fun onLinesChanged(lines: List<CurveLine>) {
+        xAxis.setAbscissas(lines.abscissas)
         onLinesChangedListeners.forEach { it.invoke(lines) }
-    }
-
-    private fun updateAxis(lines: List<CurveLine>) {
-        val (minY, maxY) = lines.getMinMaxY(graph.range)
-        val abscissas = lines.abscissas
-        graph.setYAxis(minY, maxY)
-        yAxis.setYAxis(minY, maxY)
-        xAxis.setCoordinates(abscissas)
-    }
-
-    private fun updateAxis(lines: List<CurveLine>, correspondingLegends: Map<Float, String>?) {
-        val (minY, maxY) = lines.getMinMaxY(graph.range)
-        val abscissas = lines.abscissas
-        graph.setYAxis(minY, maxY)
-        yAxis.setYAxis(minY, maxY)
-        xAxis.setCoordinates(abscissas)
-        updateCorrespondingLegends(abscissas, correspondingLegends)
     }
 
     private fun updateCorrespondingLegends(abscissas: List<Float>, correspondingLegends: Map<Float, String>?) {

@@ -10,6 +10,7 @@ import com.zero.chartview.R
 import com.zero.chartview.extensions.animatingColor
 import com.zero.chartview.model.AnimatingLegendSeries
 import com.zero.chartview.delegate.AnimationLegendService
+import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.tools.formatLegend
 import com.zero.chartview.extensions.textHeight
 import com.zero.chartview.tools.yPixelToValue
@@ -36,12 +37,11 @@ internal class YAxisView @JvmOverloads constructor(
     init {
         var gridLineWidth = resources.getDimension(R.dimen.grid_line_width_default)
         var textSize = resources.getDimension(R.dimen.legend_text_size_default)
-        context.theme.obtainStyledAttributes(attrs, R.styleable.YAxisView, defStyleAttr, defStyleRes).apply {
+        applyStyledAttributes(attrs, R.styleable.YAxisView, defStyleAttr, defStyleRes) {
             legendCount = getInteger(R.styleable.YAxisView_legendLineCount, legendCount)
             legendMargin = getDimension(R.styleable.YAxisView_ordinateLegendLabelMargin, legendMargin)
             textSize = getDimension(R.styleable.YAxisView_legendTextSize, textSize)
             gridLineWidth = getDimension(R.styleable.YAxisView_gridLineWidth, gridLineWidth)
-            recycle()
         }
         initializePaint(textSize, gridLineWidth)
     }

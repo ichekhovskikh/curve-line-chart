@@ -8,6 +8,7 @@ import android.support.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.View
 import com.zero.chartview.R
+import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.extensions.asValueRange
 import com.zero.chartview.extensions.distance
 import com.zero.chartview.model.FloatRange
@@ -31,24 +32,23 @@ internal class XAxisView @JvmOverloads constructor(
     private var legendCount = resources.getInteger(R.integer.abscissa_legend_count_default)
 
     private lateinit var correspondingLegends: Map<Float, String>
-    private lateinit var coordinates: List<Float>
+    private lateinit var abscissas: List<Float>
     private var range: FloatRange = FloatRange(0F, 1F)
 
     init {
         var textSize = resources.getDimension(R.dimen.legend_text_size_default)
-        context.theme.obtainStyledAttributes(attrs, R.styleable.XAxisView, defStyleAttr, defStyleRes).apply {
+        applyStyledAttributes(attrs, R.styleable.XAxisView, defStyleAttr, defStyleRes) {
             textSize = getDimension(R.styleable.XAxisView_legendTextSize, textSize)
             textMarginTop = getDimension(R.styleable.XAxisView_abscissaLegendMarginTop, textMarginTop)
             legendCount = getInteger(R.styleable.XAxisView_abscissaLegendCount, legendCount)
-            recycle()
         }
         legendPaint.textSize = textSize
     }
 
     fun getLegendWidth() = (legendPaint.textSize + textMarginTop).toInt()
 
-    fun setCoordinates(coordinates: List<Float>) {
-        this.coordinates = coordinates.sorted()
+    fun setAbscissas(abscissas: List<Float>) {
+        this.abscissas = abscissas.sorted()
         invalidate()
     }
 
@@ -62,8 +62,8 @@ internal class XAxisView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        if (!::coordinates.isInitialized || coordinates.isEmpty()) return
-        val valueRange = range.asValueRange(coordinates)
+        if (!::abscissas.isInitialized || abscissas.isEmpty()) return
+        val valueRange = range.asValueRange(abscissas)
         val step = calculateStep(valueRange)
         val positions = getDrawPositions(step)
         positions.forEachIndexed { index, position ->
@@ -82,8 +82,8 @@ internal class XAxisView @JvmOverloads constructor(
 
     private fun getDrawPositions(step: Float): List<Float> {
         val positions = mutableListOf<Float>()
-        var position: Float = coordinates.first()
-        while (position <= coordinates.last()) {
+        var position: Float = abscissas.first()
+        while (position <= abscissas.last()) {
             positions.add(position)
             position += step
         }
@@ -92,19 +92,19 @@ internal class XAxisView @JvmOverloads constructor(
 
     private fun getCorrespondingWithBias(drawPosition: Float, step: Float): Float? {
         val halfStep = step / 2
-        val list = coordinates.filter { it in drawPosition - halfStep..drawPosition + halfStep }
+        val list = abscissas.filter { it in drawPosition - halfStep..drawPosition + halfStep }
         return if (list.isEmpty()) null else list[list.size / 2]
     }
 
     private fun calculateStep(valueRange: FloatRange): Float {
-        val exponent = log2((coordinates.last() - coordinates.first()) / valueRange.distance)
+        val exponent = log2((abscissas.last() - abscissas.first()) / valueRange.distance)
         return (fullRangeStep() / Math.pow(2.0, floor(exponent).toDouble())).toFloat()
     }
 
-    private fun fullRangeStep() = (coordinates.last() - coordinates.first()) / (legendCount * 2)
+    private fun fullRangeStep() = (abscissas.last() - abscissas.first()) / (legendCount * 2)
 
     private fun getTransparencyColor(color: Int, valueRange: FloatRange): Int {
-        val currentExponent = log2((coordinates.last() - coordinates.first()) / valueRange.distance)
+        val currentExponent = log2((abscissas.last() - abscissas.first()) / valueRange.distance)
         val weight = Math.abs(floor(currentExponent) - currentExponent)
         return Color.argb((255 * weight).toInt(), Color.red(color), Color.green(color), Color.blue(color))
     }

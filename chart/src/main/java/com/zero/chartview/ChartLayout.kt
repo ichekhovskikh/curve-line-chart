@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.widget.LinearLayout
+import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.model.CurveLine
 
 class ChartLayout @JvmOverloads constructor(
@@ -22,10 +23,9 @@ class ChartLayout @JvmOverloads constructor(
         orientation = VERTICAL
         super.setBackgroundColor(resources.getColor(android.R.color.transparent))
 
-        val typedArray = context.theme.obtainStyledAttributes(attrs, R.styleable.ChartLayout, defStyleAttr, defStyleRes)
-        val themeDefault = getThemeColorDefault(typedArray)
-        typedArray.recycle()
-        setChartColors(themeDefault)
+        applyStyledAttributes(attrs, R.styleable.ChartLayout, defStyleAttr, defStyleRes) {
+            setChartColors(getThemeColorDefault(this))
+        }
     }
 
     override fun onFinishInflate() {

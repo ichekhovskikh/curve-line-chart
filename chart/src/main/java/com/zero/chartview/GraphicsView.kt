@@ -29,14 +29,8 @@ internal class GraphicsView @JvmOverloads constructor(
 
     init {
         var lineWidth = resources.getDimensionPixelSize(R.dimen.line_width_default)
-        context.theme.obtainStyledAttributes(
-            attrs,
-            R.styleable.GraphicsView,
-            defStyleAttr,
-            defStyleRes
-        ).apply {
+        applyStyledAttributes(attrs, R.styleable.GraphicsView, defStyleAttr, defStyleRes) {
             lineWidth = getDimensionPixelSize(R.styleable.GraphicsView_lineWidth, lineWidth)
-            recycle()
         }
         setupPaint(lineWidth)
     }
@@ -63,12 +57,12 @@ internal class GraphicsView @JvmOverloads constructor(
         delegate.removeLine(line)
     }
 
-    fun setYAxis(minY: Float, maxY: Float) {
-        delegate.setYAxis(minY, maxY)
+    fun setRange(start: Float, endInclusive: Float, smoothScroll: Boolean = false) {
+        delegate.setRange(PercentRange(start, endInclusive), smoothScroll)
     }
 
-    fun setRange(start: Float, endInclusive: Float) {
-        delegate.range = PercentRange(start, endInclusive)
+    fun setOnYAxisChangedListener(onYAxisChangedListener: ((minY: Float, maxY: Float) -> Unit)?) {
+        delegate.setOnYAxisChangedListener(onYAxisChangedListener)
     }
 
     override fun onDraw(canvas: Canvas) {

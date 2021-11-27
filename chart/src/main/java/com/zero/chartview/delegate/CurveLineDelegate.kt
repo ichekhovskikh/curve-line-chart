@@ -2,7 +2,7 @@ package com.zero.chartview.delegate
 
 import android.graphics.*
 import com.zero.chartview.anim.AppearanceAnimator
-import com.zero.chartview.anim.TensionAnimator
+import com.zero.chartview.anim.AxisAnimator
 import com.zero.chartview.extensions.*
 import com.zero.chartview.model.*
 import com.zero.chartview.model.AnimatingCurveLine
@@ -20,12 +20,11 @@ internal class CurveLineDelegate(var onUpdate: (() -> Unit)? = null) {
         private set
 
     var range = FloatRange(0f, 1f)
-        set(value) {
-            field = value
-            onUpdate?.invoke()
-        }
+        private set
 
     val lines get() = animatingLines.map { it.curveLine }
+
+    private var onYAxisChangedListener: ((minY: Float, maxY: Float) -> Unit)? = null
 
     private val valueRange get() = range.asValueRange(lines.abscissas)
 
@@ -42,14 +41,23 @@ internal class CurveLineDelegate(var onUpdate: (() -> Unit)? = null) {
         }
     }.doOnEnd(::removeDisappearingLines)
 
-    private val tensionAnimator = TensionAnimator { _, minY, maxY ->
-        this.minY = minY
-        this.maxY = maxY
+    private val axisAnimator = AxisAnimator { startX, endX, startY, endY ->
+        this.minY = startY
+        this.maxY = endY
+        this.range = FloatRange(startX, endX)
         onUpdate?.invoke()
     }
 
     private fun removeDisappearingLines() {
         animatingLines.removeAll { !it.isAppearing }
+    }
+
+    fun setRange(range: FloatRange, smoothScroll: Boolean = false) {
+        if (this.range == range) return
+        if (!smoothScroll) {
+            this.range = range
+        }
+        updateAxis(newRange = range)
     }
 
     fun setLines(newLines: List<CurveLine>) {
@@ -65,6 +73,7 @@ internal class CurveLineDelegate(var onUpdate: (() -> Unit)? = null) {
             animatingLines.find { it.curveLine == line }?.setDisappearing()
         }
         appearanceAnimator.start()
+        updateAxis(newLines = lines)
     }
 
     fun addLine(line: CurveLine) {
@@ -74,6 +83,7 @@ internal class CurveLineDelegate(var onUpdate: (() -> Unit)? = null) {
         appearanceAnimator.cancel()
         animatingLines.add(AppearingCurveLine(line))
         appearanceAnimator.start()
+        updateAxis(newLines = lines)
     }
 
     fun removeLine(line: CurveLine) {
@@ -83,16 +93,27 @@ internal class CurveLineDelegate(var onUpdate: (() -> Unit)? = null) {
         appearanceAnimator.cancel()
         animatingLines.find { it.curveLine == line }?.setDisappearing()
         appearanceAnimator.start()
+        updateAxis(newLines = lines)
     }
 
-    fun setYAxis(minY: Float, maxY: Float) {
-        if (this.maxY == maxY && this.minY == minY) return
-        tensionAnimator.reStart(
-            fromMin = this.minY,
-            toMin = minY,
-            fromMax = this.maxY,
-            toMax = maxY
+    private fun updateAxis(
+        newLines: List<CurveLine> = lines,
+        newRange: FloatRange = range
+    ) {
+        val (minY, maxY) = newLines.getMinMaxY(newRange)
+        if (this.maxY != maxY || this.minY != minY) {
+            onYAxisChangedListener?.invoke(minY, maxY)
+        }
+        axisAnimator.reStart(
+            fromXRange = this.range,
+            toXRange = newRange,
+            fromYRange = FloatRange(this.minY, this.maxY),
+            toYRange = FloatRange(minY, maxY)
         )
+    }
+
+    fun setOnYAxisChangedListener(onYAxisChangedListener: ((minY: Float, maxY: Float) -> Unit)?) {
+        this.onYAxisChangedListener = onYAxisChangedListener
     }
 
     fun drawLines(canvas: Canvas, paint: Paint, window: Size) {

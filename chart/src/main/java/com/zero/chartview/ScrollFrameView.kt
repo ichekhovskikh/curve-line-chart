@@ -10,6 +10,7 @@ import android.support.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.model.FloatRange
 import com.zero.chartview.tools.xPixelToValue
 import com.zero.chartview.tools.xValueToPixel
@@ -42,14 +43,13 @@ class ScrollFrameView @JvmOverloads constructor(
 
 
     init {
-        context.theme.obtainStyledAttributes(attrs, R.styleable.ScrollFrameView, defStyleAttr, defStyleRes).apply {
+        applyStyledAttributes(attrs, R.styleable.ScrollFrameView, defStyleAttr, defStyleRes) {
             frameThicknessHorizontal =
                 getDimension(R.styleable.ScrollFrameView_frameThicknessHorizontal, frameThicknessHorizontal)
             frameThicknessVertical =
                 getDimension(R.styleable.ScrollFrameView_frameThicknessVertical, frameThicknessVertical)
             frameMaxWidthPercent = getDimension(R.styleable.ScrollFrameView_frameMaxWidthPercent, frameMaxWidthPercent)
             frameMinWidthPercent = getDimension(R.styleable.ScrollFrameView_frameMinWidthPercent, frameMinWidthPercent)
-            recycle()
         }
         initializePaint()
     }

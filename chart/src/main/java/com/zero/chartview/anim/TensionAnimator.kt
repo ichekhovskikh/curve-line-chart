@@ -39,15 +39,6 @@ internal class TensionAnimator(
     }
 
     fun start(
-        fromMin: Float,
-        toMin: Float,
-        fromMax: Float,
-        toMax: Float
-    ) {
-        start(0f, 1f, fromMin, toMin, fromMax, toMax)
-    }
-
-    fun start(
         fromTension: Float,
         toTension: Float,
         fromMin: Float,
@@ -60,15 +51,6 @@ internal class TensionAnimator(
         val maxProperty = PropertyValuesHolder.ofFloat(MAX, fromMax, toMax)
         tensionAnimator.setValues(tensionProperty, maxProperty, minProperty)
         tensionAnimator.start()
-    }
-
-    fun reStart(
-        fromMin: Float,
-        toMin: Float,
-        fromMax: Float,
-        toMax: Float
-    ) {
-        reStart(0f, 1f, fromMin, toMin, fromMax, toMax)
     }
 
     fun reStart(

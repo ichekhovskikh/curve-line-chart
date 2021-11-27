@@ -5,7 +5,7 @@ import android.content.res.TypedArray
 import android.support.annotation.ColorInt
 import android.util.AttributeSet
 import android.widget.FrameLayout
-import com.zero.chartview.extensions.getMinMaxY
+import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.model.FloatRange
 
@@ -25,11 +25,9 @@ class ChartSelectorView @JvmOverloads constructor(
         addView(graph)
         addView(scrollFrame)
 
-        val typedArray =
-            context.theme.obtainStyledAttributes(attrs, R.styleable.ChartSelectorView, defStyleAttr, defStyleRes)
-        val themeDefault = getThemeColorDefault(typedArray)
-        typedArray.recycle()
-        setChartColors(themeDefault)
+        applyStyledAttributes(attrs, R.styleable.ChartSelectorView, defStyleAttr, defStyleRes) {
+            setChartColors(getThemeColorDefault(this))
+        }
     }
 
     fun setRange(start: Float, endInclusive: Float) {
@@ -46,13 +44,10 @@ class ChartSelectorView @JvmOverloads constructor(
 
     fun setLines(lines: List<CurveLine>) {
         graph.setLines(lines)
-        updateAxis(lines)
     }
 
     fun addLine(line: CurveLine) {
-        val lines = graph.getLines()
         graph.addLine(line)
-        updateAxis(lines + line)
     }
 
     fun removeLine(index: Int) {
@@ -61,14 +56,7 @@ class ChartSelectorView @JvmOverloads constructor(
     }
 
     fun removeLine(line: CurveLine) {
-        val lines = graph.getLines()
         graph.removeLine(line)
-        updateAxis(lines - line)
-    }
-
-    private fun updateAxis(lines: List<CurveLine>) {
-        val (minY, maxY) = lines.getMinMaxY(graph.range)
-        graph.setYAxis(minY, maxY)
     }
 
     override fun getChartColors() = chartColors
