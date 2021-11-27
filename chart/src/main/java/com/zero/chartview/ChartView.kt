@@ -7,10 +7,12 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import com.zero.chartview.axis.XAxisView
 import com.zero.chartview.axis.YAxisView
+import com.zero.chartview.extensions.abscissas
+import com.zero.chartview.extensions.getMinMaxY
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.popup.PopupLineView
 import com.zero.chartview.popup.PopupWindow
-import com.zero.chartview.utils.*
+import com.zero.chartview.tools.*
 
 class ChartView @JvmOverloads constructor(
     context: Context,
@@ -92,16 +94,16 @@ class ChartView @JvmOverloads constructor(
     }
 
     private fun updateAxis(lines: List<CurveLine>) {
-        val (minY, maxY) = findMinMaxYValueRanged(lines, graph.range)
-        val abscissas = getAbscissas(lines)
+        val (minY, maxY) = lines.getMinMaxY(graph.range)
+        val abscissas = lines.abscissas
         graph.setYAxis(minY, maxY)
         yAxis.setYAxis(minY, maxY)
         xAxis.setCoordinates(abscissas)
     }
 
     private fun updateAxis(lines: List<CurveLine>, correspondingLegends: Map<Float, String>?) {
-        val (minY, maxY) = findMinMaxYValueRanged(lines, graph.range)
-        val abscissas = getAbscissas(lines)
+        val (minY, maxY) = lines.getMinMaxY(graph.range)
+        val abscissas = lines.abscissas
         graph.setYAxis(minY, maxY)
         yAxis.setYAxis(minY, maxY)
         xAxis.setCoordinates(abscissas)

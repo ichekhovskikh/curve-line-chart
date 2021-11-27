@@ -8,9 +8,11 @@ import android.support.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.View
 import com.zero.chartview.R
+import com.zero.chartview.extensions.asValueRange
+import com.zero.chartview.extensions.distance
 import com.zero.chartview.model.FloatRange
-import com.zero.chartview.utils.convertPercentToValue
-import com.zero.chartview.utils.xValueToPixel
+import com.zero.chartview.model.PercentRange
+import com.zero.chartview.tools.xValueToPixel
 import kotlin.math.floor
 import kotlin.math.log2
 
@@ -55,14 +57,13 @@ internal class XAxisView @JvmOverloads constructor(
     }
 
     fun setRange(start: Float, endInclusive: Float) {
-        range.start = Math.max(start, 0f)
-        range.endInclusive = Math.min(endInclusive, 1f)
+        range = PercentRange(start, endInclusive)
         invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
         if (!::coordinates.isInitialized || coordinates.isEmpty()) return
-        val valueRange = convertPercentToValue(coordinates, range)
+        val valueRange = range.asValueRange(coordinates)
         val step = calculateStep(valueRange)
         val positions = getDrawPositions(step)
         positions.forEachIndexed { index, position ->
@@ -96,14 +97,14 @@ internal class XAxisView @JvmOverloads constructor(
     }
 
     private fun calculateStep(valueRange: FloatRange): Float {
-        val exponent = log2((coordinates.last() - coordinates.first()) / valueRange.distance())
+        val exponent = log2((coordinates.last() - coordinates.first()) / valueRange.distance)
         return (fullRangeStep() / Math.pow(2.0, floor(exponent).toDouble())).toFloat()
     }
 
     private fun fullRangeStep() = (coordinates.last() - coordinates.first()) / (legendCount * 2)
 
     private fun getTransparencyColor(color: Int, valueRange: FloatRange): Int {
-        val currentExponent = log2((coordinates.last() - coordinates.first()) / valueRange.distance())
+        val currentExponent = log2((coordinates.last() - coordinates.first()) / valueRange.distance)
         val weight = Math.abs(floor(currentExponent) - currentExponent)
         return Color.argb((255 * weight).toInt(), Color.red(color), Color.green(color), Color.blue(color))
     }

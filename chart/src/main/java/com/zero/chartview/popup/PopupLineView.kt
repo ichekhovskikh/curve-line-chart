@@ -10,9 +10,12 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import com.zero.chartview.R
+import com.zero.chartview.extensions.asLineAbscissaRange
+import com.zero.chartview.extensions.getMinMaxY
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.model.FloatRange
-import com.zero.chartview.utils.*
+import com.zero.chartview.model.PercentRange
+import com.zero.chartview.tools.*
 import kotlin.math.abs
 
 internal class PopupLineView @JvmOverloads constructor(
@@ -48,8 +51,7 @@ internal class PopupLineView @JvmOverloads constructor(
     }
 
     fun setRange(start: Float, endInclusive: Float) {
-        range.start = Math.max(start, 0f)
-        range.endInclusive = Math.min(endInclusive, 1f)
+        range = PercentRange(start, endInclusive)
         popupWindow?.visibility = GONE
         touchX = null
         invalidate()
@@ -94,22 +96,21 @@ internal class PopupLineView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        touchX?.also { x ->
-            val (startValue, endValue) = convertPercentToValue(lines, range)
-            val (minY, maxY) = findMinMaxYValueRanged(lines, range)
-            val intersectionPoints = getIntersectionPoint(x, startValue, endValue)
-            if (intersectionPoints.isNotEmpty()) {
-                val intersectionXValue = intersectionPoints.first().x
-                val xDrawPixel = xValueToPixel(intersectionXValue, measuredWidth, startValue, endValue)
-                canvas.drawLine(xDrawPixel, 0F, xDrawPixel, height.toFloat(), linePaint)
-                intersectionPoints.forEach {
-                    val yDrawPixel = yValueToPixel(it.y, measuredHeight, minY, maxY)
-                    drawIntersectionPoint(canvas, xDrawPixel, yDrawPixel, it.color)
-                }
-                popupWindow?.fill(touchX, intersectionPoints)
-            } else {
-                popupWindow?.visibility = GONE
+        val x = touchX ?: return
+        val (startValue, endValue) = range.asLineAbscissaRange(lines)
+        val (minY, maxY) = lines.getMinMaxY(range)
+        val intersectionPoints = getIntersectionPoint(x, startValue, endValue)
+        if (intersectionPoints.isNotEmpty()) {
+            val intersectionXValue = intersectionPoints.first().x
+            val xDrawPixel = xValueToPixel(intersectionXValue, measuredWidth, startValue, endValue)
+            canvas.drawLine(xDrawPixel, 0F, xDrawPixel, height.toFloat(), linePaint)
+            intersectionPoints.forEach {
+                val yDrawPixel = yValueToPixel(it.y, measuredHeight, minY, maxY)
+                drawIntersectionPoint(canvas, xDrawPixel, yDrawPixel, it.color)
             }
+            popupWindow?.fill(touchX, intersectionPoints)
+        } else {
+            popupWindow?.visibility = GONE
         }
     }
 

@@ -4,11 +4,16 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
+import com.zero.chartview.extensions.abscissas
+import com.zero.chartview.extensions.asValueRange
+import com.zero.chartview.extensions.contains
+import com.zero.chartview.extensions.getAbscissaBoundaries
 import com.zero.chartview.model.AnimatingCurveLine
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.model.FloatRange
+import com.zero.chartview.model.PercentRange
 import com.zero.chartview.service.AnimationLineService
-import com.zero.chartview.utils.*
+import com.zero.chartview.tools.*
 
 internal class GraphicsView @JvmOverloads constructor(
     context: Context,
@@ -64,18 +69,16 @@ internal class GraphicsView @JvmOverloads constructor(
     }
 
     fun setRange(start: Float, endInclusive: Float) {
-        range.start = Math.max(start, 0f)
-        range.endInclusive = Math.min(endInclusive, 1f)
+        range = PercentRange(start, endInclusive)
         invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
         val curveLines = animationLineService.getLines()
-        if (curveLines.isEmpty()) {
-            return
-        }
-        val abscissas = getAbscissas(curveLines)
-        val valueRange = convertPercentToValue(abscissas, range)
+        if (curveLines.isEmpty()) return
+
+        val abscissas = curveLines.abscissas
+        val valueRange = range.asValueRange(abscissas)
         val lines = animationLineService.animationLines
         lines.forEach { line ->
             path.rewind()
@@ -110,7 +113,7 @@ internal class GraphicsView @JvmOverloads constructor(
     }
 
     private fun addBoundaryPoints(pixelPoints: MutableList<PointF>, valuePoints: List<PointF>, valueRange: FloatRange) {
-        val (leftBoundary, rightBoundary) = getBoundaryPoints(valuePoints, valueRange)
+        val (leftBoundary, rightBoundary) = valuePoints.getAbscissaBoundaries(valueRange)
         leftBoundary?.also {
             val x = xValueToPixel(it.x, measuredWidth, valueRange.start, valueRange.endInclusive)
             val y = yValueToPixel(it.y, measuredHeight, getMinY(), getMaxY())

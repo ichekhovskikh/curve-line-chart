@@ -6,7 +6,7 @@ import android.animation.ValueAnimator
 import android.view.animation.DecelerateInterpolator
 import com.zero.chartview.model.AnimatingCurveLine
 import com.zero.chartview.model.CurveLine
-import com.zero.chartview.utils.AnimatorListenerAdapter
+import com.zero.chartview.tools.AnimatorListenerAdapter
 
 internal class AnimationLineService(val duration: Long = 300L, var onInvalidate: (() -> Unit)? = null) {
 
@@ -39,7 +39,8 @@ internal class AnimationLineService(val duration: Long = 300L, var onInvalidate:
             animationLines.find { it.curveLine == line }
                 ?.apply {
                     isAppearing = false
-                    animationValue = 0f }
+                    animationValue = 0f
+                }
         }
         appearanceAnimator.start()
     }

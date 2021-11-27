@@ -5,7 +5,7 @@ import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
 import android.view.animation.DecelerateInterpolator
 import com.zero.chartview.model.AnimatingLegendSeries
-import com.zero.chartview.utils.AnimatorListenerAdapter
+import com.zero.chartview.tools.AnimatorListenerAdapter
 
 internal class AnimationLegendService(val duration: Long = 300L, var onInvalidate: (() -> Unit)? = null) {
 

@@ -11,8 +11,8 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import com.zero.chartview.model.FloatRange
-import com.zero.chartview.utils.xPixelToValue
-import com.zero.chartview.utils.xValueToPixel
+import com.zero.chartview.tools.xPixelToValue
+import com.zero.chartview.tools.xValueToPixel
 
 class ScrollFrameView @JvmOverloads constructor(
     context: Context,

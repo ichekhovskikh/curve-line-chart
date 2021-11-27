@@ -11,10 +11,10 @@ import com.zero.chartview.R
 import com.zero.chartview.BuildConfig
 import com.zero.chartview.model.AnimatingLegendSeries
 import com.zero.chartview.service.AnimationLegendService
-import com.zero.chartview.utils.formatLegend
-import com.zero.chartview.utils.textHeight
-import com.zero.chartview.utils.yPixelToValue
-import com.zero.chartview.utils.yValueToPixel
+import com.zero.chartview.tools.formatLegend
+import com.zero.chartview.extensions.textHeight
+import com.zero.chartview.tools.yPixelToValue
+import com.zero.chartview.tools.yValueToPixel
 
 internal class YAxisView @JvmOverloads constructor(
     context: Context,

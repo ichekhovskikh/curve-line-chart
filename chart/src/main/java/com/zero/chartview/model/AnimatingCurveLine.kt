@@ -1,3 +1,7 @@
 package com.zero.chartview.model
 
-internal data class AnimatingCurveLine(var curveLine: CurveLine, var isAppearing: Boolean, var animationValue: Float)
+internal data class AnimatingCurveLine(
+    val curveLine: CurveLine,
+    var isAppearing: Boolean,
+    var animationValue: Float
+)

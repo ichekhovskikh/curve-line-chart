@@ -5,9 +5,9 @@ import android.content.res.TypedArray
 import android.support.annotation.ColorInt
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import com.zero.chartview.extensions.getMinMaxY
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.model.FloatRange
-import com.zero.chartview.utils.findMinMaxYValueRanged
 
 class ChartSelectorView @JvmOverloads constructor(
     context: Context,
@@ -67,7 +67,7 @@ class ChartSelectorView @JvmOverloads constructor(
     }
 
     private fun updateAxis(lines: List<CurveLine>) {
-        val (minY, maxY) = findMinMaxYValueRanged(lines, graph.range)
+        val (minY, maxY) = lines.getMinMaxY(graph.range)
         graph.setYAxis(minY, maxY)
     }
 

@@ -11,8 +11,8 @@ import com.zero.chartview.R
 import com.zero.chartview.model.CurveLine
 import kotlinx.android.synthetic.main.popup_window.view.*
 import android.view.animation.AnimationUtils
-import com.zero.chartview.utils.AnimatorListenerAdapter
-import com.zero.chartview.utils.formatLegend
+import com.zero.chartview.tools.AnimatorListenerAdapter
+import com.zero.chartview.tools.formatLegend
 
 internal class PopupWindow @JvmOverloads constructor(
     context: Context,
