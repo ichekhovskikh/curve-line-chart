@@ -1,10 +1,12 @@
-package com.zero.chartview.service
+package com.zero.chartview.delegate
 
 import com.zero.chartview.anim.TensionAnimator
 import com.zero.chartview.model.AnimatingLegendSeries
 import kotlin.math.max
 
-internal class AnimationLegendService(var onInvalidate: (() -> Unit)? = null) {
+internal class AnimationLegendService(
+    var onUpdate: (() -> Unit)? = null
+) {
 
     var maxY = 0F
         private set
@@ -20,9 +22,11 @@ internal class AnimationLegendService(var onInvalidate: (() -> Unit)? = null) {
         legendSeries.forEach { series ->
             series.animationValue = max(series.animationValue, tension)
         }
-        onInvalidate?.invoke()
-    }.apply {
-        doOnEnd { legendSeries.removeAll { !it.isAppearing } }
+        onUpdate?.invoke()
+    }.doOnEnd(::removeDisappearingLegendSeries)
+
+    private fun removeDisappearingLegendSeries() {
+        legendSeries.removeAll { !it.isAppearing }
     }
 
     fun setYAxis(minY: Float, maxY: Float) {

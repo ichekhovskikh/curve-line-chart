@@ -27,7 +27,7 @@ class ChartView @JvmOverloads constructor(
     private val popup = PopupLineView(context, attrs, defStyleAttr, defStyleRes)
     private val window = PopupWindow(context, attrs, defStyleAttr, defStyleRes)
 
-    private val linesChangedInvokers = mutableListOf<(List<CurveLine>) -> Unit>()
+    private val onLinesChangedListeners = mutableListOf<(List<CurveLine>) -> Unit>()
     private lateinit var chartColors: Themeable.ChartColors
 
     init {
@@ -57,7 +57,7 @@ class ChartView @JvmOverloads constructor(
         graph.setLines(lines)
         popup.setLines(lines)
         updateAxis(lines, correspondingLegends)
-        linesChanged(lines)
+        onLinesChanged(lines)
     }
 
     fun addLine(line: CurveLine, correspondingLegends: Map<Float, String>? = null) {
@@ -65,7 +65,7 @@ class ChartView @JvmOverloads constructor(
         graph.addLine(line)
         popup.setLines(lines)
         updateAxis(lines, correspondingLegends)
-        linesChanged(lines)
+        onLinesChanged(lines)
     }
 
     fun removeLine(index: Int) {
@@ -78,19 +78,19 @@ class ChartView @JvmOverloads constructor(
         graph.removeLine(line)
         popup.setLines(lines)
         updateAxis(lines)
-        linesChanged(lines)
+        onLinesChanged(lines)
     }
 
-    fun addLinesChangedInvoker(invoker: (List<CurveLine>) -> Unit) {
-        linesChangedInvokers.add(invoker)
+    fun addOnLinesChangedListener(listener: (List<CurveLine>) -> Unit) {
+        onLinesChangedListeners.add(listener)
     }
 
-    fun removeRangeChangedInvoker(invoker: (List<CurveLine>) -> Unit) {
-        linesChangedInvokers.remove(invoker)
+    fun removeOnRangeChangedListener(listener: (List<CurveLine>) -> Unit) {
+        onLinesChangedListeners.remove(listener)
     }
 
-    private fun linesChanged(lines: List<CurveLine>) {
-        linesChangedInvokers.forEach { it.invoke(lines) }
+    private fun onLinesChanged(lines: List<CurveLine>) {
+        onLinesChangedListeners.forEach { it.invoke(lines) }
     }
 
     private fun updateAxis(lines: List<CurveLine>) {

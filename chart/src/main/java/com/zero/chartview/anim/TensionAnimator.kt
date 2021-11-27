@@ -30,7 +30,7 @@ internal class TensionAnimator(
         }
     }
 
-    fun doOnEnd(listener: (() -> Unit)? = null) {
+    fun doOnEnd(listener: (() -> Unit)? = null) = apply {
         doOnEndListener = listener
     }
 

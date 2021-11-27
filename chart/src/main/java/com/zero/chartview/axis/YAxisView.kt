@@ -2,14 +2,14 @@ package com.zero.chartview.axis
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.support.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.View
 import com.zero.chartview.R
+import com.zero.chartview.extensions.animatingColor
 import com.zero.chartview.model.AnimatingLegendSeries
-import com.zero.chartview.service.AnimationLegendService
+import com.zero.chartview.delegate.AnimationLegendService
 import com.zero.chartview.tools.formatLegend
 import com.zero.chartview.extensions.textHeight
 import com.zero.chartview.tools.yPixelToValue
@@ -30,7 +30,7 @@ internal class YAxisView @JvmOverloads constructor(
 
     private var legendPositions: List<Float> = emptyList()
 
-    var animationLegendService = AnimationLegendService(::invalidate)
+    var animationLegendService = AnimationLegendService(onUpdate = ::invalidate)
         private set
 
     init {
@@ -78,8 +78,9 @@ internal class YAxisView @JvmOverloads constructor(
     }
 
     private fun updateLegendSeries(legendSeries: AnimatingLegendSeries, legendPositions: List<Float>) {
-        legendSeries.legends =
-            legendPositions.map { yPixelToValue(it, measuredHeight, legendSeries.minY, legendSeries.maxY) }
+        legendSeries.legends = legendPositions.map {
+            yPixelToValue(it, measuredHeight, legendSeries.minY, legendSeries.maxY)
+        }
     }
 
     private fun getLegendPositions(availableHeight: Int, legendHeight: Float): List<Float> {
@@ -89,8 +90,8 @@ internal class YAxisView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         animationLegendService.legendSeries.forEach { series ->
-            gridPaint.color = getTransparencyColor(gridPaint.color, series)
-            legendPaint.color = getTransparencyColor(legendPaint.color, series)
+            gridPaint.color = series.animatingColor(gridPaint.color)
+            legendPaint.color = series.animatingColor(legendPaint.color)
             series.legends.forEach { legend ->
                 val yPixel =
                     yValueToPixel(legend, measuredHeight, animationLegendService.minY, animationLegendService.maxY)
@@ -99,13 +100,6 @@ internal class YAxisView @JvmOverloads constructor(
             }
         }
     }
-
-    private fun getTransparencyColor(color: Int, labels: AnimatingLegendSeries): Int {
-        return Color.argb(seriesTransparency(labels), Color.red(color), Color.green(color), Color.blue(color))
-    }
-
-    private fun seriesTransparency(labels: AnimatingLegendSeries) =
-        (255 * if (labels.isAppearing) labels.animationValue else 1 - labels.animationValue).toInt()
 
     fun setGridColor(@ColorInt gridColor: Int) {
         if (gridColor != gridPaint.color) {

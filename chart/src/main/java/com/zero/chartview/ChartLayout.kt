@@ -34,7 +34,7 @@ class ChartLayout @JvmOverloads constructor(
             val child = getChildAt(index)
             if (child is ChartView) {
                 chart = child
-                child.addLinesChangedInvoker { lines ->
+                child.addOnLinesChangedListener { lines ->
                     selector?.setLines(lines)
                 }
             } else if (child is ChartSelectorView) {

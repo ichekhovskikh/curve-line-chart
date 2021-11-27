@@ -5,3 +5,13 @@ internal data class AnimatingCurveLine(
     var isAppearing: Boolean,
     var animationValue: Float
 )
+
+
+internal object AppearingCurveLine {
+
+    operator fun invoke(curveLine: CurveLine) = AnimatingCurveLine(
+        curveLine = curveLine,
+        isAppearing = true,
+        animationValue = 0f
+    )
+}
