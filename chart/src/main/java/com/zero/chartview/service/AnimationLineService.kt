@@ -1,14 +1,13 @@
 package com.zero.chartview.service
 
-import android.animation.Animator
-import android.animation.PropertyValuesHolder
-import android.animation.ValueAnimator
-import android.view.animation.DecelerateInterpolator
+import com.zero.chartview.anim.AppearanceAnimator
+import com.zero.chartview.anim.TensionAnimator
 import com.zero.chartview.model.AnimatingCurveLine
 import com.zero.chartview.model.CurveLine
-import com.zero.chartview.tools.AnimatorListenerAdapter
 
-internal class AnimationLineService(val duration: Long = 300L, var onInvalidate: (() -> Unit)? = null) {
+internal class AnimationLineService(
+    var onInvalidate: (() -> Unit)? = null
+) {
 
     var maxY = 0F
         private set
@@ -18,8 +17,22 @@ internal class AnimationLineService(val duration: Long = 300L, var onInvalidate:
     internal var animationLines: MutableList<AnimatingCurveLine> = mutableListOf()
         private set
 
-    private val appearanceAnimator = createAppearanceAnimator(onEnd = ::onAnimationEnd)
-    private val tensionAnimator = createTensionAnimator()
+    private val appearanceAnimator = AppearanceAnimator { value ->
+        animationLines.forEach { line ->
+            if (line.animationValue <= value) {
+                line.animationValue = value
+                onInvalidate?.invoke()
+            }
+        }
+    }.apply {
+        doOnEnd { animationLines.removeAll { !it.isAppearing } }
+    }
+
+    private val tensionAnimator = TensionAnimator { _, minY, maxY ->
+        this.minY = minY
+        this.maxY = maxY
+        onInvalidate?.invoke()
+    }
 
     fun getLines() = animationLines.map { it.curveLine }
 
@@ -69,54 +82,11 @@ internal class AnimationLineService(val duration: Long = 300L, var onInvalidate:
 
     fun setYAxis(minY: Float, maxY: Float) {
         if (this.maxY == maxY && this.minY == minY) return
-
-        tensionAnimator.cancel()
-        val minProperty = PropertyValuesHolder.ofFloat(MIN_Y, this.minY, minY)
-        val maxProperty = PropertyValuesHolder.ofFloat(MAX_Y, this.maxY, maxY)
-        tensionAnimator.setValues(maxProperty, minProperty)
-        tensionAnimator.start()
-    }
-
-    private fun onAnimationEnd() {
-        animationLines.removeAll { !it.isAppearing }
-    }
-
-    private fun createAppearanceAnimator(onEnd: (() -> Unit)? = null) =
-        ValueAnimator.ofFloat(0F, 1F).apply {
-
-            duration = this@AnimationLineService.duration
-
-            addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
-                    onEnd?.invoke()
-                }
-            })
-
-            addUpdateListener { animator ->
-                val animatorValue = animator.animatedValue as Float
-                animationLines.forEach { line ->
-                    if (line.animationValue <= animatorValue) {
-                        line.animationValue = animatorValue
-                        onInvalidate?.invoke()
-                    }
-                }
-            }
-        }
-
-    private fun createTensionAnimator() =
-        ValueAnimator().apply {
-            interpolator = DecelerateInterpolator()
-            duration = this@AnimationLineService.duration
-
-            addUpdateListener { animator ->
-                minY = animator.getAnimatedValue(MIN_Y) as Float
-                maxY = animator.getAnimatedValue(MAX_Y) as Float
-                onInvalidate?.invoke()
-            }
-        }
-
-    companion object {
-        private const val MIN_Y = "MIN_Y"
-        private const val MAX_Y = "MAX_Y"
+        tensionAnimator.reStart(
+            fromMin = this.minY,
+            toMin = minY,
+            fromMax = this.maxY,
+            toMax = maxY
+        )
     }
 }

@@ -8,7 +8,6 @@ import android.support.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.View
 import com.zero.chartview.R
-import com.zero.chartview.BuildConfig
 import com.zero.chartview.model.AnimatingLegendSeries
 import com.zero.chartview.service.AnimationLegendService
 import com.zero.chartview.tools.formatLegend
@@ -31,11 +30,10 @@ internal class YAxisView @JvmOverloads constructor(
 
     private var legendPositions: List<Float> = emptyList()
 
-    var animationLegendService = AnimationLegendService(BuildConfig.ANIMATION_DURATION_MS)
+    var animationLegendService = AnimationLegendService(::invalidate)
         private set
 
     init {
-        animationLegendService.onInvalidate = ::invalidate
         var gridLineWidth = resources.getDimension(R.dimen.grid_line_width_default)
         var textSize = resources.getDimension(R.dimen.legend_text_size_default)
         context.theme.obtainStyledAttributes(attrs, R.styleable.YAxisView, defStyleAttr, defStyleRes).apply {

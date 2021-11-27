@@ -28,12 +28,10 @@ internal class GraphicsView @JvmOverloads constructor(
     var range = FloatRange(0F, 1F)
         private set
 
-    var animationLineService = AnimationLineService(BuildConfig.ANIMATION_DURATION_MS)
+    var animationLineService = AnimationLineService(::invalidate)
         private set
 
     init {
-        animationLineService.onInvalidate = ::invalidate
-
         var lineWidth = resources.getDimensionPixelSize(R.dimen.line_width_default)
         context.theme.obtainStyledAttributes(attrs, R.styleable.GraphicsView, defStyleAttr, defStyleRes).apply {
             lineWidth = getDimensionPixelSize(R.styleable.GraphicsView_lineWidth, lineWidth)
