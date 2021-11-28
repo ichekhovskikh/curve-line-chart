@@ -7,11 +7,10 @@ import android.util.AttributeSet
 import android.view.View
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.model.PercentRange
-import com.zero.chartview.delegate.CurveLineDelegate
+import com.zero.chartview.delegate.CurveLineGraphDelegate
 import com.zero.chartview.extensions.*
-import com.zero.chartview.model.Size
 
-internal class GraphicsView @JvmOverloads constructor(
+class CurveLineGraphView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
     defStyleAttr: Int = 0,
@@ -20,27 +19,19 @@ internal class GraphicsView @JvmOverloads constructor(
 
     val range get() = delegate.range
 
-    val maxY get() = delegate.maxY
-
-    val minY get() = delegate.minY
-
-    private val paint = Paint()
-
-    private val delegate = CurveLineDelegate(onUpdate = ::invalidate)
-
-    init {
-        var lineWidth = resources.getDimensionPixelSize(R.dimen.line_width_default)
-        applyStyledAttributes(attrs, R.styleable.GraphicsView, defStyleAttr, defStyleRes) {
-            lineWidth = getDimensionPixelSize(R.styleable.GraphicsView_lineWidth, lineWidth)
-        }
-        setupPaint(lineWidth)
+    private val paint = Paint().apply {
+        style = Paint.Style.STROKE
+        isAntiAlias = true
     }
 
-    private fun setupPaint(lineWidth: Int) {
-        paint.apply {
-            style = Paint.Style.STROKE
-            strokeWidth = lineWidth.toFloat()
-            isAntiAlias = true
+    private val delegate = CurveLineGraphDelegate(onUpdate = ::invalidate)
+
+    init {
+        applyStyledAttributes(attrs, R.styleable.GraphicsView, defStyleAttr, defStyleRes) {
+            paint.strokeWidth = getDimensionPixelSize(
+                R.styleable.GraphicsView_lineWidth,
+                resources.getDimensionPixelSize(R.dimen.line_width_default)
+            ).toFloat()
         }
     }
 
@@ -64,6 +55,10 @@ internal class GraphicsView @JvmOverloads constructor(
 
     fun setOnYAxisChangedListener(onYAxisChangedListener: ((minY: Float, maxY: Float) -> Unit)?) {
         delegate.setOnYAxisChangedListener(onYAxisChangedListener)
+    }
+
+    fun setOnRangeChangedListener(onRangeChangedListener: ((start: Float, endInclusive: Float) -> Unit)?) {
+        delegate.setOnRangeChangedListener(onRangeChangedListener)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

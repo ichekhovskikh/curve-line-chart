@@ -10,17 +10,22 @@ import kotlin.math.max
 import kotlin.math.min
 
 internal class ScrollFrameDelegate(
+    private val frameCornerRadius: Float,
     private val frameThicknessHorizontal: Float,
     private val frameThicknessVertical: Float,
     private val frameMaxWidthPercent: Float,
     private val frameMinWidthPercent: Float,
-    private val additionalTouchWidth: Float,
+    private val dragIndicatorCornerRadius: Float,
+    private val dragIndicatorWidth: Float,
+    private val dragIndicatorMaxHeight: Float,
     var onUpdate: (() -> Unit)? = null
 ) {
 
     private val path = Path()
     private val frameInnerContour = RectF()
     private val frameOuterContour = RectF()
+    private val leftDragIndicatorContour = RectF()
+    private val rightDragIndicatorContour = RectF()
 
     private var downTouchPosition = 0f
     private var activeComponent = ComponentType.NOTHING
@@ -32,7 +37,7 @@ internal class ScrollFrameDelegate(
     var viewSize = Size()
         set(value) {
             field = value
-            updateFrameSize(range)
+            updateFrameCounters(range)
             onUpdate?.invoke()
         }
 
@@ -40,7 +45,7 @@ internal class ScrollFrameDelegate(
         if (this.range == range) return
         if (range.distance in frameMinWidthPercent..frameMaxWidthPercent) {
             this.range = range
-            updateFrameSize(range)
+            updateFrameCounters(range)
             onUpdate?.invoke()
             onRangeChanged()
         }
@@ -58,52 +63,54 @@ internal class ScrollFrameDelegate(
         onRangeChangedListeners.forEach { it.invoke(range) }
     }
 
-    fun onActionDown(event: MotionEvent, window: Size) {
+    fun onActionDown(event: MotionEvent) {
         val abscissa = event.x
-        val startPixel = xValueToPixel(range.start, window.width, 0f, 1f)
-        val endInclusivePixel = xValueToPixel(range.endInclusive, window.width, 0f, 1f)
+        val startPixel = xValueToPixel(range.start, viewSize.width, 0f, 1f)
+        val endInclusivePixel = xValueToPixel(range.endInclusive, viewSize.width, 0f, 1f)
 
+        // the additional half width of the curtain is used by the curtain
+        // to prevent frame shift mistakes instead of the curtain shift
+        val leftCurtainStart = startPixel - frameThicknessVertical
         val leftCurtainEnd = startPixel + frameThicknessVertical
         val rightCurtainStart = endInclusivePixel - frameThicknessVertical
+        val rightCurtainEnd = endInclusivePixel + frameThicknessVertical
 
-        activeComponent = when {
-            abscissa <= leftCurtainEnd + additionalTouchWidth -> {
-                setLeftCurtainPosition(abscissa, window)
+        activeComponent = when (abscissa) {
+            in leftCurtainStart..leftCurtainEnd -> {
+                setLeftCurtainPosition(abscissa)
                 ComponentType.LEFT_CURTAIN
             }
-            abscissa >= rightCurtainStart - additionalTouchWidth -> {
-                setRightCurtainPosition(abscissa, window)
+            in rightCurtainStart..rightCurtainEnd -> {
+                setRightCurtainPosition(abscissa)
                 ComponentType.RIGHT_CURTAIN
             }
             else -> {
+                // todo move left and right curtain (offset range)
                 downTouchPosition = abscissa
                 ComponentType.FRAME
             }
         }
     }
 
-    fun onActionMove(event: MotionEvent, window: Size) {
+    fun onActionMove(event: MotionEvent) {
         when (activeComponent) {
-            ComponentType.LEFT_CURTAIN -> setLeftCurtainPosition(event.x, window)
-            ComponentType.RIGHT_CURTAIN -> setRightCurtainPosition(event.x, window)
-            ComponentType.FRAME -> moveFrame(event.x, window)
+            ComponentType.LEFT_CURTAIN -> setLeftCurtainPosition(event.x)
+            ComponentType.RIGHT_CURTAIN -> setRightCurtainPosition(event.x)
+            ComponentType.FRAME -> moveFrame(event.x)
             ComponentType.NOTHING -> Unit
         }
     }
 
-    private fun setLeftCurtainPosition(abscissa: Float, window: Size) {
-        val start = xPixelToValue(abscissa, window.width, 0f, 1f)
-        setRange(range.copy(start = start))
+    private fun setLeftCurtainPosition(abscissa: Float) {
+        setRange(range.copy(start = abscissa.pxToPercent()))
     }
 
-    private fun setRightCurtainPosition(abscissa: Float, window: Size) {
-        val endInclusive = xPixelToValue(abscissa, window.width, 0f, 1f)
-        setRange(range.copy(endInclusive = endInclusive))
+    private fun setRightCurtainPosition(abscissa: Float) {
+        setRange(range.copy(endInclusive = abscissa.pxToPercent()))
     }
 
-    private fun moveFrame(abscissa: Float, window: Size) {
-        val incrementPixel = abscissa - downTouchPosition
-        val increment = xPixelToValue(incrementPixel, window.width, 0f, 1f)
+    private fun moveFrame(abscissa: Float) {
+        val increment = (abscissa - downTouchPosition).pxToPercent()
         val start = range.start + increment
         val endInclusive = range.endInclusive + increment
         if (start >= 0f && endInclusive <= 1f) {
@@ -112,22 +119,84 @@ internal class ScrollFrameDelegate(
         }
     }
 
-    fun drawScrollFrame(canvas: Canvas, framePaint: Paint, fogPaint: Paint, window: Size) {
+    fun drawScrollFrame(
+        canvas: Canvas,
+        framePaint: Paint,
+        fogPaint: Paint,
+        dragIndicatorPaint: Paint
+    ) {
         path.rewind()
-        path.moveTo(frameOuterContour.left, frameOuterContour.top)
-        path.addRect(frameOuterContour, Path.Direction.CW)
-        path.moveTo(frameInnerContour.left, frameInnerContour.top)
-        path.addRect(frameInnerContour, Path.Direction.CCW)
-        canvas.drawPath(path, framePaint)
-
-        canvas.drawRect(0f, 0f, frameOuterContour.left, window.height.toFloat(), fogPaint)
-        canvas.drawRect(frameOuterContour.right, 0f, window.width.toFloat(), window.height.toFloat(), fogPaint)
+        canvas.drawFog(fogPaint)
+        canvas.drawFrame(framePaint)
+        canvas.drawLeftDragIndicator(dragIndicatorPaint)
+        canvas.drawRightDragIndicator(dragIndicatorPaint)
     }
 
-    private fun updateFrameSize(range: FloatRange) {
+    private fun Canvas.drawFog(paint: Paint) {
+        drawRect(
+            0f,
+            0f,
+            frameInnerContour.left,
+            viewSize.height.toFloat(),
+            paint
+        )
+        drawRect(
+            frameInnerContour.right,
+            0f,
+            viewSize.width.toFloat(),
+            viewSize.height.toFloat(),
+            paint
+        )
+        drawRect(
+            frameInnerContour.left,
+            0f,
+            frameInnerContour.right,
+            frameInnerContour.top,
+            paint
+        )
+        drawRect(
+            frameInnerContour.left,
+            frameInnerContour.bottom,
+            frameInnerContour.right,
+            0f,
+            paint
+        )
+    }
+
+    private fun Canvas.drawFrame(paint: Paint) {
+        path.moveTo(frameOuterContour.left, frameOuterContour.top)
+        path.addRoundRect(
+            frameOuterContour,
+            frameCornerRadius,
+            frameCornerRadius,
+            Path.Direction.CW
+        )
+        path.moveTo(frameInnerContour.left, frameInnerContour.top)
+        path.addRect(frameInnerContour, Path.Direction.CCW)
+        drawPath(path, paint)
+    }
+
+    private fun Canvas.drawLeftDragIndicator(paint: Paint) {
+        drawRoundRect(
+            leftDragIndicatorContour,
+            dragIndicatorCornerRadius,
+            dragIndicatorCornerRadius,
+            paint
+        )
+    }
+
+    private fun Canvas.drawRightDragIndicator(paint: Paint) {
+        drawRoundRect(
+            rightDragIndicatorContour,
+            dragIndicatorCornerRadius,
+            dragIndicatorCornerRadius,
+            paint
+        )
+    }
+
+    private fun updateFrameCounters(range: FloatRange) {
         val startPixel = xValueToPixel(range.start, viewSize.width, 0f, 1f)
         val endInclusivePixel = xValueToPixel(range.endInclusive, viewSize.width, 0f, 1f)
-
         frameOuterContour.set(
             max(startPixel - frameThicknessVertical / 2, 0f),
             0f,
@@ -140,7 +209,27 @@ internal class ScrollFrameDelegate(
             frameOuterContour.right - frameThicknessVertical,
             frameOuterContour.bottom - frameThicknessHorizontal
         )
+
+        val frameCurtainWidth = frameInnerContour.left - frameOuterContour.left
+        val dragIndicatorHorizontalOffset = (frameCurtainWidth - dragIndicatorWidth) / 2
+        val dragIndicatorHeight = min(frameInnerContour.height() / 3, dragIndicatorMaxHeight)
+        val dragIndicatorTop = (frameOuterContour.bottom - dragIndicatorHeight) / 2
+        val dragIndicatorBottom = dragIndicatorTop + dragIndicatorHeight
+        leftDragIndicatorContour.set(
+            frameOuterContour.left + dragIndicatorHorizontalOffset,
+            dragIndicatorTop,
+            frameInnerContour.left - dragIndicatorHorizontalOffset,
+            dragIndicatorBottom
+        )
+        rightDragIndicatorContour.set(
+            frameInnerContour.right + dragIndicatorHorizontalOffset,
+            dragIndicatorTop,
+            frameOuterContour.right - dragIndicatorHorizontalOffset,
+            dragIndicatorBottom
+        )
     }
+
+    private fun Float.pxToPercent() = xPixelToValue(this, viewSize.width, 0f, 1f)
 
     private enum class ComponentType {
         NOTHING, FRAME, LEFT_CURTAIN, RIGHT_CURTAIN

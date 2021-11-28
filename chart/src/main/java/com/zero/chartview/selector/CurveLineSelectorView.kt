@@ -1,23 +1,26 @@
-package com.zero.chartview
+package com.zero.chartview.selector
 
 import android.content.Context
 import android.content.res.TypedArray
 import android.support.annotation.ColorInt
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import com.zero.chartview.CurveLineGraphView
+import com.zero.chartview.R
+import com.zero.chartview.Themeable
 import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.model.FloatRange
 
-class ChartSelectorView @JvmOverloads constructor(
+class CurveLineSelectorView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes), Themeable {
 
-    private val graph: GraphicsView = GraphicsView(context, attrs, defStyleAttr, defStyleRes)
-    private var scrollFrame = ScrollFrameView(context, attrs, defStyleAttr, defStyleRes)
+    private val graph = CurveLineGraphView(context, attrs, defStyleAttr, defStyleRes)
+    private val scrollFrame = ScrollFrameView(context, attrs, defStyleAttr, defStyleRes)
 
     private lateinit var chartColors: Themeable.ChartColors
 

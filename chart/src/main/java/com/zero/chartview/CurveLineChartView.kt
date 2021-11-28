@@ -14,14 +14,14 @@ import com.zero.chartview.popup.PopupLineView
 import com.zero.chartview.popup.PopupWindow
 import com.zero.chartview.tools.*
 
-class ChartView @JvmOverloads constructor(
+class CurveLineChartView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes), Themeable {
 
-    private val graph = GraphicsView(context, attrs, defStyleAttr, defStyleRes)
+    private val chart = CurveLineGraphView(context, attrs, defStyleAttr, defStyleRes)
     private val yAxis = YAxisView(context, attrs, defStyleAttr, defStyleRes)
     private val xAxis = XAxisView(context, attrs, defStyleAttr, defStyleRes)
     private val popup = PopupLineView(context, attrs, defStyleAttr, defStyleRes)
@@ -33,11 +33,11 @@ class ChartView @JvmOverloads constructor(
     init {
         addView(xAxis)
         addView(yAxis)
-        addView(graph)
+        addView(chart)
         addView(popup)
         addView(window)
         popup.popupWindow = window
-        graph.setOnYAxisChangedListener(yAxis::setYAxis)
+        chart.setOnYAxisChangedListener(yAxis::setYAxis)
 
         applyStyledAttributes(attrs, R.styleable.ChartView, defStyleAttr, defStyleRes) {
             setChartColors(getThemeColorDefault(this))
@@ -45,36 +45,36 @@ class ChartView @JvmOverloads constructor(
     }
 
     fun setRange(start: Float, endInclusive: Float, smoothScroll: Boolean = false) {
-        graph.setRange(start, endInclusive, smoothScroll)
+        chart.setRange(start, endInclusive, smoothScroll)
         xAxis.setRange(start, endInclusive)
         popup.setRange(start, endInclusive)
     }
 
-    fun getLines() = graph.getLines()
+    fun getLines() = chart.getLines()
 
     fun setLines(lines: List<CurveLine>, correspondingLegends: Map<Float, String>? = null) {
-        graph.setLines(lines)
+        chart.setLines(lines)
         popup.setLines(lines)
         updateCorrespondingLegends(lines.abscissas, correspondingLegends)
         onLinesChanged(lines)
     }
 
     fun addLine(line: CurveLine, correspondingLegends: Map<Float, String>? = null) {
-        val lines = graph.getLines() + line
-        graph.addLine(line)
+        val lines = chart.getLines() + line
+        chart.addLine(line)
         popup.setLines(lines)
         updateCorrespondingLegends(lines.abscissas, correspondingLegends)
         onLinesChanged(lines)
     }
 
     fun removeLine(index: Int) {
-        val lines = graph.getLines()
+        val lines = chart.getLines()
         removeLine(lines[index])
     }
 
     fun removeLine(line: CurveLine) {
-        val lines = graph.getLines() - line
-        graph.removeLine(line)
+        val lines = chart.getLines() - line
+        chart.removeLine(line)
         popup.setLines(lines)
         onLinesChanged(lines)
     }
@@ -106,7 +106,7 @@ class ChartView @JvmOverloads constructor(
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         measureChildWithMargins(
-            graph,
+            chart,
             widthMeasureSpec,
             0,
             heightMeasureSpec,

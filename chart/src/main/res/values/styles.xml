@@ -18,12 +18,14 @@
     <dimen name="abscissa_legend_margin_top_default">4dp</dimen>
     <integer name="abscissa_legend_count_default">5</integer>
 
-    <dimen name="frame_thickness_horizontal_default">1dp</dimen>
-    <dimen name="frame_thickness_vertical_default">6dp</dimen>
+    <dimen name="frame_corner_radius_default">8dp</dimen>
+    <dimen name="frame_thickness_horizontal_default">2dp</dimen>
+    <dimen name="frame_thickness_vertical_default">14dp</dimen>
     <fraction name="frame_min_width_percent_default">10%</fraction>
     <fraction name="frame_max_width_percent_default">100%</fraction>
-
-    <dimen name="additional_curtain_touch_width">6dp</dimen>
+    <dimen name="frame_drag_indicator_max_height_default">24dp</dimen>
+    <dimen name="frame_drag_indicator_width_default">4dp</dimen>
+    <dimen name="frame_drag_indicator_corner_radius_default">4dp</dimen>
 
     <dimen name="popup_line_width">1dp</dimen>
     <dimen name="point_inner_radius">3dp</dimen>

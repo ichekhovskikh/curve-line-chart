@@ -8,5 +8,6 @@
     <color name="colorGrid">#D3DBE7</color>
     <color name="colorFrameSelector">#38416990</color>
     <color name="colorFogSelector">#14416990</color>
+    <color name="colorFrameDragIndicator">#CCFFFFFF</color>
     <color name="colorPopupLine">#EBF0F3</color>
 </resources>

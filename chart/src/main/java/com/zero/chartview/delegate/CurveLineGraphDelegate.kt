@@ -11,13 +11,10 @@ import com.zero.chartview.model.Size
 import com.zero.chartview.tools.xValueToPixel
 import com.zero.chartview.tools.yValueToPixel
 
-internal class CurveLineDelegate(var onUpdate: (() -> Unit)? = null) {
+internal class CurveLineGraphDelegate(var onUpdate: (() -> Unit)? = null) {
 
-    var maxY = 0f
-        private set
-
-    var minY = 0f
-        private set
+    private var maxY = 0f
+    private var minY = 0f
 
     var range = FloatRange(0f, 1f)
         private set
@@ -35,6 +32,7 @@ internal class CurveLineDelegate(var onUpdate: (() -> Unit)? = null) {
     private val animatingLines = mutableListOf<AnimatingCurveLine>()
 
     private var onYAxisChangedListener: ((minY: Float, maxY: Float) -> Unit)? = null
+    private var onRangeChangedListener: ((start: Float, endInclusive: Float) -> Unit)? = null
 
     private val appearanceAnimator = AppearanceAnimator { value ->
         animatingLines.forEach { line ->
@@ -66,6 +64,7 @@ internal class CurveLineDelegate(var onUpdate: (() -> Unit)? = null) {
         if (!smoothScroll) {
             this.range = range
         }
+        onRangeChangedListener?.invoke(range.start, range.endInclusive)
         updateAxis(newRange = range)
     }
 
@@ -125,7 +124,15 @@ internal class CurveLineDelegate(var onUpdate: (() -> Unit)? = null) {
         this.onYAxisChangedListener = onYAxisChangedListener
     }
 
+    fun setOnRangeChangedListener(onRangeChangedListener: ((start: Float, endInclusive: Float) -> Unit)?) {
+        this.onRangeChangedListener = onRangeChangedListener
+    }
+
     fun drawLines(canvas: Canvas, paint: Paint) {
+        canvas.drawCurveLines(paint)
+    }
+
+    private fun Canvas.drawCurveLines(paint: Paint) {
         animatingLines.forEach { line ->
             path.rewind()
             paint.color = line.animatingColor
@@ -135,7 +142,7 @@ internal class CurveLineDelegate(var onUpdate: (() -> Unit)? = null) {
                     else -> path.lineTo(point.x, point.y)
                 }
             }
-            canvas.drawPath(path, paint)
+            drawPath(path, paint)
         }
     }
 

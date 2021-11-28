@@ -6,16 +6,17 @@ import android.util.AttributeSet
 import android.widget.LinearLayout
 import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.model.CurveLine
+import com.zero.chartview.selector.CurveLineSelectorView
 
-class ChartLayout @JvmOverloads constructor(
+class CurveLineChartLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr, defStyleRes), Themeable {
 
-    private var chart: ChartView? = null
-    private var selector: ChartSelectorView? = null
+    private var chart: CurveLineChartView? = null
+    private var selector: CurveLineSelectorView? = null
 
     private lateinit var chartColors: Themeable.ChartColors
 
@@ -32,12 +33,12 @@ class ChartLayout @JvmOverloads constructor(
         super.onFinishInflate()
         for (index in 0 until childCount) {
             val child = getChildAt(index)
-            if (child is ChartView) {
+            if (child is CurveLineChartView) {
                 chart = child
                 child.addOnLinesChangedListener { lines ->
                     selector?.setLines(lines)
                 }
-            } else if (child is ChartSelectorView) {
+            } else if (child is CurveLineSelectorView) {
                 selector = child
                 child.addOnRangeChangedListener { range ->
                     chart?.setRange(range.start, range.endInclusive)
@@ -72,13 +73,13 @@ class ChartLayout @JvmOverloads constructor(
         val chartColors = chart?.getChartColors()
         val controlColors = selector?.getChartColors()
         chartColors?.apply {
-            this@ChartLayout.chartColors.colorLegend = colorLegend
-            this@ChartLayout.chartColors.colorGrid = colorGrid
-            this@ChartLayout.chartColors.colorPopupLine = colorPopupLine
+            this@CurveLineChartLayout.chartColors.colorLegend = colorLegend
+            this@CurveLineChartLayout.chartColors.colorGrid = colorGrid
+            this@CurveLineChartLayout.chartColors.colorPopupLine = colorPopupLine
         }
         controlColors?.apply {
-            this@ChartLayout.chartColors.colorFrameSelector = colorFrameSelector
-            this@ChartLayout.chartColors.colorFogSelector = colorFogSelector
+            this@CurveLineChartLayout.chartColors.colorFrameSelector = colorFrameSelector
+            this@CurveLineChartLayout.chartColors.colorFogSelector = colorFogSelector
         }
         return this.chartColors
     }
