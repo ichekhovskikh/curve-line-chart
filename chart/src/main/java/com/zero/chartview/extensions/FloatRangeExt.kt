@@ -10,6 +10,8 @@ fun FloatRange.contains(value: Float) = value in start..endInclusive
 
 fun FloatRange.isEmpty() = start == endInclusive
 
+fun FloatRange.offset(offset: Float) = FloatRange(start - offset, endInclusive - offset)
+
 /**
  * Convert range of percents to range of values
  */

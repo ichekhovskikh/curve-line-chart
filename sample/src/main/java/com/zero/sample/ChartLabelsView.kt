@@ -8,7 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.CheckBox
 import android.widget.LinearLayout
-import com.zero.chartview.ChartLayout
+import com.zero.chartview.CurveLineChartLayout
 import com.zero.chartview.model.CurveLine
 
 class ChartLabelsView @JvmOverloads constructor(
@@ -18,7 +18,7 @@ class ChartLabelsView @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr, defStyleRes) {
 
-    var chart: ChartLayout? = null
+    var chart: CurveLineChartLayout? = null
     private var items = mutableListOf<View>()
 
     init {

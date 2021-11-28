@@ -33,23 +33,23 @@
                 android:layout_gravity="center_vertical|end"/>
     </FrameLayout>
 
-    <com.zero.chartview.ChartLayout
+    <com.zero.chartview.CurveLineChartLayout
             android:id="@+id/chartLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-        <com.zero.chartview.ChartView
+        <com.zero.chartview.CurveLineChartView
                 android:id="@+id/chart"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"/>
 
-        <com.zero.chartview.ChartSelectorView
+        <com.zero.chartview.selector.CurveLineSelectorView
                 android:id="@+id/selector"
                 android:layout_marginTop="20dp"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"/>
 
-    </com.zero.chartview.ChartLayout>
+    </com.zero.chartview.CurveLineChartLayout>
 
     <com.zero.sample.ChartLabelsView
             android:id="@+id/labels"

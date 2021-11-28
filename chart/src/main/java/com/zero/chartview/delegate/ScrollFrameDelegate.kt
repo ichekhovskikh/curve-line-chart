@@ -3,6 +3,7 @@ package com.zero.chartview.delegate
 import android.graphics.*
 import android.view.MotionEvent
 import com.zero.chartview.extensions.distance
+import com.zero.chartview.extensions.offset
 import com.zero.chartview.model.*
 import com.zero.chartview.tools.xPixelToValue
 import com.zero.chartview.tools.xValueToPixel
@@ -65,6 +66,8 @@ internal class ScrollFrameDelegate(
 
     fun onActionDown(event: MotionEvent) {
         val abscissa = event.x
+        downTouchPosition = abscissa
+
         val startPixel = xValueToPixel(range.start, viewSize.width, 0f, 1f)
         val endInclusivePixel = xValueToPixel(range.endInclusive, viewSize.width, 0f, 1f)
 
@@ -85,8 +88,7 @@ internal class ScrollFrameDelegate(
                 ComponentType.RIGHT_CURTAIN
             }
             else -> {
-                // todo move left and right curtain (offset range)
-                downTouchPosition = abscissa
+                frameCenterByTouchPosition()
                 ComponentType.FRAME
             }
         }
@@ -117,6 +119,24 @@ internal class ScrollFrameDelegate(
             downTouchPosition = abscissa
             setRange(FloatRange(start, endInclusive))
         }
+    }
+
+    private fun frameCenterByTouchPosition() {
+        val touchAsPercent = downTouchPosition.pxToPercent()
+        val halfRangeDistance = range.distance / 2
+
+        val newRange = when {
+            touchAsPercent < halfRangeDistance -> {
+                range.offset(range.start)
+            }
+            1f - touchAsPercent < halfRangeDistance -> {
+                range.offset(range.endInclusive - 1f)
+            }
+            else -> {
+                range.offset(range.start + halfRangeDistance - touchAsPercent)
+            }
+        }
+        setRange(newRange)
     }
 
     fun drawScrollFrame(
