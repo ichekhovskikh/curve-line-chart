@@ -1,5 +1,6 @@
 package com.zero.chartview.selector
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.TypedArray
 import android.support.annotation.ColorInt
@@ -33,8 +34,8 @@ class CurveLineSelectorView @JvmOverloads constructor(
         }
     }
 
-    fun setRange(start: Float, endInclusive: Float) {
-        scrollFrame.setRange(start, endInclusive)
+    fun setRange(start: Float, endInclusive: Float, smoothScroll: Boolean = false) {
+        scrollFrame.setRange(start, endInclusive, smoothScroll)
     }
 
     fun addOnRangeChangedListener(listener: (FloatRange) -> Unit) {
@@ -91,6 +92,11 @@ class CurveLineSelectorView @JvmOverloads constructor(
         scrollFrame.setFogSelectorColor(chartColors.colorFogSelector)
         super.setBackgroundColor(chartColors.colorBackground)
         scrollFrame.invalidate()
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun setOnTouchListener(listener: OnTouchListener?) {
+        scrollFrame.setOnTouchListener(listener)
     }
 
     private fun getThemeColorDefault(typedArray: TypedArray): Themeable.ChartColors {

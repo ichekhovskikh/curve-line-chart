@@ -111,8 +111,8 @@ internal class ScrollFrameView @JvmOverloads constructor(
         }
     }
 
-    fun setRange(start: Float, endInclusive: Float) {
-        delegate.setRange(PercentRange(start, endInclusive))
+    fun setRange(start: Float, endInclusive: Float, smoothScroll: Boolean = false) {
+        delegate.setRange(PercentRange(start, endInclusive), smoothScroll)
     }
 
     fun addOnRangeChangedListener(listener: (FloatRange) -> Unit) {

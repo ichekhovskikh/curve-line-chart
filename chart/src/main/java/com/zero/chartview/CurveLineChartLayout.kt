@@ -1,8 +1,10 @@
 package com.zero.chartview
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.widget.LinearLayout
 import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.model.CurveLine
@@ -29,6 +31,7 @@ class CurveLineChartLayout @JvmOverloads constructor(
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onFinishInflate() {
         super.onFinishInflate()
         for (index in 0 until childCount) {
@@ -40,15 +43,20 @@ class CurveLineChartLayout @JvmOverloads constructor(
                 }
             } else if (child is CurveLineSelectorView) {
                 selector = child
+                var smoothScroll = false
+                selector?.setOnTouchListener { view, event ->
+                    smoothScroll = event.action == MotionEvent.ACTION_DOWN
+                    view.onTouchEvent(event)
+                }
                 child.addOnRangeChangedListener { range ->
-                    chart?.setRange(range.start, range.endInclusive)
+                    chart?.setRange(range.start, range.endInclusive, smoothScroll)
                 }
             }
         }
     }
 
-    fun setRange(start: Float, endInclusive: Float) {
-        selector?.setRange(start, endInclusive)
+    fun setRange(start: Float, endInclusive: Float, smoothScroll: Boolean = false) {
+        selector?.setRange(start, endInclusive, smoothScroll)
     }
 
     fun getLines() = chart?.getLines()

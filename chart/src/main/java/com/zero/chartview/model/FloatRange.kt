@@ -9,3 +9,8 @@ object PercentRange {
         endInclusive = endInclusive.coerceAtMost(1f)
     )
 }
+
+object ZeroRange {
+
+    operator fun invoke() = FloatRange(0f, 0f)
+}

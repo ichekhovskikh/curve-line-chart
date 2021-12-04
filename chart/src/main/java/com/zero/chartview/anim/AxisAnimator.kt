@@ -6,6 +6,7 @@ import android.animation.ValueAnimator
 import android.view.animation.DecelerateInterpolator
 import com.zero.chartview.BuildConfig
 import com.zero.chartview.model.FloatRange
+import com.zero.chartview.model.ZeroRange
 import com.zero.chartview.tools.AnimatorListenerAdapter
 
 internal class AxisAnimator(
@@ -43,8 +44,8 @@ internal class AxisAnimator(
     fun start(
         fromXRange: FloatRange,
         toXRange: FloatRange,
-        fromYRange: FloatRange,
-        toYRange: FloatRange
+        fromYRange: FloatRange = ZeroRange(),
+        toYRange: FloatRange = ZeroRange()
     ) {
         val startXProperty = PropertyValuesHolder.ofFloat(START_X, fromXRange.start, toXRange.start)
         val endXProperty = PropertyValuesHolder.ofFloat(END_X, fromXRange.endInclusive, toXRange.endInclusive)
@@ -57,8 +58,8 @@ internal class AxisAnimator(
     fun reStart(
         fromXRange: FloatRange,
         toXRange: FloatRange,
-        fromYRange: FloatRange,
-        toYRange: FloatRange
+        fromYRange: FloatRange = ZeroRange(),
+        toYRange: FloatRange = ZeroRange()
     ) {
         cancel()
         start(fromXRange, toXRange, fromYRange, toYRange)

@@ -2,6 +2,7 @@ package com.zero.chartview.delegate
 
 import android.graphics.*
 import android.view.MotionEvent
+import com.zero.chartview.anim.AxisAnimator
 import com.zero.chartview.extensions.distance
 import com.zero.chartview.extensions.offset
 import com.zero.chartview.model.*
@@ -39,17 +40,23 @@ internal class ScrollFrameDelegate(
         set(value) {
             field = value
             updateFrameCounters(range)
-            onUpdate?.invoke()
         }
 
-    fun setRange(range: FloatRange) {
+    private val axisAnimator = AxisAnimator(ANIMATION_DURATION_MS) { start, end, _, _ ->
+        updateFrameCounters(FloatRange(start, end))
+    }
+
+    fun setRange(range: FloatRange, smoothScroll: Boolean = false) {
         if (this.range == range) return
-        if (range.distance in frameMinWidthPercent..frameMaxWidthPercent) {
-            this.range = range
+        if (range.distance !in frameMinWidthPercent..frameMaxWidthPercent) return
+        if (smoothScroll) {
+            axisAnimator.reStart(this.range, range)
+        } else {
+            axisAnimator.cancel()
             updateFrameCounters(range)
-            onUpdate?.invoke()
-            onRangeChanged()
         }
+        this.range = range
+        onRangeChanged(range)
     }
 
     fun addOnRangeChangedListener(listener: (FloatRange) -> Unit) {
@@ -60,7 +67,7 @@ internal class ScrollFrameDelegate(
         onRangeChangedListeners.remove(listener)
     }
 
-    private fun onRangeChanged() {
+    private fun onRangeChanged(range: FloatRange) {
         onRangeChangedListeners.forEach { it.invoke(range) }
     }
 
@@ -87,8 +94,11 @@ internal class ScrollFrameDelegate(
                 setRightCurtainPosition(abscissa)
                 ComponentType.RIGHT_CURTAIN
             }
-            else -> {
+            !in leftCurtainStart..rightCurtainEnd -> {
                 frameCenterByTouchPosition()
+                ComponentType.FRAME
+            }
+            else -> {
                 ComponentType.FRAME
             }
         }
@@ -136,7 +146,7 @@ internal class ScrollFrameDelegate(
                 range.offset(range.start + halfRangeDistance - touchAsPercent)
             }
         }
-        setRange(newRange)
+        setRange(newRange, smoothScroll = true)
     }
 
     fun drawScrollFrame(
@@ -247,11 +257,16 @@ internal class ScrollFrameDelegate(
             frameOuterContour.right - dragIndicatorHorizontalOffset,
             dragIndicatorBottom
         )
+        onUpdate?.invoke()
     }
 
     private fun Float.pxToPercent() = xPixelToValue(this, viewSize.width, 0f, 1f)
 
     private enum class ComponentType {
         NOTHING, FRAME, LEFT_CURTAIN, RIGHT_CURTAIN
+    }
+
+    private companion object {
+        const val ANIMATION_DURATION_MS = 150L
     }
 }
