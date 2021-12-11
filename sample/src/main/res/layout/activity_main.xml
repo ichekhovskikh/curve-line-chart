@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:gravity="center_horizontal"
+        android:orientation="vertical"
         tools:context=".MainActivity">
 
     <FrameLayout
@@ -16,21 +16,21 @@
                 android:id="@+id/titleView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/colorTitle"
-                android:layout_margin="16dp"
-                android:textSize="20sp"
                 android:layout_gravity="center_vertical|start"
-                android:text="Chart View Sample"/>
+                android:layout_margin="16dp"
+                android:text="Chart View Sample"
+                android:textColor="@color/colorTitle"
+                android:textSize="20sp" />
 
         <Button
                 android:id="@+id/button"
                 style="@style/Widget.AppCompat.Toolbar.Button.Navigation"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
+                android:layout_gravity="center_vertical|end"
                 android:layout_marginEnd="16dp"
-                android:drawableTint="@color/colorTitle"
                 android:drawableStart="@drawable/ic_moon"
-                android:layout_gravity="center_vertical|end"/>
+                android:drawableTint="@color/colorTitle" />
     </FrameLayout>
 
     <com.zero.chartview.CurveLineChartLayout
@@ -41,13 +41,14 @@
         <com.zero.chartview.CurveLineChartView
                 android:id="@+id/chart"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"/>
+                android:layout_height="300dp"
+                app:scrollEnabled="true" />
 
         <com.zero.chartview.selector.CurveLineSelectorView
                 android:id="@+id/selector"
-                android:layout_marginTop="20dp"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"/>
+                android:layout_height="50dp"
+                android:layout_marginTop="20dp" />
 
     </com.zero.chartview.CurveLineChartLayout>
 
@@ -55,6 +56,6 @@
             android:id="@+id/labels"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"/>
+            android:layout_marginTop="16dp" />
 
 </LinearLayout>

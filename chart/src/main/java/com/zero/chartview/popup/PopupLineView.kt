@@ -73,26 +73,16 @@ internal class PopupLineView @JvmOverloads constructor(
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
-                parent.requestDisallowInterceptTouchEvent(true)
                 touchX = event.x
                 touchY = event.y
             }
             MotionEvent.ACTION_MOVE -> {
-                if (Math.abs(event.y - touchY) > dyStopTrackingTouch) {
-                    parent.requestDisallowInterceptTouchEvent(false)
-                    popupWindow?.visibility = GONE
-                    touchX = null
-                    invalidate()
-                    return false
-                }
-                touchX = event.x
-            }
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                parent.requestDisallowInterceptTouchEvent(false)
+                popupWindow?.visibility = GONE
+                touchX = null
             }
         }
         invalidate()
-        return true
+        return false
     }
 
     override fun onDraw(canvas: Canvas) {

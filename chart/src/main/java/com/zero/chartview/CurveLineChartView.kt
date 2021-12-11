@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.TypedArray
 import android.support.annotation.ColorInt
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.widget.FrameLayout
 import com.zero.chartview.axis.XAxisView
 import com.zero.chartview.axis.YAxisView
@@ -21,23 +22,32 @@ class CurveLineChartView @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes), Themeable {
 
-    private val chart = CurveLineGraphView(context, attrs, defStyleAttr, defStyleRes)
+    private val graph = CurveLineGraphView(context, attrs, defStyleAttr, defStyleRes)
     private val yAxis = YAxisView(context, attrs, defStyleAttr, defStyleRes)
     private val xAxis = XAxisView(context, attrs, defStyleAttr, defStyleRes)
     private val popup = PopupLineView(context, attrs, defStyleAttr, defStyleRes)
     private val window = PopupWindow(context, attrs, defStyleAttr, defStyleRes)
 
-    private val onLinesChangedListeners = mutableListOf<(List<CurveLine>) -> Unit>()
     private lateinit var chartColors: Themeable.ChartColors
+
+    var isScrollEnabled
+        get() = graph.isScrollEnabled
+        set(value) {
+            graph.isScrollEnabled = value
+        }
 
     init {
         addView(xAxis)
         addView(yAxis)
-        addView(chart)
+        addView(graph)
         addView(popup)
         addView(window)
         popup.popupWindow = window
-        chart.setOnYAxisChangedListener(yAxis::setYAxis)
+        graph.setOnYAxisChangedListener(yAxis::setYAxis)
+        graph.addOnRangeChangedListener { start: Float, endInclusive: Float, smoothScroll: Boolean ->
+            xAxis.setRange(start, endInclusive, smoothScroll)
+            popup.setRange(start, endInclusive)
+        }
 
         applyStyledAttributes(attrs, R.styleable.ChartView, defStyleAttr, defStyleRes) {
             setChartColors(getThemeColorDefault(this))
@@ -45,51 +55,54 @@ class CurveLineChartView @JvmOverloads constructor(
     }
 
     fun setRange(start: Float, endInclusive: Float, smoothScroll: Boolean = false) {
-        chart.setRange(start, endInclusive, smoothScroll)
-        xAxis.setRange(start, endInclusive)
-        popup.setRange(start, endInclusive)
+        graph.setRange(start, endInclusive, smoothScroll)
     }
 
-    fun getLines() = chart.getLines()
+    fun getLines() = graph.getLines()
 
     fun setLines(lines: List<CurveLine>, correspondingLegends: Map<Float, String>? = null) {
-        chart.setLines(lines)
+        val abscissas = lines.abscissas
+        graph.setLines(lines)
         popup.setLines(lines)
-        updateCorrespondingLegends(lines.abscissas, correspondingLegends)
-        onLinesChanged(lines)
+        xAxis.setAbscissas(abscissas)
+        updateCorrespondingLegends(abscissas, correspondingLegends)
     }
 
     fun addLine(line: CurveLine, correspondingLegends: Map<Float, String>? = null) {
-        val lines = chart.getLines() + line
-        chart.addLine(line)
+        val lines = graph.getLines() + line
+        val abscissas = lines.abscissas
+        graph.addLine(line)
         popup.setLines(lines)
-        updateCorrespondingLegends(lines.abscissas, correspondingLegends)
-        onLinesChanged(lines)
+        xAxis.setAbscissas(abscissas)
+        updateCorrespondingLegends(abscissas, correspondingLegends)
     }
 
     fun removeLine(index: Int) {
-        val lines = chart.getLines()
+        val lines = graph.getLines()
         removeLine(lines[index])
     }
 
     fun removeLine(line: CurveLine) {
-        val lines = chart.getLines() - line
-        chart.removeLine(line)
+        val lines = graph.getLines() - line
+        graph.removeLine(line)
         popup.setLines(lines)
-        onLinesChanged(lines)
-    }
-
-    fun addOnLinesChangedListener(listener: (List<CurveLine>) -> Unit) {
-        onLinesChangedListeners.add(listener)
-    }
-
-    fun removeOnRangeChangedListener(listener: (List<CurveLine>) -> Unit) {
-        onLinesChangedListeners.remove(listener)
-    }
-
-    private fun onLinesChanged(lines: List<CurveLine>) {
         xAxis.setAbscissas(lines.abscissas)
-        onLinesChangedListeners.forEach { it.invoke(lines) }
+    }
+
+    fun addOnLinesChangedListener(onLinesChangedListener: (List<CurveLine>) -> Unit) {
+        graph.addOnLinesChangedListener(onLinesChangedListener)
+    }
+
+    fun removeOnLinesChangedListener(onLinesChangedListener: (List<CurveLine>) -> Unit) {
+        graph.removeOnLinesChangedListener(onLinesChangedListener)
+    }
+
+    fun addOnRangeChangedListener(onRangeChangedListener: (start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit) {
+        graph.addOnRangeChangedListener(onRangeChangedListener)
+    }
+
+    fun removeOnRangeChangedListener(onRangeChangedListener: (start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit) {
+        graph.removeOnRangeChangedListener(onRangeChangedListener)
     }
 
     private fun updateCorrespondingLegends(abscissas: List<Float>, correspondingLegends: Map<Float, String>?) {
@@ -103,10 +116,15 @@ class CurveLineChartView @JvmOverloads constructor(
         }
     }
 
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        popup.dispatchTouchEvent(event)
+        return super.dispatchTouchEvent(event)
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         measureChildWithMargins(
-            chart,
+            graph,
             widthMeasureSpec,
             0,
             heightMeasureSpec,

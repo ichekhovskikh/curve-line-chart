@@ -2,6 +2,7 @@
 <resources>
     <declare-styleable name="ChartView">
         <attr name="lineWidth" format="dimension" />
+        <attr name="scrollEnabled" format="boolean" />
 
         <attr name="gridLineWidth" format="dimension" />
         <attr name="legendLineCount" format="integer" />
@@ -19,6 +20,7 @@
 
     <declare-styleable name="GraphicsView" parent="ChartView">
         <attr name="lineWidth" />
+        <attr name="scrollEnabled" />
     </declare-styleable>
 
     <declare-styleable name="XAxisView" parent="ChartView">
@@ -40,13 +42,15 @@
         <attr name="colorFogSelector" format="color" />
         <attr name="frameMinWidthPercent" format="fraction" />
         <attr name="frameMaxWidthPercent" format="fraction" />
+        <attr name="smoothScrollEnabled" format="boolean" />
     </declare-styleable>
 
-    <declare-styleable name="ScrollFrameView" parent="ChartControlView">
+    <declare-styleable name="ScrollFrameView" parent="ChartSelectorView">
         <attr name="frameMinWidthPercent" />
         <attr name="frameMaxWidthPercent" />
         <attr name="colorFrameSelector" />
         <attr name="colorFogSelector" />
+        <attr name="smoothScrollEnabled" />
     </declare-styleable>
 
     <declare-styleable name="ChartLayout">

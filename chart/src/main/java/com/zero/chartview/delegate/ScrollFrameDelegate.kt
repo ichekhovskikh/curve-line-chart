@@ -20,6 +20,7 @@ internal class ScrollFrameDelegate(
     private val dragIndicatorCornerRadius: Float,
     private val dragIndicatorWidth: Float,
     private val dragIndicatorMaxHeight: Float,
+    var isSmoothScrollEnabled: Boolean,
     var onUpdate: (() -> Unit)? = null
 ) {
 
@@ -31,16 +32,12 @@ internal class ScrollFrameDelegate(
 
     private var downTouchPosition = 0f
     private var activeComponent = ComponentType.NOTHING
-    private val onRangeChangedListeners = mutableListOf<(FloatRange) -> Unit>()
+    private val onRangeChangedListeners = mutableListOf<(start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit>()
 
     var range = FloatRange(0f, frameMaxWidthPercent)
         private set
 
-    var viewSize = Size()
-        set(value) {
-            field = value
-            updateFrameCounters(range)
-        }
+    private var viewSize = Size()
 
     private val axisAnimator = AxisAnimator(ANIMATION_DURATION_MS) { start, end, _, _ ->
         updateFrameCounters(FloatRange(start, end))
@@ -56,19 +53,19 @@ internal class ScrollFrameDelegate(
             updateFrameCounters(range)
         }
         this.range = range
-        onRangeChanged(range)
+        onRangeChanged(range, smoothScroll)
     }
 
-    fun addOnRangeChangedListener(listener: (FloatRange) -> Unit) {
-        onRangeChangedListeners.add(listener)
+    fun addOnRangeChangedListener(onRangeChangedListener: (start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit) {
+        onRangeChangedListeners.add(onRangeChangedListener)
     }
 
-    fun removeOnRangeChangedListener(listener: (FloatRange) -> Unit) {
-        onRangeChangedListeners.remove(listener)
+    fun removeOnRangeChangedListener(onRangeChangedListener: (start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit) {
+        onRangeChangedListeners.remove(onRangeChangedListener)
     }
 
-    private fun onRangeChanged(range: FloatRange) {
-        onRangeChangedListeners.forEach { it.invoke(range) }
+    private fun onRangeChanged(range: FloatRange, smoothScroll: Boolean) {
+        onRangeChangedListeners.forEach { it.invoke(range.start, range.endInclusive, smoothScroll) }
     }
 
     fun onActionDown(event: MotionEvent) {
@@ -80,18 +77,18 @@ internal class ScrollFrameDelegate(
 
         // the additional half width of the curtain is used by the curtain
         // to prevent frame shift mistakes instead of the curtain shift
-        val leftCurtainStart = startPixel - frameThicknessVertical
-        val leftCurtainEnd = startPixel + frameThicknessVertical
-        val rightCurtainStart = endInclusivePixel - frameThicknessVertical
-        val rightCurtainEnd = endInclusivePixel + frameThicknessVertical
+        val leftCurtainStart = startPixel - 0.5f * frameThicknessVertical
+        val leftCurtainEnd = startPixel + 1.5f * frameThicknessVertical
+        val rightCurtainStart = endInclusivePixel - 1.5f * frameThicknessVertical
+        val rightCurtainEnd = endInclusivePixel - 0.5f * frameThicknessVertical
 
         activeComponent = when (abscissa) {
             in leftCurtainStart..leftCurtainEnd -> {
-                setLeftCurtainPosition(abscissa)
+                setLeftCurtainPosition(abscissa - 0.5f * frameThicknessVertical)
                 ComponentType.LEFT_CURTAIN
             }
             in rightCurtainStart..rightCurtainEnd -> {
-                setRightCurtainPosition(abscissa)
+                setRightCurtainPosition(abscissa + 0.5f * frameThicknessVertical)
                 ComponentType.RIGHT_CURTAIN
             }
             !in leftCurtainStart..rightCurtainEnd -> {
@@ -106,8 +103,8 @@ internal class ScrollFrameDelegate(
 
     fun onActionMove(event: MotionEvent) {
         when (activeComponent) {
-            ComponentType.LEFT_CURTAIN -> setLeftCurtainPosition(event.x)
-            ComponentType.RIGHT_CURTAIN -> setRightCurtainPosition(event.x)
+            ComponentType.LEFT_CURTAIN -> setLeftCurtainPosition(event.x - 0.5f * frameThicknessVertical)
+            ComponentType.RIGHT_CURTAIN -> setRightCurtainPosition(event.x + 0.5f * frameThicknessVertical)
             ComponentType.FRAME -> moveFrame(event.x)
             ComponentType.NOTHING -> Unit
         }
@@ -123,12 +120,13 @@ internal class ScrollFrameDelegate(
 
     private fun moveFrame(abscissa: Float) {
         val increment = (abscissa - downTouchPosition).pxToPercent()
-        val start = range.start + increment
-        val endInclusive = range.endInclusive + increment
-        if (start >= 0f && endInclusive <= 1f) {
-            downTouchPosition = abscissa
-            setRange(FloatRange(start, endInclusive))
+        val (start, endInclusive) = when {
+            range.start + increment < 0 -> 0f to range.endInclusive - range.start
+            range.endInclusive + increment > 1 -> range.start + 1 - range.endInclusive to 1f
+            else -> range.start + increment to range.endInclusive + increment
         }
+        downTouchPosition = abscissa
+        setRange(FloatRange(start, endInclusive))
     }
 
     private fun frameCenterByTouchPosition() {
@@ -146,7 +144,12 @@ internal class ScrollFrameDelegate(
                 range.offset(range.start + halfRangeDistance - touchAsPercent)
             }
         }
-        setRange(newRange, smoothScroll = true)
+        setRange(newRange, smoothScroll = isSmoothScrollEnabled)
+    }
+
+    fun onMeasure(size: Size) {
+        viewSize = size
+        updateFrameCounters(range)
     }
 
     fun drawScrollFrame(
@@ -228,9 +231,9 @@ internal class ScrollFrameDelegate(
         val startPixel = xValueToPixel(range.start, viewSize.width, 0f, 1f)
         val endInclusivePixel = xValueToPixel(range.endInclusive, viewSize.width, 0f, 1f)
         frameOuterContour.set(
-            max(startPixel - frameThicknessVertical / 2, 0f),
+            max(startPixel, 0f),
             0f,
-            min(endInclusivePixel + frameThicknessVertical / 2, viewSize.width.toFloat()),
+            min(endInclusivePixel, viewSize.width.toFloat()),
             viewSize.height.toFloat()
         )
         frameInnerContour.set(

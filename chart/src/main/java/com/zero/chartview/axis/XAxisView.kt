@@ -56,7 +56,8 @@ internal class XAxisView @JvmOverloads constructor(
         this.correspondingLegends = correspondingLegends
     }
 
-    fun setRange(start: Float, endInclusive: Float) {
+    fun setRange(start: Float, endInclusive: Float, smoothScroll: Boolean) {
+        // todo add smooth scroll
         range = PercentRange(start, endInclusive)
         invalidate()
     }

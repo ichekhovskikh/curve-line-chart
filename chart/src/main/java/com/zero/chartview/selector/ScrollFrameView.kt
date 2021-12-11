@@ -13,7 +13,6 @@ import com.zero.chartview.delegate.ScrollFrameDelegate
 import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.extensions.getColorCompat
 import com.zero.chartview.extensions.on
-import com.zero.chartview.model.FloatRange
 import com.zero.chartview.model.PercentRange
 
 internal class ScrollFrameView @JvmOverloads constructor(
@@ -38,6 +37,12 @@ internal class ScrollFrameView @JvmOverloads constructor(
 
     val range get() = delegate.range
 
+    var isSmoothScrollEnabled
+        get() = delegate.isSmoothScrollEnabled
+        set(value) {
+            delegate.isSmoothScrollEnabled = value
+        }
+
     private val delegate: ScrollFrameDelegate
 
     init {
@@ -47,6 +52,7 @@ internal class ScrollFrameView @JvmOverloads constructor(
         var frameMinWidthPercent = resources.getFraction(
             R.fraction.frame_min_width_percent_default, 1, 1
         )
+        var isSmoothScrollEnabled = true
         val frameCornerRadius = resources.getDimension(
             R.dimen.frame_corner_radius_default
         )
@@ -83,6 +89,10 @@ internal class ScrollFrameView @JvmOverloads constructor(
                 R.styleable.ScrollFrameView_frameMinWidthPercent,
                 frameMinWidthPercent
             )
+            isSmoothScrollEnabled = getBoolean(
+                R.styleable.ScrollFrameView_smoothScrollEnabled,
+                true
+            )
         }
         delegate = ScrollFrameDelegate(
             frameCornerRadius,
@@ -93,6 +103,7 @@ internal class ScrollFrameView @JvmOverloads constructor(
             dragIndicatorCornerRadius,
             dragIndicatorWidth,
             dragIndicatorMaxHeight,
+            isSmoothScrollEnabled,
             onUpdate = ::invalidate
         )
     }
@@ -115,12 +126,12 @@ internal class ScrollFrameView @JvmOverloads constructor(
         delegate.setRange(PercentRange(start, endInclusive), smoothScroll)
     }
 
-    fun addOnRangeChangedListener(listener: (FloatRange) -> Unit) {
-        delegate.addOnRangeChangedListener(listener)
+    fun addOnRangeChangedListener(onRangeChangedListener: (start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit) {
+        delegate.addOnRangeChangedListener(onRangeChangedListener)
     }
 
-    fun removeOnRangeChangedListener(listener: (FloatRange) -> Unit) {
-        delegate.removeOnRangeChangedListener(listener)
+    fun removeOnRangeChangedListener(onRangeChangedListener: (start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit) {
+        delegate.removeOnRangeChangedListener(onRangeChangedListener)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -143,7 +154,7 @@ internal class ScrollFrameView @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        delegate.viewSize = measuredWidth on measuredHeight
+        delegate.onMeasure(measuredWidth on measuredHeight)
     }
 
     override fun onDraw(canvas: Canvas) {

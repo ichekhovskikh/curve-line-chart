@@ -1,6 +1,8 @@
 package com.zero.chartview.delegate
 
 import android.graphics.*
+import android.view.MotionEvent
+import android.view.VelocityTracker
 import com.zero.chartview.anim.AppearanceAnimator
 import com.zero.chartview.anim.AxisAnimator
 import com.zero.chartview.extensions.*
@@ -8,6 +10,7 @@ import com.zero.chartview.model.*
 import com.zero.chartview.model.AnimatingCurveLine
 import com.zero.chartview.model.AppearingCurveLine
 import com.zero.chartview.model.Size
+import com.zero.chartview.tools.xPixelToValue
 import com.zero.chartview.tools.xValueToPixel
 import com.zero.chartview.tools.yValueToPixel
 
@@ -15,15 +18,10 @@ internal class CurveLineGraphDelegate(var onUpdate: (() -> Unit)? = null) {
 
     private var maxY = 0f
     private var minY = 0f
+    private var viewSize = Size()
 
     var range = FloatRange(0f, 1f)
         private set
-
-    var viewSize = Size()
-        set(value) {
-            field = value
-            onUpdate?.invoke()
-        }
 
     val lines get() = animatingLines.map { it.curveLine }
 
@@ -32,7 +30,11 @@ internal class CurveLineGraphDelegate(var onUpdate: (() -> Unit)? = null) {
     private val animatingLines = mutableListOf<AnimatingCurveLine>()
 
     private var onYAxisChangedListener: ((minY: Float, maxY: Float) -> Unit)? = null
-    private var onRangeChangedListener: ((start: Float, endInclusive: Float) -> Unit)? = null
+    private val onLinesChangedListeners = mutableListOf<(List<CurveLine>) -> Unit>()
+    private val onRangeChangedListeners = mutableListOf<(start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit>()
+
+    private var velocityTracker: VelocityTracker? = null
+    private var lastMotionX = 0f
 
     private val appearanceAnimator = AppearanceAnimator { value ->
         animatingLines.forEach { line ->
@@ -64,8 +66,8 @@ internal class CurveLineGraphDelegate(var onUpdate: (() -> Unit)? = null) {
         if (!smoothScroll) {
             this.range = range
         }
-        onRangeChangedListener?.invoke(range.start, range.endInclusive)
         updateAxis(newRange = range)
+        onRangeChanged(range, smoothScroll)
     }
 
     fun setLines(newLines: List<CurveLine>) {
@@ -81,7 +83,8 @@ internal class CurveLineGraphDelegate(var onUpdate: (() -> Unit)? = null) {
             animatingLines.find { it.curveLine == line }?.setDisappearing()
         }
         appearanceAnimator.start()
-        updateAxis(newLines = newLines)
+        updateAxis(newLines)
+        onLinesChanged(newLines)
     }
 
     fun addLine(line: CurveLine) {
@@ -91,7 +94,9 @@ internal class CurveLineGraphDelegate(var onUpdate: (() -> Unit)? = null) {
         appearanceAnimator.cancel()
         animatingLines.add(AppearingCurveLine(line))
         appearanceAnimator.start()
-        updateAxis(newLines = current + line)
+        val newLines = current + line
+        updateAxis(newLines)
+        onLinesChanged(newLines)
     }
 
     fun removeLine(line: CurveLine) {
@@ -101,7 +106,9 @@ internal class CurveLineGraphDelegate(var onUpdate: (() -> Unit)? = null) {
         appearanceAnimator.cancel()
         animatingLines.find { it.curveLine == line }?.setDisappearing()
         appearanceAnimator.start()
-        updateAxis(newLines = current - line)
+        val newLines = current - line
+        updateAxis(newLines)
+        onLinesChanged(newLines)
     }
 
     private fun updateAxis(
@@ -124,8 +131,75 @@ internal class CurveLineGraphDelegate(var onUpdate: (() -> Unit)? = null) {
         this.onYAxisChangedListener = onYAxisChangedListener
     }
 
-    fun setOnRangeChangedListener(onRangeChangedListener: ((start: Float, endInclusive: Float) -> Unit)?) {
-        this.onRangeChangedListener = onRangeChangedListener
+    fun addOnLinesChangedListener(onLinesChangedListener: (List<CurveLine>) -> Unit) {
+        onLinesChangedListeners.add(onLinesChangedListener)
+    }
+
+    fun removeOnLinesChangedListener(onLinesChangedListener: (List<CurveLine>) -> Unit) {
+        onLinesChangedListeners.remove(onLinesChangedListener)
+    }
+
+    fun addOnRangeChangedListener(onRangeChangedListener: (start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit) {
+        onRangeChangedListeners.add(onRangeChangedListener)
+    }
+
+    fun removeOnRangeChangedListener(onRangeChangedListener: (start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit) {
+        onRangeChangedListeners.remove(onRangeChangedListener)
+    }
+
+    private fun onLinesChanged(lines: List<CurveLine>) {
+        onLinesChangedListeners.forEach { it.invoke(lines) }
+    }
+
+    private fun onRangeChanged(range: FloatRange, smoothScroll: Boolean) {
+        onRangeChangedListeners.forEach { it.invoke(range.start, range.endInclusive, smoothScroll) }
+    }
+
+    fun onTouchEvent(event: MotionEvent) = when (event.actionMasked) {
+        MotionEvent.ACTION_DOWN -> {
+            lastMotionX = event.x
+            velocityTracker = VelocityTracker.obtain()
+            velocityTracker?.addMovement(event)
+            true
+        }
+        MotionEvent.ACTION_MOVE -> {
+            scrollGraph(event.x)
+            velocityTracker?.addMovement(event)
+            true
+        }
+        MotionEvent.ACTION_CANCEL -> {
+            velocityTracker?.recycle()
+            velocityTracker = null
+            true
+        }
+        MotionEvent.ACTION_UP -> {
+            velocityTracker?.apply {
+                addMovement(event)
+                computeCurrentVelocity(VELOCITY_UNITS)
+                scrollGraph(lastMotionX + xVelocity, smoothScroll = true)
+            }
+            velocityTracker?.recycle()
+            velocityTracker = null
+            true
+        }
+        else -> false
+    }
+
+    private fun scrollGraph(abscissa: Float, smoothScroll: Boolean = false) {
+        val graphWidth = (viewSize.width.toFloat() / range.distance).toInt()
+        val increment = xPixelToValue(lastMotionX - abscissa, graphWidth, 0f, 1f)
+        val (start, endInclusive) = when {
+            range.start + increment < 0 -> 0f to range.endInclusive - range.start
+            range.endInclusive + increment > 1 -> range.start + 1 - range.endInclusive to 1f
+            else -> range.start + increment to range.endInclusive + increment
+        }
+        lastMotionX = abscissa
+        setRange(FloatRange(start, endInclusive), smoothScroll)
+    }
+
+    fun onMeasure(size: Size) {
+        viewSize = size
+        onUpdate?.invoke()
     }
 
     fun drawLines(canvas: Canvas, paint: Paint) {
@@ -169,5 +243,9 @@ internal class CurveLineGraphDelegate(var onUpdate: (() -> Unit)? = null) {
         val x = xValueToPixel(x, viewSize.width, interpolatedRange.start, interpolatedRange.endInclusive)
         val y = yValueToPixel(y, viewSize.height, minY, maxY)
         return PointF(x, y)
+    }
+
+    private companion object {
+        const val VELOCITY_UNITS = 200
     }
 }

@@ -35,23 +35,24 @@ class CurveLineChartLayout @JvmOverloads constructor(
     override fun onFinishInflate() {
         super.onFinishInflate()
         for (index in 0 until childCount) {
-            val child = getChildAt(index)
-            if (child is CurveLineChartView) {
-                chart = child
-                child.addOnLinesChangedListener { lines ->
-                    selector?.setLines(lines)
-                }
-            } else if (child is CurveLineSelectorView) {
-                selector = child
-                var smoothScroll = false
-                selector?.setOnTouchListener { view, event ->
-                    smoothScroll = event.action == MotionEvent.ACTION_DOWN
-                    view.onTouchEvent(event)
-                }
-                child.addOnRangeChangedListener { range ->
-                    chart?.setRange(range.start, range.endInclusive, smoothScroll)
-                }
+            when (val child = getChildAt(index)) {
+                is CurveLineChartView -> chart = child
+                is CurveLineSelectorView -> selector = child
             }
+        }
+        chart?.addOnLinesChangedListener { lines ->
+            selector?.setLines(lines)
+        }
+        var ignoreSelectorChanged = false
+        selector?.addOnRangeChangedListener { start, endInclusive, smoothScroll ->
+            if (!ignoreSelectorChanged) {
+                chart?.setRange(start, endInclusive, smoothScroll)
+            }
+            ignoreSelectorChanged = false
+        }
+        chart?.addOnRangeChangedListener { start, endInclusive, smoothScroll ->
+            ignoreSelectorChanged = true
+            selector?.setRange(start, endInclusive, smoothScroll)
         }
     }
 

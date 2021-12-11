@@ -11,7 +11,6 @@ import com.zero.chartview.R
 import com.zero.chartview.Themeable
 import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.model.CurveLine
-import com.zero.chartview.model.FloatRange
 
 class CurveLineSelectorView @JvmOverloads constructor(
     context: Context,
@@ -20,10 +19,18 @@ class CurveLineSelectorView @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes), Themeable {
 
-    private val graph = CurveLineGraphView(context, attrs, defStyleAttr, defStyleRes)
     private val scrollFrame = ScrollFrameView(context, attrs, defStyleAttr, defStyleRes)
+    private val graph = CurveLineGraphView(context, attrs, defStyleAttr, defStyleRes).apply {
+        isScrollEnabled = false
+    }
 
     private lateinit var chartColors: Themeable.ChartColors
+
+    var isSmoothScrollEnabled
+        get() = scrollFrame.isSmoothScrollEnabled
+        set(value) {
+            scrollFrame.isSmoothScrollEnabled = value
+        }
 
     init {
         addView(graph)
@@ -38,12 +45,12 @@ class CurveLineSelectorView @JvmOverloads constructor(
         scrollFrame.setRange(start, endInclusive, smoothScroll)
     }
 
-    fun addOnRangeChangedListener(listener: (FloatRange) -> Unit) {
-        scrollFrame.addOnRangeChangedListener(listener)
+    fun addOnRangeChangedListener(onRangeChangedListener: (start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit) {
+        scrollFrame.addOnRangeChangedListener(onRangeChangedListener)
     }
 
-    fun removeOnRangeChangedListener(listener: (FloatRange) -> Unit) {
-        scrollFrame.removeOnRangeChangedListener(listener)
+    fun removeOnRangeChangedListener(onRangeChangedListener: (start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit) {
+        scrollFrame.removeOnRangeChangedListener(onRangeChangedListener)
     }
 
     fun setLines(lines: List<CurveLine>) {
