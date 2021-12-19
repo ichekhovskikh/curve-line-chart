@@ -48,7 +48,7 @@ class CurveLineGraphView @JvmOverloads constructor(
         else -> super.onTouchEvent(event)
     }
 
-    fun getLines() = delegate.lines
+    fun getLines() = delegate.linesAfterAnimate
 
     fun setLines(lines: List<CurveLine>) {
         delegate.setLines(lines)

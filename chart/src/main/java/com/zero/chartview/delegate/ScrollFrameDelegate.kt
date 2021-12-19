@@ -21,7 +21,7 @@ internal class ScrollFrameDelegate(
     private val dragIndicatorWidth: Float,
     private val dragIndicatorMaxHeight: Float,
     var isSmoothScrollEnabled: Boolean,
-    var onUpdate: (() -> Unit)? = null
+    private val onUpdate: () -> Unit
 ) {
 
     private val path = Path()
@@ -191,7 +191,7 @@ internal class ScrollFrameDelegate(
             frameInnerContour.left,
             frameInnerContour.bottom,
             frameInnerContour.right,
-            0f,
+            viewSize.height.toFloat(),
             paint
         )
     }
@@ -260,7 +260,7 @@ internal class ScrollFrameDelegate(
             frameOuterContour.right - dragIndicatorHorizontalOffset,
             dragIndicatorBottom
         )
-        onUpdate?.invoke()
+        onUpdate.invoke()
     }
 
     private fun Float.pxToPercent() = xPixelToValue(this, viewSize.width, 0f, 1f)

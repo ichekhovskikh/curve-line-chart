@@ -4,8 +4,10 @@ import android.graphics.Color
 import com.zero.chartview.model.AnimatingCurveLine
 
 internal fun AnimatingCurveLine.setDisappearing() {
+    if (animationValue == 1f) {
+        animationValue = 0f
+    }
     isAppearing = false
-    animationValue = 0f
 }
 
 internal val AnimatingCurveLine.animatingColor: Int

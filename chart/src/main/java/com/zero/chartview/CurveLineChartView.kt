@@ -6,8 +6,8 @@ import android.support.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.FrameLayout
-import com.zero.chartview.axis.XAxisView
 import com.zero.chartview.axis.YAxisView
+import com.zero.chartview.axis.XAxisView
 import com.zero.chartview.extensions.abscissas
 import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.model.CurveLine
@@ -197,8 +197,8 @@ class CurveLineChartView @JvmOverloads constructor(
         typedArray.apply {
             val colorBackground =
                 getColor(R.styleable.ChartView_colorBackground, resources.getColor(R.color.colorBackground))
-            val colorLegend = getColor(R.styleable.ChartView_colorLegend, resources.getColor(R.color.colorLegend))
-            val colorGrid = getColor(R.styleable.ChartView_colorGrid, resources.getColor(R.color.colorGrid))
+            val colorLegend = getColor(R.styleable.ChartView_legendTextColor, resources.getColor(R.color.colorLegend))
+            val colorGrid = getColor(R.styleable.ChartView_gridColor, resources.getColor(R.color.colorGrid))
             val colorPopupLine =
                 getColor(R.styleable.ChartView_colorPopupLine, resources.getColor(R.color.colorPopupLine))
             return Themeable.ChartColors(colorBackground, colorLegend, colorGrid, colorPopupLine)

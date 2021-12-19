@@ -7,14 +7,15 @@
         <attr name="gridLineWidth" format="dimension" />
         <attr name="legendLineCount" format="integer" />
         <attr name="legendTextSize" format="dimension" />
-        <attr name="ordinateLegendLabelMargin" format="dimension" />
+        <attr name="bottomLegendMargin" format="dimension" />
+        <attr name="startLegendMargin" format="dimension" />
 
         <attr name="abscissaLegendMarginTop" format="dimension" />
         <attr name="abscissaLegendCount" format="integer" />
 
         <attr name="colorBackground" format="color" />
-        <attr name="colorLegend" format="color" />
-        <attr name="colorGrid" format="color" />
+        <attr name="legendTextColor" format="color" />
+        <attr name="gridColor" format="color" />
         <attr name="colorPopupLine" format="color" />
     </declare-styleable>
 
@@ -30,10 +31,13 @@
     </declare-styleable>
 
     <declare-styleable name="YAxisView" parent="ChartView">
+        <attr name="legendTextColor" />
+        <attr name="gridColor" />
         <attr name="legendTextSize" />
         <attr name="gridLineWidth" />
         <attr name="legendLineCount" />
-        <attr name="ordinateLegendLabelMargin" />
+        <attr name="bottomLegendMargin" />
+        <attr name="startLegendMargin" />
     </declare-styleable>
 
     <declare-styleable name="ChartSelectorView">

@@ -14,16 +14,21 @@ import com.zero.chartview.tools.xPixelToValue
 import com.zero.chartview.tools.xValueToPixel
 import com.zero.chartview.tools.yValueToPixel
 
-internal class CurveLineGraphDelegate(var onUpdate: (() -> Unit)? = null) {
+internal class CurveLineGraphDelegate(
+    private val onUpdate: () -> Unit
+) {
 
-    private var maxY = 0f
-    private var minY = 0f
+    private var currentMaxY = 0f
+    private var currentMinY = 0f
+    private var maxYAfterAnimate = 0f
+    private var minYAfterAnimate = 0f
     private var viewSize = Size()
 
     var range = FloatRange(0f, 1f)
         private set
 
-    val lines get() = animatingLines.map { it.curveLine }
+    private val currentLines get() = animatingLines.map { it.curveLine }
+    val linesAfterAnimate get() = animatingLines.filter { it.isAppearing }.map { it.curveLine }
 
     private val path = Path()
 
@@ -40,25 +45,25 @@ internal class CurveLineGraphDelegate(var onUpdate: (() -> Unit)? = null) {
         animatingLines.forEach { line ->
             if (line.animationValue <= value) {
                 line.animationValue = value
-                onUpdate?.invoke()
+                onUpdate.invoke()
             }
         }
     }.doOnEnd(::removeDisappearingLines)
 
     private val axisAnimator = AxisAnimator { startX, endX, startY, endY ->
-        this.minY = startY
-        this.maxY = endY
+        this.currentMinY = startY
+        this.currentMaxY = endY
         this.range = FloatRange(startX, endX)
 
-        val interpolatedRange = range.interpolateByValues(lines.abscissas)
+        val interpolatedRange = range.interpolateByValues(currentLines.abscissas)
         animatingLines.forEach { line ->
             line.interpolatedPoints = transformAxis(line.curveLine.points, interpolatedRange)
         }
-        onUpdate?.invoke()
+        onUpdate.invoke()
     }
 
     private fun removeDisappearingLines() {
-        animatingLines.removeAll { !it.isAppearing }
+        animatingLines.removeAll { !it.isAppearing && it.animationValue == 1f }
     }
 
     fun setRange(range: FloatRange, smoothScroll: Boolean = false) {
@@ -71,7 +76,7 @@ internal class CurveLineGraphDelegate(var onUpdate: (() -> Unit)? = null) {
     }
 
     fun setLines(newLines: List<CurveLine>) {
-        val current = lines
+        val current = linesAfterAnimate
         if (newLines == current) return
 
         appearanceAnimator.cancel()
@@ -88,7 +93,7 @@ internal class CurveLineGraphDelegate(var onUpdate: (() -> Unit)? = null) {
     }
 
     fun addLine(line: CurveLine) {
-        val current = lines
+        val current = linesAfterAnimate
         if (current.contains(line)) return
 
         appearanceAnimator.cancel()
@@ -100,7 +105,7 @@ internal class CurveLineGraphDelegate(var onUpdate: (() -> Unit)? = null) {
     }
 
     fun removeLine(line: CurveLine) {
-        val current = lines
+        val current = linesAfterAnimate
         if (!current.contains(line)) return
 
         appearanceAnimator.cancel()
@@ -112,17 +117,19 @@ internal class CurveLineGraphDelegate(var onUpdate: (() -> Unit)? = null) {
     }
 
     private fun updateAxis(
-        newLines: List<CurveLine> = lines,
+        newLines: List<CurveLine> = currentLines,
         newRange: FloatRange = range
     ) {
         val (minY, maxY) = newLines.getMinMaxY(newRange)
-        if (this.maxY != maxY || this.minY != minY) {
+        if (this.maxYAfterAnimate != maxY || this.minYAfterAnimate != minY) {
+            maxYAfterAnimate = maxY
+            minYAfterAnimate = minY
             onYAxisChangedListener?.invoke(minY, maxY)
         }
         axisAnimator.reStart(
             fromXRange = this.range,
             toXRange = newRange,
-            fromYRange = FloatRange(this.minY, this.maxY),
+            fromYRange = FloatRange(this.currentMinY, this.currentMaxY),
             toYRange = FloatRange(minY, maxY)
         )
     }
@@ -199,7 +206,7 @@ internal class CurveLineGraphDelegate(var onUpdate: (() -> Unit)? = null) {
 
     fun onMeasure(size: Size) {
         viewSize = size
-        onUpdate?.invoke()
+        onUpdate.invoke()
     }
 
     fun drawLines(canvas: Canvas, paint: Paint) {
@@ -241,7 +248,7 @@ internal class CurveLineGraphDelegate(var onUpdate: (() -> Unit)? = null) {
 
     private fun PointF.toPixelPoint(interpolatedRange: FloatRange): PointF {
         val x = xValueToPixel(x, viewSize.width, interpolatedRange.start, interpolatedRange.endInclusive)
-        val y = yValueToPixel(y, viewSize.height, minY, maxY)
+        val y = yValueToPixel(y, viewSize.height, currentMinY, currentMaxY)
         return PointF(x, y)
     }
 
