@@ -10,7 +10,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import com.zero.chartview.R
-import com.zero.chartview.extensions.interpolateLineAbscissas
+import com.zero.chartview.extensions.interpolateByLineAbscissas
 import com.zero.chartview.extensions.getMinMaxY
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.model.FloatRange
@@ -87,7 +87,7 @@ internal class PopupLineView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         val x = touchX ?: return
-        val (startValue, endValue) = range.interpolateLineAbscissas(lines)
+        val (startValue, endValue) = range.interpolateByLineAbscissas(lines)
         val (minY, maxY) = lines.getMinMaxY(range)
         val intersectionPoints = getIntersectionPoint(x, startValue, endValue)
         if (intersectionPoints.isNotEmpty()) {

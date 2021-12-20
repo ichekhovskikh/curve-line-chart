@@ -80,7 +80,7 @@ internal class ScrollFrameDelegate(
         val leftCurtainStart = startPixel - 0.5f * frameThicknessVertical
         val leftCurtainEnd = startPixel + 1.5f * frameThicknessVertical
         val rightCurtainStart = endInclusivePixel - 1.5f * frameThicknessVertical
-        val rightCurtainEnd = endInclusivePixel - 0.5f * frameThicknessVertical
+        val rightCurtainEnd = endInclusivePixel + 0.5f * frameThicknessVertical
 
         activeComponent = when (abscissa) {
             in leftCurtainStart..leftCurtainEnd -> {

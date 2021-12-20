@@ -28,11 +28,11 @@ internal fun FloatRange.interpolateByValues(values: List<Float>): FloatRange {
 /**
  * Convert range of percents to range of abscissas
  */
-internal fun FloatRange.interpolateLineAbscissas(lines: List<CurveLine>): FloatRange =
-    interpolatePointAbscissas(lines.flatMap { it.points })
+internal fun FloatRange.interpolateByLineAbscissas(lines: List<CurveLine>): FloatRange =
+    interpolateByPointAbscissas(lines.flatMap { it.points })
 
 /**
  * Convert range of percents to range of abscissas
  */
-internal fun FloatRange.interpolatePointAbscissas(points: List<PointF>): FloatRange =
+internal fun FloatRange.interpolateByPointAbscissas(points: List<PointF>): FloatRange =
     interpolateByValues(points.map { it.x })
