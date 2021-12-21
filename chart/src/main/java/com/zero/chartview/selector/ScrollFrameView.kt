@@ -104,7 +104,7 @@ internal class ScrollFrameView @JvmOverloads constructor(
             dragIndicatorWidth,
             dragIndicatorMaxHeight,
             isSmoothScrollEnabled,
-            onUpdate = ::invalidate
+            onUpdate = ::postInvalidateOnAnimation
         )
     }
 

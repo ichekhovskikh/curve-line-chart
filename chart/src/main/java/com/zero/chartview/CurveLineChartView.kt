@@ -170,14 +170,14 @@ class CurveLineChartView @JvmOverloads constructor(
     fun setLegendColor(@ColorInt legendColor: Int) {
         chartColors.colorLegend = legendColor
         xAxis.setLegendColor(legendColor)
-        yAxis.setLegendColor(legendColor)
+        yAxis.legendColor = legendColor
         xAxis.invalidate()
         yAxis.invalidate()
     }
 
     fun setGridColor(@ColorInt gridColor: Int) {
         chartColors.colorGrid = gridColor
-        yAxis.setGridColor(gridColor)
+        yAxis.gridColor = gridColor
         yAxis.invalidate()
     }
 
@@ -188,9 +188,9 @@ class CurveLineChartView @JvmOverloads constructor(
     }
 
     private fun onThemeColorChanged() {
-        yAxis.setGridColor(chartColors.colorGrid)
+        yAxis.gridColor = chartColors.colorGrid
         xAxis.setLegendColor(chartColors.colorLegend)
-        yAxis.setLegendColor(chartColors.colorLegend)
+        yAxis.legendColor = chartColors.colorLegend
         popup.setPopupLineColor(chartColors.colorPopupLine)
         popup.setPointColor(chartColors.colorBackground)
         window.setBackgroundColor(chartColors.colorBackground)

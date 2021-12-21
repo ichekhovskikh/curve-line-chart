@@ -29,7 +29,7 @@ class CurveLineGraphView @JvmOverloads constructor(
         isAntiAlias = true
     }
 
-    private val delegate = CurveLineGraphDelegate(onUpdate = ::invalidate)
+    private val delegate = CurveLineGraphDelegate(onUpdate = ::postInvalidateOnAnimation)
 
     init {
         applyStyledAttributes(attrs, R.styleable.GraphicsView, defStyleAttr, defStyleRes) {

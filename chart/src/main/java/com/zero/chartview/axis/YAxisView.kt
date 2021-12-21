@@ -34,6 +34,22 @@ internal class YAxisView @JvmOverloads constructor(
             delegate.axisFormatter = value
         }
 
+    @get:ColorInt
+    @setparam:ColorInt
+    var legendColor: Int
+        get() = legendPaint.color
+        set(value) {
+            legendPaint.color = value
+        }
+
+    @get:ColorInt
+    @setparam:ColorInt
+    var gridColor: Int
+        get() = gridPaint.color
+        set(value) {
+            gridPaint.color = value
+        }
+
     init {
         var legendCount = resources.getInteger(R.integer.legend_line_count_default)
         var startLegendMargin = resources.getDimension(R.dimen.start_legend_margin_default)
@@ -73,7 +89,7 @@ internal class YAxisView @JvmOverloads constructor(
             legendCount,
             startLegendMargin,
             bottomLegendMargin,
-            onUpdate = ::invalidate
+            onUpdate = ::postInvalidateOnAnimation
         )
     }
 
@@ -93,17 +109,5 @@ internal class YAxisView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         delegate.drawLegends(canvas, legendPaint, gridPaint)
-    }
-
-    fun setGridColor(@ColorInt gridColor: Int) {
-        if (gridColor != gridPaint.color) {
-            gridPaint.color = gridColor
-        }
-    }
-
-    fun setLegendColor(@ColorInt legendColor: Int) {
-        if (legendColor != legendPaint.color) {
-            legendPaint.color = legendColor
-        }
     }
 }

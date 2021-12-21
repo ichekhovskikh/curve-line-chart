@@ -49,7 +49,7 @@ internal class XAxisView @JvmOverloads constructor(
 
     fun setAbscissas(abscissas: List<Float>) {
         this.abscissas = abscissas.sorted()
-        invalidate()
+        postInvalidateOnAnimation()
     }
 
     fun setCorrespondingLegends(correspondingLegends: Map<Float, String>) {
@@ -59,7 +59,7 @@ internal class XAxisView @JvmOverloads constructor(
     fun setRange(start: Float, endInclusive: Float, smoothScroll: Boolean) {
         // todo add smooth scroll
         range = PercentRange(start, endInclusive)
-        invalidate()
+        postInvalidateOnAnimation()
     }
 
     override fun onDraw(canvas: Canvas) {

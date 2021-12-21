@@ -57,7 +57,7 @@ internal class PopupLineView @JvmOverloads constructor(
         range = PercentRange(start, endInclusive)
         popupWindow?.visibility = GONE
         touchX = null
-        invalidate()
+        postInvalidateOnAnimation()
     }
 
     fun setLines(lines: List<CurveLine>) {
@@ -65,7 +65,7 @@ internal class PopupLineView @JvmOverloads constructor(
         popupWindow?.setLines(lines)
         popupWindow?.visibility = GONE
         touchX = null
-        invalidate()
+        postInvalidateOnAnimation()
     }
 
     fun setCorrespondingLegends(correspondingLegends: Map<Float, String>) {
@@ -84,7 +84,7 @@ internal class PopupLineView @JvmOverloads constructor(
                 touchX = null
             }
         }
-        invalidate()
+        postInvalidateOnAnimation()
         return false
     }
 
