@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import com.zero.chartview.BuildConfig
+import com.zero.chartview.axis.formatter.ShortAxisFormatter
 import com.zero.chartview.model.CurveLine
 import com.zero.sample.service.AnimationThemeService
 import com.zero.sample.service.ColoringService
@@ -49,7 +50,7 @@ class MainActivity : AppCompatActivity(), Stainable {
     }
 
     private fun initLabels() {
-        labels.chart = chartLayout
+        labels.chart = chart.apply { yAxisFormatter = ShortAxisFormatter() }
     }
 
     fun addLabels(lines: List<CurveLine>) {

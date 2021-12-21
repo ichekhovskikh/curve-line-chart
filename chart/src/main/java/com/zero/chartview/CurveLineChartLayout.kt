@@ -4,10 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
-import android.view.MotionEvent
 import android.widget.LinearLayout
 import com.zero.chartview.extensions.applyStyledAttributes
-import com.zero.chartview.model.CurveLine
 import com.zero.chartview.selector.CurveLineSelectorView
 
 class CurveLineChartLayout @JvmOverloads constructor(
@@ -54,28 +52,6 @@ class CurveLineChartLayout @JvmOverloads constructor(
             ignoreSelectorChanged = true
             selector?.setRange(start, endInclusive, smoothScroll)
         }
-    }
-
-    fun setRange(start: Float, endInclusive: Float, smoothScroll: Boolean = false) {
-        selector?.setRange(start, endInclusive, smoothScroll)
-    }
-
-    fun getLines() = chart?.getLines()
-
-    fun setLines(lines: List<CurveLine>, correspondingLegends: Map<Float, String>? = null) {
-        chart?.setLines(lines, correspondingLegends)
-    }
-
-    fun addLine(line: CurveLine, correspondingLegends: Map<Float, String>? = null) {
-        chart?.addLine(line, correspondingLegends)
-    }
-
-    fun removeLine(index: Int) {
-        chart?.removeLine(index)
-    }
-
-    fun removeLine(line: CurveLine) {
-        chart?.removeLine(line)
     }
 
     override fun getChartColors(): Themeable.ChartColors {

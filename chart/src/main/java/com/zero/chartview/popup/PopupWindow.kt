@@ -11,8 +11,8 @@ import com.zero.chartview.R
 import com.zero.chartview.model.CurveLine
 import kotlinx.android.synthetic.main.popup_window.view.*
 import android.view.animation.AnimationUtils
+import com.zero.chartview.axis.formatter.ShortAxisFormatter
 import com.zero.chartview.tools.AnimatorListenerAdapter
-import com.zero.chartview.tools.formatLegend
 
 internal class PopupWindow @JvmOverloads constructor(
     context: Context,
@@ -23,6 +23,7 @@ internal class PopupWindow @JvmOverloads constructor(
 
     private val windowView: View
     private val coordinateViews = mutableListOf<View>()
+    private val axisFormatter = ShortAxisFormatter()
 
     private var animationOut = AnimationUtils.loadAnimation(context, android.R.anim.slide_out_right)
     private var animationIn = AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left)
@@ -60,7 +61,7 @@ internal class PopupWindow @JvmOverloads constructor(
                 val xValueView: TextView = view.findViewById(R.id.xValue)
                 val yValueView: TextView = view.findViewById(R.id.yValue)
                 xValueView.text = chartPoint.correspondingLegend
-                yValueView.text = formatLegend(chartPoint.y)
+                yValueView.text = axisFormatter.format(chartPoint.y)
             }
             val isAppearing = chartPoint != null
             startAnimation(view, isAppearing)

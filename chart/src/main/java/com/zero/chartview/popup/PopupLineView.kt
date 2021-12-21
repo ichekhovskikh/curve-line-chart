@@ -10,6 +10,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import com.zero.chartview.R
+import com.zero.chartview.axis.formatter.ShortAxisFormatter
 import com.zero.chartview.extensions.interpolateByLineAbscissas
 import com.zero.chartview.extensions.getMinMaxY
 import com.zero.chartview.model.CurveLine
@@ -31,6 +32,8 @@ internal class PopupLineView @JvmOverloads constructor(
 
     private val linePaint = Paint()
     private val pointPaint = Paint()
+
+    private val axisFormatter = ShortAxisFormatter()
 
     private var range = FloatRange(0F, 1F)
 
@@ -131,7 +134,7 @@ internal class PopupLineView @JvmOverloads constructor(
 
     private fun getIntersectionLegend(point: PointF) =
         if (::correspondingLegends.isInitialized) correspondingLegends[point.x] ?: ""
-        else formatLegend(point.x)
+        else axisFormatter.format(point.x)
 
     fun setPointColor(@ColorInt pointColor: Int) {
         if (pointColor != this.pointColor) {

@@ -8,6 +8,7 @@ import android.view.MotionEvent
 import android.widget.FrameLayout
 import com.zero.chartview.axis.YAxisView
 import com.zero.chartview.axis.XAxisView
+import com.zero.chartview.axis.formatter.AxisFormatter
 import com.zero.chartview.extensions.abscissas
 import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.model.CurveLine
@@ -34,6 +35,12 @@ class CurveLineChartView @JvmOverloads constructor(
         get() = graph.isScrollEnabled
         set(value) {
             graph.isScrollEnabled = value
+        }
+
+    var yAxisFormatter: AxisFormatter
+        get() = yAxis.axisFormatter
+        set(value) {
+            yAxis.axisFormatter = value
         }
 
     init {

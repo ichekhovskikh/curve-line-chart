@@ -7,6 +7,7 @@ import android.support.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.View
 import com.zero.chartview.R
+import com.zero.chartview.axis.formatter.AxisFormatter
 import com.zero.chartview.delegate.YAxisDelegate
 import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.extensions.getColorCompat
@@ -26,6 +27,12 @@ internal class YAxisView @JvmOverloads constructor(
     }
 
     private val delegate: YAxisDelegate
+
+    var axisFormatter: AxisFormatter
+        get() = delegate.axisFormatter
+        set(value) {
+            delegate.axisFormatter = value
+        }
 
     init {
         var legendCount = resources.getInteger(R.integer.legend_line_count_default)

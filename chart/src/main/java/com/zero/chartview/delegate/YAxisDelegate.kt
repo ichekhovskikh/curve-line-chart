@@ -3,13 +3,14 @@ package com.zero.chartview.delegate
 import android.graphics.Canvas
 import android.graphics.Paint
 import com.zero.chartview.anim.TensionAnimator
+import com.zero.chartview.axis.formatter.AxisFormatter
+import com.zero.chartview.axis.formatter.DefaultAxisFormatter
 import com.zero.chartview.extensions.animatingColor
 import com.zero.chartview.extensions.setDisappearing
 import com.zero.chartview.model.AnimatingLegend
 import com.zero.chartview.model.AnimatingLegendSeries
 import com.zero.chartview.model.AppearingLegendSeries
 import com.zero.chartview.model.Size
-import com.zero.chartview.tools.formatLegend
 import com.zero.chartview.tools.yPixelToValue
 import com.zero.chartview.tools.yValueToPixel
 import kotlin.math.max
@@ -20,6 +21,8 @@ internal class YAxisDelegate(
     private val bottomLegendMargin: Float,
     private val onUpdate: () -> Unit
 ) {
+
+    var axisFormatter: AxisFormatter = DefaultAxisFormatter()
 
     private var minY = 0f
     private var maxY = 0f
@@ -125,7 +128,7 @@ internal class YAxisDelegate(
         val absolutePosition = yPixelToValue(it, viewSize.height, absoluteMinY, absoluteMaxY)
         AnimatingLegend(
             position = absolutePosition,
-            label = formatLegend(absolutePosition),
+            label = axisFormatter.format(absolutePosition),
             interpolatedPosition = yValueToPixel(
                 absolutePosition,
                 viewSize.height,
