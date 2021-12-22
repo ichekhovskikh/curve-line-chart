@@ -7,7 +7,7 @@ fun createCorrespondingLegends(coordinates: List<Float>): Map<Float, String> {
     val axisFormatter = ShortAxisFormatter()
     coordinates.forEach { coordinate ->
         if (!correspondingLegends.containsKey(coordinate)) {
-            correspondingLegends[coordinate] = axisFormatter.format(coordinate)
+            correspondingLegends[coordinate] = axisFormatter.format(coordinate, 1f)
         }
     }
     return correspondingLegends

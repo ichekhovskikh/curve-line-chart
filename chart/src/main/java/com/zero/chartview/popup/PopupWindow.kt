@@ -61,7 +61,7 @@ internal class PopupWindow @JvmOverloads constructor(
                 val xValueView: TextView = view.findViewById(R.id.xValue)
                 val yValueView: TextView = view.findViewById(R.id.yValue)
                 xValueView.text = chartPoint.correspondingLegend
-                yValueView.text = axisFormatter.format(chartPoint.y)
+                yValueView.text = axisFormatter.format(chartPoint.y, 1f)
             }
             val isAppearing = chartPoint != null
             startAnimation(view, isAppearing)

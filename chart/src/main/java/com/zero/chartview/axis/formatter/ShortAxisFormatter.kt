@@ -10,7 +10,7 @@ class ShortAxisFormatter : AxisFormatter {
         applyPattern("#.#")
     }
 
-    override fun format(value: Float) = when {
+    override fun format(value: Float, zoom: Float) = when {
         abs(value) > 1000000000000f -> value.formatMM()
         abs(value) > 1000000f -> value.formatM()
         abs(value) > 1000f -> value.formatK()

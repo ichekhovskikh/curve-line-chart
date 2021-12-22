@@ -29,6 +29,7 @@ internal class ScrollFrameDelegate(
     private val frameOuterContour = RectF()
     private val leftDragIndicatorContour = RectF()
     private val rightDragIndicatorContour = RectF()
+    private val touchPadding = frameThicknessVertical / 2
 
     private var downTouchPosition = 0f
     private var activeComponent = ComponentType.NOTHING
@@ -75,12 +76,10 @@ internal class ScrollFrameDelegate(
         val startPixel = xValueToPixel(range.start, viewSize.width, 0f, 1f)
         val endInclusivePixel = xValueToPixel(range.endInclusive, viewSize.width, 0f, 1f)
 
-        // the additional half width of the curtain is used by the curtain
-        // to prevent frame shift mistakes instead of the curtain shift
-        val leftCurtainStart = startPixel - 0.5f * frameThicknessVertical
-        val leftCurtainEnd = startPixel + 1.5f * frameThicknessVertical
-        val rightCurtainStart = endInclusivePixel - 1.5f * frameThicknessVertical
-        val rightCurtainEnd = endInclusivePixel + 0.5f * frameThicknessVertical
+        val leftCurtainStart = startPixel - touchPadding
+        val leftCurtainEnd = startPixel + frameThicknessVertical + touchPadding
+        val rightCurtainStart = endInclusivePixel - frameThicknessVertical - touchPadding
+        val rightCurtainEnd = endInclusivePixel + touchPadding
 
         activeComponent = when (abscissa) {
             in leftCurtainStart..leftCurtainEnd -> {

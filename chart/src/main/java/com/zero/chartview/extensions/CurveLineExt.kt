@@ -8,6 +8,9 @@ import com.zero.chartview.model.MinMax
 val List<CurveLine>.abscissas: List<Float>
     get() = flatMap { line -> line.points.map { it.x } }.distinct()
 
+val List<CurveLine>.ordinates: List<Float>
+    get() = flatMap { line -> line.points.map { it.y } }.distinct()
+
 internal fun List<CurveLine>.getMinMaxY(range: FloatRange): MinMax {
     val interpolatedRange = range.interpolateByLineAbscissas(this)
     val points = flatMap { it.points }

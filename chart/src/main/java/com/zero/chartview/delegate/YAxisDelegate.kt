@@ -6,6 +6,7 @@ import com.zero.chartview.anim.TensionAnimator
 import com.zero.chartview.axis.formatter.AxisFormatter
 import com.zero.chartview.axis.formatter.DefaultAxisFormatter
 import com.zero.chartview.extensions.animatingColor
+import com.zero.chartview.extensions.orZero
 import com.zero.chartview.extensions.setDisappearing
 import com.zero.chartview.model.AnimatingLegend
 import com.zero.chartview.model.AnimatingLegendSeries
@@ -16,7 +17,7 @@ import com.zero.chartview.tools.yValueToPixel
 import kotlin.math.max
 
 internal class YAxisDelegate(
-    private val legendCount: Int,
+    private var legendCount: Int,
     private val startLegendMargin: Float,
     private val bottomLegendMargin: Float,
     private val onUpdate: () -> Unit
@@ -26,6 +27,7 @@ internal class YAxisDelegate(
 
     private var minY = 0f
     private var maxY = 0f
+    private var yAxisDistance = 0f
     private var textHeight = 0f
     private var viewSize = Size()
     private var legendPositions = emptyList<Float>()
@@ -36,7 +38,12 @@ internal class YAxisDelegate(
             this.minY = minY
             this.maxY = maxY
 
-            series.animationValue = max(series.animationValue, tension)
+            series.animationValue = if (series.isAppearing) {
+                val appearingTension = tension * APPEARING_TENSION_SCALE + APPEARING_TENSION_OFFSET
+                max(series.animationValue, appearingTension)
+            } else {
+                tension
+            }
             series.legends.forEach { legend ->
                 legend.interpolatedPosition = yValueToPixel(
                     legend.position,
@@ -50,11 +57,25 @@ internal class YAxisDelegate(
     }.doOnEnd(::removeDisappearingLegendSeries)
 
     private fun removeDisappearingLegendSeries() {
-        series.removeAll { !it.isAppearing && it.animationValue == 1f }
+        series.removeAll { !it.isAppearing }
+    }
+
+    fun getLegendCount() = legendCount
+
+    fun setLegendCount(legendCount: Int) {
+        this.legendCount = legendCount
+        calculateLegendPositions()
+        series.find { it.isAppearing }?.let { setYAxis(it.minY, it.maxY) }
+    }
+
+    fun setOrdinates(ordinates: List<Float>) {
+        yAxisDistance = ordinates.max().orZero - ordinates.min().orZero
     }
 
     fun setYAxis(minY: Float, maxY: Float) {
-        val hasSeries = series.any { it.isAppearing && it.maxY == maxY && it.minY == minY }
+        val hasSeries = series.any {
+            it.isAppearing && it.legends.size == legendCount && it.maxY == maxY && it.minY == minY
+        }
         if (hasSeries) return
 
         series.forEach { it.setDisappearing() }
@@ -87,13 +108,17 @@ internal class YAxisDelegate(
     }
 
     fun onLayout() {
+        calculateLegendPositions()
+        series.setLegendPositions(legendPositions)
+    }
+
+    private fun calculateLegendPositions() {
         val availableHeight = viewSize.height
         val legendHeight = textHeight + bottomLegendMargin
         val legendHeightWithMargin = (availableHeight - legendHeight) / (legendCount - 1)
         legendPositions = (0 until legendCount).map { index ->
             legendHeightWithMargin * index
         }
-        series.setLegendPositions(legendPositions)
     }
 
     fun drawLegends(canvas: Canvas, legendPaint: Paint, gridPaint: Paint) {
@@ -125,10 +150,12 @@ internal class YAxisDelegate(
         absoluteMinY: Float = minY,
         absoluteMaxY: Float = maxY
     ) = map {
+        val absoluteDistance = absoluteMaxY - absoluteMinY
+        val zoom = if (yAxisDistance == 0f || absoluteDistance == 0f) 1f else yAxisDistance / absoluteDistance
         val absolutePosition = yPixelToValue(it, viewSize.height, absoluteMinY, absoluteMaxY)
         AnimatingLegend(
             position = absolutePosition,
-            label = axisFormatter.format(absolutePosition),
+            label = axisFormatter.format(absolutePosition, zoom),
             interpolatedPosition = yValueToPixel(
                 absolutePosition,
                 viewSize.height,
@@ -139,7 +166,9 @@ internal class YAxisDelegate(
     }
 
     private companion object {
-        const val FROM_TENSION = 0.8f
+        const val APPEARING_TENSION_SCALE = 0.2f
+        const val APPEARING_TENSION_OFFSET = 0.8f
+        const val FROM_TENSION = 0f
         const val TO_TENSION = 1f
     }
 }

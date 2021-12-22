@@ -11,6 +11,7 @@ import com.zero.chartview.axis.XAxisView
 import com.zero.chartview.axis.formatter.AxisFormatter
 import com.zero.chartview.extensions.abscissas
 import com.zero.chartview.extensions.applyStyledAttributes
+import com.zero.chartview.extensions.ordinates
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.popup.PopupLineView
 import com.zero.chartview.popup.PopupWindow
@@ -43,6 +44,12 @@ class CurveLineChartView @JvmOverloads constructor(
             yAxis.axisFormatter = value
         }
 
+    var yAxisLegendCount: Int
+        get() = yAxis.legendCount
+        set(value) {
+            yAxis.legendCount = value
+        }
+
     init {
         addView(xAxis)
         addView(yAxis)
@@ -71,6 +78,7 @@ class CurveLineChartView @JvmOverloads constructor(
         val abscissas = lines.abscissas
         graph.setLines(lines)
         popup.setLines(lines)
+        yAxis.setOrdinates(lines.ordinates)
         xAxis.setAbscissas(abscissas)
         updateCorrespondingLegends(abscissas, correspondingLegends)
     }
@@ -80,6 +88,7 @@ class CurveLineChartView @JvmOverloads constructor(
         val abscissas = lines.abscissas
         graph.addLine(line)
         popup.setLines(lines)
+        yAxis.setOrdinates(lines.ordinates)
         xAxis.setAbscissas(abscissas)
         updateCorrespondingLegends(abscissas, correspondingLegends)
     }
@@ -93,6 +102,7 @@ class CurveLineChartView @JvmOverloads constructor(
         val lines = graph.getLines() - line
         graph.removeLine(line)
         popup.setLines(lines)
+        yAxis.setOrdinates(lines.ordinates)
         xAxis.setAbscissas(lines.abscissas)
     }
 
@@ -130,26 +140,27 @@ class CurveLineChartView @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        val legendTextHeightUsed = xAxis.legendTextHeightUsed
         measureChildWithMargins(
             graph,
             widthMeasureSpec,
             0,
             heightMeasureSpec,
-            xAxis.getLegendWidth()
+            legendTextHeightUsed
         )
         measureChildWithMargins(
             yAxis,
             widthMeasureSpec,
             0,
             heightMeasureSpec,
-            xAxis.getLegendWidth()
+            legendTextHeightUsed
         )
         measureChildWithMargins(
             popup,
             widthMeasureSpec,
             0,
             heightMeasureSpec,
-            xAxis.getLegendWidth()
+            legendTextHeightUsed
         )
     }
 

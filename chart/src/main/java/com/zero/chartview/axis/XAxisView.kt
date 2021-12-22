@@ -14,8 +14,10 @@ import com.zero.chartview.extensions.distance
 import com.zero.chartview.model.FloatRange
 import com.zero.chartview.model.PercentRange
 import com.zero.chartview.tools.xValueToPixel
+import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.log2
+import kotlin.math.pow
 
 internal class XAxisView @JvmOverloads constructor(
     context: Context,
@@ -24,7 +26,10 @@ internal class XAxisView @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
 
-    private val legendPaint = Paint()
+    private val legendPaint = Paint().apply {
+        textSize = resources.getDimension(R.dimen.legend_text_size_default)
+    }
+
     @ColorInt private var legendColor = resources.getColor(R.color.colorLegend)
 
     private var textMarginTop = resources.getDimension(R.dimen.abscissa_legend_margin_top_default)
@@ -32,20 +37,19 @@ internal class XAxisView @JvmOverloads constructor(
     private var legendCount = resources.getInteger(R.integer.abscissa_legend_count_default)
 
     private lateinit var correspondingLegends: Map<Float, String>
-    private lateinit var abscissas: List<Float>
+    private var abscissas: List<Float> = emptyList()
     private var range: FloatRange = FloatRange(0F, 1F)
 
+    internal val legendTextHeightUsed
+        get() = (legendPaint.textSize + textMarginTop).toInt()
+
     init {
-        var textSize = resources.getDimension(R.dimen.legend_text_size_default)
         applyStyledAttributes(attrs, R.styleable.XAxisView, defStyleAttr, defStyleRes) {
-            textSize = getDimension(R.styleable.XAxisView_legendTextSize, textSize)
+            legendPaint.textSize = getDimension(R.styleable.XAxisView_legendTextSize, legendPaint.textSize)
             textMarginTop = getDimension(R.styleable.XAxisView_abscissaLegendMarginTop, textMarginTop)
             legendCount = getInteger(R.styleable.XAxisView_abscissaLegendCount, legendCount)
         }
-        legendPaint.textSize = textSize
     }
-
-    fun getLegendWidth() = (legendPaint.textSize + textMarginTop).toInt()
 
     fun setAbscissas(abscissas: List<Float>) {
         this.abscissas = abscissas.sorted()
@@ -63,7 +67,7 @@ internal class XAxisView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        if (!::abscissas.isInitialized || abscissas.isEmpty()) return
+        if (abscissas.isEmpty()) return
         val interpolatedRange = range.interpolateByValues(abscissas)
         val step = calculateStep(interpolatedRange)
         val positions = getDrawPositions(step)
@@ -93,20 +97,20 @@ internal class XAxisView @JvmOverloads constructor(
 
     private fun getCorrespondingWithBias(drawPosition: Float, step: Float): Float? {
         val halfStep = step / 2
-        val list = abscissas.filter { it in drawPosition - halfStep..drawPosition + halfStep }
-        return if (list.isEmpty()) null else list[list.size / 2]
+        val list = abscissas.filter { it in (drawPosition - halfStep)..(drawPosition + halfStep) }
+        return list.getOrNull(list.size / 2)
     }
 
     private fun calculateStep(interpolatedRange: FloatRange): Float {
         val exponent = log2((abscissas.last() - abscissas.first()) / interpolatedRange.distance)
-        return (fullRangeStep() / Math.pow(2.0, floor(exponent).toDouble())).toFloat()
+        return (fullRangeStep() / 2.0.pow(floor(exponent).toDouble())).toFloat()
     }
 
     private fun fullRangeStep() = (abscissas.last() - abscissas.first()) / (legendCount * 2)
 
     private fun getTransparencyColor(color: Int, interpolatedRange: FloatRange): Int {
         val currentExponent = log2((abscissas.last() - abscissas.first()) / interpolatedRange.distance)
-        val weight = Math.abs(floor(currentExponent) - currentExponent)
+        val weight = abs(floor(currentExponent) - currentExponent)
         return Color.argb((255 * weight).toInt(), Color.red(color), Color.green(color), Color.blue(color))
     }
 

@@ -50,6 +50,10 @@ internal class YAxisView @JvmOverloads constructor(
             gridPaint.color = value
         }
 
+    var legendCount: Int
+        get() = delegate.getLegendCount()
+        set(value) = delegate.setLegendCount(value)
+
     init {
         var legendCount = resources.getInteger(R.integer.legend_line_count_default)
         var startLegendMargin = resources.getDimension(R.dimen.start_legend_margin_default)
@@ -91,6 +95,10 @@ internal class YAxisView @JvmOverloads constructor(
             bottomLegendMargin,
             onUpdate = ::postInvalidateOnAnimation
         )
+    }
+
+    fun setOrdinates(ordinates: List<Float>) {
+        delegate.setOrdinates(ordinates)
     }
 
     fun setYAxis(minY: Float, maxY: Float) {

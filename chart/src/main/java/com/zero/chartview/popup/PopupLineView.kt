@@ -134,7 +134,7 @@ internal class PopupLineView @JvmOverloads constructor(
 
     private fun getIntersectionLegend(point: PointF) =
         if (::correspondingLegends.isInitialized) correspondingLegends[point.x] ?: ""
-        else axisFormatter.format(point.x)
+        else axisFormatter.format(point.x, 1f)
 
     fun setPointColor(@ColorInt pointColor: Int) {
         if (pointColor != this.pointColor) {
