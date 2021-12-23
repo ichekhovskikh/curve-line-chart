@@ -1,9 +1,9 @@
 package com.zero.chartview.extensions
 
 import android.content.res.TypedArray
-import android.support.annotation.AttrRes
-import android.support.annotation.StyleRes
-import android.support.annotation.StyleableRes
+import androidx.annotation.AttrRes
+import androidx.annotation.StyleRes
+import androidx.annotation.StyleableRes
 import android.util.AttributeSet
 import android.view.View
 

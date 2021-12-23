@@ -19,8 +19,8 @@ internal fun FloatRange.interpolateByValues(values: List<Float>): FloatRange {
     if (start < 0 || endInclusive > 1 || start > endInclusive) {
         throw IllegalArgumentException("It's not PercentRange")
     }
-    val minValue = values.min().orZero
-    val maxValue = values.max().orZero
+    val minValue = values.minOrNull().orZero
+    val maxValue = values.maxOrNull().orZero
     val length = maxValue - minValue
     return FloatRange(minValue + start * length, minValue + endInclusive * length)
 }

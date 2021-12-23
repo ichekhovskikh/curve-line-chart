@@ -3,7 +3,7 @@ package com.zero.chartview.selector
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.TypedArray
-import android.support.annotation.ColorInt
+import androidx.annotation.ColorInt
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import com.zero.chartview.CurveLineGraphView

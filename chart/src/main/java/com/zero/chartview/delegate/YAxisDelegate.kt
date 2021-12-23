@@ -69,7 +69,7 @@ internal class YAxisDelegate(
     }
 
     fun setOrdinates(ordinates: List<Float>) {
-        yAxisDistance = ordinates.max().orZero - ordinates.min().orZero
+        yAxisDistance = ordinates.maxOrNull().orZero - ordinates.minOrNull().orZero
     }
 
     fun setYAxis(minY: Float, maxY: Float) {

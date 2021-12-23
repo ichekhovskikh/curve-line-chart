@@ -23,7 +23,7 @@ internal fun List<CurveLine>.getMinMaxY(range: FloatRange): MinMax {
         rightBoundary?.let(points::add)
     }
     return MinMax(
-        min = points.minBy(PointF::y)?.y.orZero,
-        max = points.maxBy(PointF::y)?.y.orZero
+        min = points.minOf(PointF::y),
+        max = points.maxOf(PointF::y)
     )
 }

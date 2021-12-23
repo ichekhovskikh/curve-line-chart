@@ -2,7 +2,7 @@ package com.zero.chartview
 
 import android.content.Context
 import android.content.res.TypedArray
-import android.support.annotation.ColorInt
+import androidx.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.FrameLayout

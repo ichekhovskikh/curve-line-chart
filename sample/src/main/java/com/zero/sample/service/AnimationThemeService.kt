@@ -1,7 +1,7 @@
 package com.zero.sample.service
 
 import android.animation.ValueAnimator
-import android.support.v4.graphics.ColorUtils
+import androidx.core.graphics.ColorUtils
 import android.view.animation.DecelerateInterpolator
 import com.zero.sample.Stainable
 
