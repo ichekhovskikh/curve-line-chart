@@ -6,32 +6,18 @@
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
         android:orientation="vertical"
+        android:background="@color/colorBackground"
         tools:context=".MainActivity">
 
-    <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-        <TextView
-                android:id="@+id/titleView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|start"
-                android:layout_margin="16dp"
-                android:text="Chart View Sample"
-                android:textColor="@color/colorTitle"
-                android:textSize="20sp" />
-
-        <Button
-                android:id="@+id/button"
-                style="@style/Widget.AppCompat.Toolbar.Button.Navigation"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_gravity="center_vertical|end"
-                android:layout_marginEnd="16dp"
-                android:drawableStart="@drawable/ic_moon"
-                android:drawableTint="@color/colorTitle" />
-    </FrameLayout>
+    <TextView
+            android:id="@+id/titleView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|start"
+            android:layout_margin="16dp"
+            android:text="@string/sample_title"
+            android:textColor="@color/colorTitle"
+            android:textSize="20sp" />
 
     <com.zero.chartview.CurveLineChartLayout
             android:id="@+id/chartLayout"
@@ -44,13 +30,19 @@
                 android:layout_height="300dp"
                 app:yLegendMarginStart="8dp"
                 app:xLegendMarginHorizontalPercent="30%"
+                app:xLegendTextColor="@color/colorXLegendText"
+                app:yLegendTextColor="@color/colorYLegendText"
+                app:yLegendLineColor="@color/colorYLegendLine"
+                app:popupLineColor="@color/colorPopupLine"
                 app:scrollEnabled="true" />
 
         <com.zero.chartview.selector.CurveLineSelectorView
                 android:id="@+id/selector"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginTop="20dp" />
+                android:layout_marginTop="20dp"
+                app:selectorFrameColor="@color/colorSelectorFrame"
+                app:selectorFogColor="@color/colorSelectorFog" />
 
     </com.zero.chartview.CurveLineChartLayout>
 

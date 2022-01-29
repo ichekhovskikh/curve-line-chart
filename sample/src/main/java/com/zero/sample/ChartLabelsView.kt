@@ -2,7 +2,6 @@ package com.zero.sample
 
 import android.content.Context
 import android.content.res.ColorStateList
-import androidx.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -57,18 +56,5 @@ class ChartLabelsView @JvmOverloads constructor(
         val states = arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf())
         val colors = intArrayOf(line.color, line.color)
         return ColorStateList(states, colors)
-    }
-
-    @ColorInt fun getTextColor(): Int {
-        if (items.isEmpty()) return 0
-        val labelCheckbox = items.first().findViewById<CheckBox>(R.id.labelCheckbox)
-        return labelCheckbox.textColors.defaultColor
-    }
-
-    fun setTextColor(@ColorInt color: Int) {
-        items.forEach {
-            val labelCheckbox = it.findViewById<CheckBox>(R.id.labelCheckbox)
-            labelCheckbox.setTextColor(color)
-        }
     }
 }

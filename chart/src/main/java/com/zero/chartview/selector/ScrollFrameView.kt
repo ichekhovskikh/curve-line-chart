@@ -75,11 +75,11 @@ internal class ScrollFrameView @JvmOverloads constructor(
         applyStyledAttributes(attrs, R.styleable.ScrollFrameView, defStyleAttr, defStyleRes) {
             framePaint.color = getColor(
                 R.styleable.ScrollFrameView_selectorFrameColor,
-                context.getColorCompat(R.color.colorFrameSelector)
+                context.getColorCompat(R.color.colorSelectorFrame)
             )
             fogPaint.color = getColor(
                 R.styleable.ScrollFrameView_selectorFogColor,
-                context.getColorCompat(R.color.colorFogSelector)
+                context.getColorCompat(R.color.colorSelectorFog)
             )
             frameMaxWidthPercent = getDimension(
                 R.styleable.ScrollFrameView_selectorFrameMaxWidthPercent,

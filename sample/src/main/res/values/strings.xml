@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ChartView</string>
+    <string name="sample_title">Chart View Sample</string>
 </resources>

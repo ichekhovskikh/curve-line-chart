@@ -1,8 +1,6 @@
 package com.zero.chartview
 
 import android.content.Context
-import android.content.res.TypedArray
-import android.graphics.Color
 import androidx.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -11,7 +9,6 @@ import com.zero.chartview.axis.YAxisView
 import com.zero.chartview.axis.XAxisView
 import com.zero.chartview.axis.formatter.AxisFormatter
 import com.zero.chartview.extensions.abscissas
-import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.extensions.ordinates
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.popup.PopupLineView
@@ -23,15 +20,13 @@ class CurveLineChartView @JvmOverloads constructor(
     attrs: AttributeSet,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0
-) : FrameLayout(context, attrs, defStyleAttr, defStyleRes), Themeable {
+) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
 
     private val graph = CurveLineGraphView(context, attrs, defStyleAttr, defStyleRes)
     private val yAxis = YAxisView(context, attrs, defStyleAttr, defStyleRes)
     private val xAxis = XAxisView(context, attrs, defStyleAttr, defStyleRes)
     private val popup = PopupLineView(context, attrs, defStyleAttr, defStyleRes)
     private val window = PopupWindow(context, attrs, defStyleAttr, defStyleRes)
-
-    private lateinit var chartColors: Themeable.ChartColors
 
     val range get() = graph.range
 
@@ -64,10 +59,6 @@ class CurveLineChartView @JvmOverloads constructor(
         graph.addOnRangeChangedListener { start: Float, endInclusive: Float, smoothScroll: Boolean ->
             xAxis.setRange(start, endInclusive, smoothScroll)
             popup.setRange(start, endInclusive)
-        }
-
-        applyStyledAttributes(attrs, R.styleable.CurveLineChartView, defStyleAttr, defStyleRes) {
-            setChartColors(getThemeColorDefault(this))
         }
     }
 
@@ -160,61 +151,23 @@ class CurveLineChartView @JvmOverloads constructor(
         )
     }
 
-    override fun getChartColors() = chartColors
-
-    override fun setChartColors(colors: Themeable.ChartColors) {
-        chartColors = colors
-        onThemeColorChanged()
-    }
-
-    override fun setBackgroundColor(@ColorInt backgroundColor: Int) {
-        chartColors.colorBackground = backgroundColor
-        popup.setPointColor(backgroundColor)
-        window.setBackgroundColor(backgroundColor)
-        super.setBackgroundColor(backgroundColor)
-    }
-
-    fun setLegendTextColor(@ColorInt textColor: Int) {
-        chartColors.colorLegend = textColor
+    fun setXLegendTextColor(@ColorInt textColor: Int) {
         xAxis.textColor = textColor
-        yAxis.textColor = textColor
         xAxis.invalidate()
+    }
+
+    fun setYLegendTextColor(@ColorInt textColor: Int) {
+        yAxis.textColor = textColor
         yAxis.invalidate()
     }
 
-    fun setYLegendLineColor(@ColorInt colorYLegendLine: Int) {
-        chartColors.colorYLegendLine = colorYLegendLine
-        yAxis.lineColor = colorYLegendLine
+    fun setYLegendLineColor(@ColorInt lineColor: Int) {
+        yAxis.lineColor = lineColor
         yAxis.invalidate()
     }
 
     fun setPopupLineColor(@ColorInt popupLineColor: Int) {
-        chartColors.colorPopupLine = popupLineColor
         popup.setPopupLineColor(popupLineColor)
         popup.invalidate()
-    }
-
-    private fun onThemeColorChanged() {
-        yAxis.lineColor = chartColors.colorYLegendLine
-        xAxis.textColor = chartColors.colorLegend
-        yAxis.textColor = chartColors.colorLegend
-        popup.setPopupLineColor(chartColors.colorPopupLine)
-        popup.setPointColor(chartColors.colorBackground)
-        window.setBackgroundColor(chartColors.colorBackground)
-        super.setBackgroundColor(chartColors.colorBackground)
-        xAxis.invalidate()
-        yAxis.invalidate()
-        popup.invalidate()
-    }
-
-    private fun getThemeColorDefault(typedArray: TypedArray): Themeable.ChartColors {
-        typedArray.apply {
-            val colorBackground = Color.WHITE
-            val colorLegend = getColor(R.styleable.CurveLineChartView_yLegendTextColor, resources.getColor(R.color.colorYLegendText))
-            val colorGrid = getColor(R.styleable.CurveLineChartView_yLegendLineColor, resources.getColor(R.color.colorYLegendLine))
-            val colorPopupLine =
-                getColor(R.styleable.CurveLineChartView_popupLineColor, resources.getColor(R.color.colorPopupLine))
-            return Themeable.ChartColors(colorBackground, colorLegend, colorGrid, colorPopupLine)
-        }
     }
 }

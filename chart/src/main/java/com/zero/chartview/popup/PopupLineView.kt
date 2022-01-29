@@ -12,6 +12,8 @@ import android.view.MotionEvent
 import android.view.View
 import com.zero.chartview.R
 import com.zero.chartview.axis.formatter.ShortAxisFormatter
+import com.zero.chartview.extensions.applyStyledAttributes
+import com.zero.chartview.extensions.getColorCompat
 import com.zero.chartview.extensions.interpolateByLineAbscissas
 import com.zero.chartview.extensions.getMinMaxY
 import com.zero.chartview.model.CurveLine
@@ -49,9 +51,15 @@ internal class PopupLineView @JvmOverloads constructor(
     private var touchY: Float = 0f
 
     init {
-        linePaint.color = resources.getColor(R.color.colorPopupLine)
+        linePaint.color = context.getColorCompat(R.color.colorPopupLine)
         linePaint.strokeWidth = resources.getDimension(R.dimen.popup_line_width)
         pointPaint.style = Paint.Style.FILL
+        applyStyledAttributes(attrs, R.styleable.CurveLineChartView, defStyleAttr, defStyleRes) {
+            linePaint.color = getColor(
+                R.styleable.CurveLineChartView_popupLineColor,
+                context.getColorCompat(R.color.colorPopupLine)
+            )
+        }
     }
 
     fun setRange(start: Float, endInclusive: Float) {

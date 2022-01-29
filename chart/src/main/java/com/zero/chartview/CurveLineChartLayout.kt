@@ -2,11 +2,9 @@ package com.zero.chartview
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.TypedArray
-import android.graphics.Color
 import android.util.AttributeSet
 import android.widget.LinearLayout
-import com.zero.chartview.extensions.applyStyledAttributes
+import com.zero.chartview.extensions.getColorCompat
 import com.zero.chartview.selector.CurveLineSelectorView
 
 class CurveLineChartLayout @JvmOverloads constructor(
@@ -14,20 +12,14 @@ class CurveLineChartLayout @JvmOverloads constructor(
     attrs: AttributeSet,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0
-) : LinearLayout(context, attrs, defStyleAttr, defStyleRes), Themeable {
+) : LinearLayout(context, attrs, defStyleAttr, defStyleRes) {
 
     private var chart: CurveLineChartView? = null
     private var selector: CurveLineSelectorView? = null
 
-    private lateinit var chartColors: Themeable.ChartColors
-
     init {
         orientation = VERTICAL
-        super.setBackgroundColor(resources.getColor(android.R.color.transparent))
-
-        applyStyledAttributes(attrs, R.styleable.CurveLineChartLayout, defStyleAttr, defStyleRes) {
-            setChartColors(getThemeColorDefault(this))
-        }
+        super.setBackgroundColor(context.getColorCompat(android.R.color.transparent))
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -52,34 +44,6 @@ class CurveLineChartLayout @JvmOverloads constructor(
         chart?.addOnRangeChangedListener { start, endInclusive, smoothScroll ->
             ignoreSelectorChanged = true
             selector?.setRange(start, endInclusive, smoothScroll)
-        }
-    }
-
-    override fun getChartColors(): Themeable.ChartColors {
-        val chartColors = chart?.getChartColors()
-        val controlColors = selector?.getChartColors()
-        chartColors?.apply {
-            this@CurveLineChartLayout.chartColors.colorLegend = colorLegend
-            this@CurveLineChartLayout.chartColors.colorYLegendLine = colorYLegendLine
-            this@CurveLineChartLayout.chartColors.colorPopupLine = colorPopupLine
-        }
-        controlColors?.apply {
-            this@CurveLineChartLayout.chartColors.colorFrameSelector = colorFrameSelector
-            this@CurveLineChartLayout.chartColors.colorFogSelector = colorFogSelector
-        }
-        return this.chartColors
-    }
-
-    override fun setChartColors(colors: Themeable.ChartColors) {
-        chartColors = colors
-        chart?.setChartColors(colors)
-        selector?.setChartColors(colors)
-        setBackgroundColor(colors.colorBackground)
-    }
-
-    private fun getThemeColorDefault(typedArray: TypedArray): Themeable.ChartColors {
-        typedArray.apply {
-            return Themeable.ChartColors(colorBackground = Color.WHITE)
         }
     }
 }
