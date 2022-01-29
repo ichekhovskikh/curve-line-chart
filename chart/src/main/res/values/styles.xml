@@ -1,23 +1,22 @@
 <resources>
-
-    <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
     <dimen name="line_width_default">2dp</dimen>
-    <integer name="legend_line_count_default">6</integer>
-    <dimen name="start_legend_margin_default">0dp</dimen>
-    <dimen name="bottom_legend_margin_default">6dp</dimen>
-    <dimen name="legend_text_size_default">13sp</dimen>
-    <dimen name="grid_line_width_default">1dp</dimen>
 
-    <dimen name="abscissa_legend_margin_top_default">4dp</dimen>
-    <integer name="abscissa_legend_count_default">5</integer>
-    <fraction name="abscissa_legend_horizontal_margin_percent_default">0%</fraction>
+    <dimen name="y_legend_margin_start_default">0dp</dimen>
+    <dimen name="y_legend_margin_bottom_default">6dp</dimen>
+    <dimen name="y_legend_text_size_default">13sp</dimen>
+    <dimen name="y_legend_line_width_default">1dp</dimen>
+    <integer name="y_legend_count_default">6</integer>
+
+    <dimen name="x_legend_margin_top_default">4dp</dimen>
+    <integer name="x_legend_count_default">5</integer>
+    <fraction name="x_legend_margin_horizontal_percent_default">0%</fraction>
+    <dimen name="x_legend_text_size_default">13sp</dimen>
 
     <dimen name="frame_corner_radius_default">8dp</dimen>
     <dimen name="frame_thickness_horizontal_default">2dp</dimen>

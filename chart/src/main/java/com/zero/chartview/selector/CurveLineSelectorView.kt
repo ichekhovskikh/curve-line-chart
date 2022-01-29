@@ -3,6 +3,7 @@ package com.zero.chartview.selector
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.TypedArray
+import android.graphics.Color
 import androidx.annotation.ColorInt
 import android.util.AttributeSet
 import android.widget.FrameLayout
@@ -36,7 +37,7 @@ class CurveLineSelectorView @JvmOverloads constructor(
         addView(graph)
         addView(scrollFrame)
 
-        applyStyledAttributes(attrs, R.styleable.ChartSelectorView, defStyleAttr, defStyleRes) {
+        applyStyledAttributes(attrs, R.styleable.CurveLineSelectorView, defStyleAttr, defStyleRes) {
             setChartColors(getThemeColorDefault(this))
         }
     }
@@ -82,21 +83,21 @@ class CurveLineSelectorView @JvmOverloads constructor(
         super.setBackgroundColor(backgroundColor)
     }
 
-    fun setFrameSelectorColor(@ColorInt frameSelectorColor: Int) {
-        chartColors.colorFrameSelector = frameSelectorColor
-        scrollFrame.setFrameSelectorColor(chartColors.colorFrameSelector)
+    fun setFrameColor(@ColorInt frameColor: Int) {
+        chartColors.colorFrameSelector = frameColor
+        scrollFrame.setFrameColor(chartColors.colorFrameSelector)
         scrollFrame.invalidate()
     }
 
-    fun setFogCSelectorColor(@ColorInt fogSelectorColor: Int) {
-        chartColors.colorFogSelector = fogSelectorColor
-        scrollFrame.setFogSelectorColor(chartColors.colorFogSelector)
+    fun setFogColor(@ColorInt fogColor: Int) {
+        chartColors.colorFogSelector = fogColor
+        scrollFrame.setFogColor(chartColors.colorFogSelector)
         scrollFrame.invalidate()
     }
 
     private fun onThemeColorChanged() {
-        scrollFrame.setFrameSelectorColor(chartColors.colorFrameSelector)
-        scrollFrame.setFogSelectorColor(chartColors.colorFogSelector)
+        scrollFrame.setFrameColor(chartColors.colorFrameSelector)
+        scrollFrame.setFogColor(chartColors.colorFogSelector)
         super.setBackgroundColor(chartColors.colorBackground)
         scrollFrame.invalidate()
     }
@@ -108,14 +109,12 @@ class CurveLineSelectorView @JvmOverloads constructor(
 
     private fun getThemeColorDefault(typedArray: TypedArray): Themeable.ChartColors {
         typedArray.apply {
-            val colorBackground =
-                getColor(R.styleable.ChartSelectorView_colorBackground, resources.getColor(R.color.colorBackground))
             val colorFrameSelector =
-                getColor(R.styleable.ChartSelectorView_colorFrameSelector, resources.getColor(R.color.colorFrameSelector))
+                getColor(R.styleable.CurveLineSelectorView_selectorFrameColor, resources.getColor(R.color.colorFrameSelector))
             val colorFogSelector =
-                getColor(R.styleable.ChartSelectorView_colorFogSelector, resources.getColor(R.color.colorFogSelector))
+                getColor(R.styleable.CurveLineSelectorView_selectorFogColor, resources.getColor(R.color.colorFogSelector))
             return Themeable.ChartColors(
-                colorBackground = colorBackground,
+                colorBackground = Color.WHITE,
                 colorFrameSelector = colorFrameSelector,
                 colorFogSelector = colorFogSelector
             )

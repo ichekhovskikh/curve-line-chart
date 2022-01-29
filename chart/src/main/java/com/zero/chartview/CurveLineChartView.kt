@@ -2,6 +2,7 @@ package com.zero.chartview
 
 import android.content.Context
 import android.content.res.TypedArray
+import android.graphics.Color
 import androidx.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -65,7 +66,7 @@ class CurveLineChartView @JvmOverloads constructor(
             popup.setRange(start, endInclusive)
         }
 
-        applyStyledAttributes(attrs, R.styleable.ChartView, defStyleAttr, defStyleRes) {
+        applyStyledAttributes(attrs, R.styleable.CurveLineChartView, defStyleAttr, defStyleRes) {
             setChartColors(getThemeColorDefault(this))
         }
     }
@@ -208,12 +209,11 @@ class CurveLineChartView @JvmOverloads constructor(
 
     private fun getThemeColorDefault(typedArray: TypedArray): Themeable.ChartColors {
         typedArray.apply {
-            val colorBackground =
-                getColor(R.styleable.ChartView_colorBackground, resources.getColor(R.color.colorBackground))
-            val colorLegend = getColor(R.styleable.ChartView_yLegendTextColor, resources.getColor(R.color.colorYLegendText))
-            val colorGrid = getColor(R.styleable.ChartView_yLegendLineColor, resources.getColor(R.color.colorYLegendLine))
+            val colorBackground = Color.WHITE
+            val colorLegend = getColor(R.styleable.CurveLineChartView_yLegendTextColor, resources.getColor(R.color.colorYLegendText))
+            val colorGrid = getColor(R.styleable.CurveLineChartView_yLegendLineColor, resources.getColor(R.color.colorYLegendLine))
             val colorPopupLine =
-                getColor(R.styleable.ChartView_colorPopupLine, resources.getColor(R.color.colorPopupLine))
+                getColor(R.styleable.CurveLineChartView_popupLineColor, resources.getColor(R.color.colorPopupLine))
             return Themeable.ChartColors(colorBackground, colorLegend, colorGrid, colorPopupLine)
         }
     }

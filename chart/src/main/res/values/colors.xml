@@ -3,7 +3,6 @@
     <color name="colorPrimary">#517DA1</color>
     <color name="colorPrimaryDark">#426381</color>
     <color name="colorAccent">#D81B60</color>
-    <color name="colorBackground">#FFFFFF</color>
     <color name="colorXLegendText">#9DA4AC</color>
     <color name="colorYLegendText">#9DA4AC</color>
     <color name="colorYLegendLine">#D3DBE7</color>

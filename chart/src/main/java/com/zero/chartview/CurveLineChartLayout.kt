@@ -3,6 +3,7 @@ package com.zero.chartview
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.TypedArray
+import android.graphics.Color
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import com.zero.chartview.extensions.applyStyledAttributes
@@ -24,7 +25,7 @@ class CurveLineChartLayout @JvmOverloads constructor(
         orientation = VERTICAL
         super.setBackgroundColor(resources.getColor(android.R.color.transparent))
 
-        applyStyledAttributes(attrs, R.styleable.ChartLayout, defStyleAttr, defStyleRes) {
+        applyStyledAttributes(attrs, R.styleable.CurveLineChartLayout, defStyleAttr, defStyleRes) {
             setChartColors(getThemeColorDefault(this))
         }
     }
@@ -78,9 +79,7 @@ class CurveLineChartLayout @JvmOverloads constructor(
 
     private fun getThemeColorDefault(typedArray: TypedArray): Themeable.ChartColors {
         typedArray.apply {
-            val colorBackground =
-                getColor(R.styleable.ChartLayout_colorBackground, resources.getColor(R.color.colorBackground))
-            return Themeable.ChartColors(colorBackground = colorBackground)
+            return Themeable.ChartColors(colorBackground = Color.WHITE)
         }
     }
 }

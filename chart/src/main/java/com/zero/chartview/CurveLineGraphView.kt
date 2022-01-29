@@ -32,10 +32,10 @@ class CurveLineGraphView @JvmOverloads constructor(
     private val delegate = CurveLineGraphDelegate(onUpdate = ::postInvalidateOnAnimation)
 
     init {
-        applyStyledAttributes(attrs, R.styleable.GraphicsView, defStyleAttr, defStyleRes) {
-            isScrollEnabled = getBoolean(R.styleable.GraphicsView_scrollEnabled, false)
+        applyStyledAttributes(attrs, R.styleable.CurveLineGraphView, defStyleAttr, defStyleRes) {
+            isScrollEnabled = getBoolean(R.styleable.CurveLineGraphView_scrollEnabled, false)
             paint.strokeWidth = getDimensionPixelSize(
-                R.styleable.GraphicsView_lineWidth,
+                R.styleable.CurveLineGraphView_lineWidth,
                 resources.getDimensionPixelSize(R.dimen.line_width_default)
             ).toFloat()
         }

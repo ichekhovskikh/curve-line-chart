@@ -74,19 +74,19 @@ internal class ScrollFrameView @JvmOverloads constructor(
 
         applyStyledAttributes(attrs, R.styleable.ScrollFrameView, defStyleAttr, defStyleRes) {
             framePaint.color = getColor(
-                R.styleable.ScrollFrameView_colorFrameSelector,
+                R.styleable.ScrollFrameView_selectorFrameColor,
                 context.getColorCompat(R.color.colorFrameSelector)
             )
             fogPaint.color = getColor(
-                R.styleable.ScrollFrameView_colorFogSelector,
+                R.styleable.ScrollFrameView_selectorFogColor,
                 context.getColorCompat(R.color.colorFogSelector)
             )
             frameMaxWidthPercent = getDimension(
-                R.styleable.ScrollFrameView_frameMaxWidthPercent,
+                R.styleable.ScrollFrameView_selectorFrameMaxWidthPercent,
                 frameMaxWidthPercent
             )
             frameMinWidthPercent = getDimension(
-                R.styleable.ScrollFrameView_frameMinWidthPercent,
+                R.styleable.ScrollFrameView_selectorFrameMinWidthPercent,
                 frameMinWidthPercent
             )
             isSmoothScrollEnabled = getBoolean(
@@ -108,16 +108,16 @@ internal class ScrollFrameView @JvmOverloads constructor(
         )
     }
 
-    fun setFrameSelectorColor(@ColorInt frameSelectorColor: Int) {
-        if (frameSelectorColor != framePaint.color) {
-            framePaint.color = frameSelectorColor
+    fun setFrameColor(@ColorInt frameColor: Int) {
+        if (frameColor != framePaint.color) {
+            framePaint.color = frameColor
             invalidate()
         }
     }
 
-    fun setFogSelectorColor(@ColorInt fogSelectorColor: Int) {
-        if (fogSelectorColor != fogPaint.color) {
-            fogPaint.color = fogSelectorColor
+    fun setFogColor(@ColorInt fogColor: Int) {
+        if (fogColor != fogPaint.color) {
+            fogPaint.color = fogColor
             invalidate()
         }
     }

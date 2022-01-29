@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="ChartView">
-        <attr name="colorBackground" format="color" />
+    <declare-styleable name="CurveLineChartView">
         <attr name="lineWidth" format="dimension" />
         <attr name="scrollEnabled" format="boolean" />
 
@@ -19,15 +18,15 @@
         <attr name="xLegendMarginHorizontalPercent" format="fraction" />
         <attr name="xLegendCount" format="integer" />
 
-        <attr name="colorPopupLine" format="color" />
+        <attr name="popupLineColor" format="color" />
     </declare-styleable>
 
-    <declare-styleable name="GraphicsView" parent="ChartView">
+    <declare-styleable name="CurveLineGraphView" parent="CurveLineChartView">
         <attr name="lineWidth" />
         <attr name="scrollEnabled" />
     </declare-styleable>
 
-    <declare-styleable name="XAxisView" parent="ChartView">
+    <declare-styleable name="XAxisView" parent="CurveLineChartView">
         <attr name="xLegendTextColor" />
         <attr name="xLegendTextSize" />
         <attr name="xLegendMarginTop" />
@@ -35,7 +34,7 @@
         <attr name="xLegendCount" />
     </declare-styleable>
 
-    <declare-styleable name="YAxisView" parent="ChartView">
+    <declare-styleable name="YAxisView" parent="CurveLineChartView">
         <attr name="yLegendTextColor" />
         <attr name="yLegendTextSize" />
         <attr name="yLegendLineColor" />
@@ -45,24 +44,21 @@
         <attr name="yLegendMarginStart" />
     </declare-styleable>
 
-    <declare-styleable name="ChartSelectorView">
-        <attr name="colorBackground" />
-        <attr name="colorFrameSelector" format="color" />
-        <attr name="colorFogSelector" format="color" />
-        <attr name="frameMinWidthPercent" format="fraction" />
-        <attr name="frameMaxWidthPercent" format="fraction" />
+    <declare-styleable name="CurveLineSelectorView">
+        <attr name="selectorFrameColor" format="color" />
+        <attr name="selectorFogColor" format="color" />
+        <attr name="selectorFrameMinWidthPercent" format="fraction" />
+        <attr name="selectorFrameMaxWidthPercent" format="fraction" />
         <attr name="smoothScrollEnabled" format="boolean" />
     </declare-styleable>
 
-    <declare-styleable name="ScrollFrameView" parent="ChartSelectorView">
-        <attr name="frameMinWidthPercent" />
-        <attr name="frameMaxWidthPercent" />
-        <attr name="colorFrameSelector" />
-        <attr name="colorFogSelector" />
+    <declare-styleable name="ScrollFrameView" parent="CurveLineSelectorView">
+        <attr name="selectorFrameMinWidthPercent" />
+        <attr name="selectorFrameMaxWidthPercent" />
+        <attr name="selectorFrameColor" />
+        <attr name="selectorFogColor" />
         <attr name="smoothScrollEnabled" />
     </declare-styleable>
 
-    <declare-styleable name="ChartLayout">
-        <attr name="colorBackground" />
-    </declare-styleable>
+    <declare-styleable name="CurveLineChartLayout" />
 </resources>

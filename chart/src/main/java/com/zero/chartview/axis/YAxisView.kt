@@ -53,9 +53,9 @@ internal class YAxisView @JvmOverloads constructor(
         val linePaint = Paint().apply {
             style = Paint.Style.STROKE
         }
-        var legendCount = resources.getInteger(R.integer.legend_line_count_default)
-        var legendMarginStart = resources.getDimension(R.dimen.start_legend_margin_default)
-        var legendMarginBottom = resources.getDimension(R.dimen.bottom_legend_margin_default)
+        var legendCount = resources.getInteger(R.integer.y_legend_count_default)
+        var legendMarginStart = resources.getDimension(R.dimen.y_legend_margin_start_default)
+        var legendMarginBottom = resources.getDimension(R.dimen.y_legend_margin_bottom_default)
 
         applyStyledAttributes(attrs, R.styleable.YAxisView, defStyleAttr, defStyleRes) {
             legendCount = getInteger(
@@ -76,7 +76,7 @@ internal class YAxisView @JvmOverloads constructor(
             )
             legendPaint.textSize = getDimension(
                 R.styleable.YAxisView_yLegendTextSize,
-                resources.getDimension(R.dimen.legend_text_size_default)
+                resources.getDimension(R.dimen.y_legend_text_size_default)
             )
             linePaint.color = getColor(
                 R.styleable.YAxisView_yLegendLineColor,
@@ -84,7 +84,7 @@ internal class YAxisView @JvmOverloads constructor(
             )
             linePaint.strokeWidth = getDimension(
                 R.styleable.YAxisView_yLegendLineWidth,
-                resources.getDimension(R.dimen.grid_line_width_default)
+                resources.getDimension(R.dimen.y_legend_line_width_default)
             )
         }
         delegate = YAxisDelegate(

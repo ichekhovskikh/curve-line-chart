@@ -3,6 +3,7 @@ package com.zero.chartview.popup
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PointF
 import androidx.annotation.ColorInt
@@ -28,7 +29,7 @@ internal class PopupLineView @JvmOverloads constructor(
 
     private var pointInnerRadius = resources.getDimension(R.dimen.point_inner_radius)
     private var pointOuterRadius = resources.getDimension(R.dimen.point_outer_radius)
-    private var pointColor = resources.getColor(R.color.colorBackground)
+    private var pointColor = Color.WHITE
 
     private val linePaint = Paint()
     private val pointPaint = Paint()

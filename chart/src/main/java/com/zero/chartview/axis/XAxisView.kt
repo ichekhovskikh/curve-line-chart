@@ -44,17 +44,17 @@ internal class XAxisView @JvmOverloads constructor(
 
     init {
         val legendPaint = Paint()
-        var textMarginTop = resources.getDimension(R.dimen.abscissa_legend_margin_top_default)
-        var legendCount = resources.getInteger(R.integer.abscissa_legend_count_default)
+        var textMarginTop = resources.getDimension(R.dimen.x_legend_margin_top_default)
+        var legendCount = resources.getInteger(R.integer.x_legend_count_default)
         var textMarginHorizontalPercent = resources.getFraction(
-            R.fraction.abscissa_legend_horizontal_margin_percent_default,
+            R.fraction.x_legend_margin_horizontal_percent_default,
             1,
             1
         )
         applyStyledAttributes(attrs, R.styleable.XAxisView, defStyleAttr, defStyleRes) {
             legendPaint.textSize = getDimension(
                 R.styleable.XAxisView_xLegendTextSize,
-                resources.getDimension(R.dimen.legend_text_size_default)
+                resources.getDimension(R.dimen.x_legend_text_size_default)
             )
             legendPaint.color = getColor(
                 R.styleable.XAxisView_xLegendTextColor,

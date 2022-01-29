@@ -1,6 +1,7 @@
 package com.zero.chartview.popup
 
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -31,7 +32,7 @@ internal class PopupWindow @JvmOverloads constructor(
     init {
         visibility = View.INVISIBLE
         windowView = LayoutInflater.from(context).inflate(R.layout.popup_window, this, false)
-        windowView.setBackgroundColor(resources.getColor(R.color.colorBackground))
+        windowView.setBackgroundColor(Color.WHITE)
         addView(windowView)
     }
 
