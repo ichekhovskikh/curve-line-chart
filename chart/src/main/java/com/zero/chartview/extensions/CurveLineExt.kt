@@ -12,6 +12,7 @@ val List<CurveLine>.ordinates: List<Float>
     get() = flatMap { line -> line.points.map { it.y } }.distinct()
 
 internal fun List<CurveLine>.getMinMaxY(range: FloatRange): MinMax {
+    if (isEmpty()) return MinMax(0f, 0f)
     val interpolatedRange = range.interpolateByLineAbscissas(this)
     val points = flatMap { it.points }
         .filter { it.x in interpolatedRange.start..interpolatedRange.endInclusive }
