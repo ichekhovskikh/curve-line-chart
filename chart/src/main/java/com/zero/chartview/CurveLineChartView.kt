@@ -36,16 +36,34 @@ class CurveLineChartView @JvmOverloads constructor(
             graph.isScrollEnabled = value
         }
 
+    var xAxisFormatter: AxisFormatter
+        get() = xAxis.axisFormatter
+        set(value) {
+            xAxis.axisFormatter = value
+        }
+
     var yAxisFormatter: AxisFormatter
         get() = yAxis.axisFormatter
         set(value) {
             yAxis.axisFormatter = value
         }
 
+    var lineWidth: Float
+        get() = graph.lineWidth
+        set(value) {
+            graph.lineWidth = value
+        }
+
     var yAxisLegendCount: Int
         get() = yAxis.legendCount
         set(value) {
             yAxis.legendCount = value
+        }
+
+    var xAxisLegendCount: Int
+        get() = xAxis.legendCount
+        set(value) {
+            xAxis.legendCount = value
         }
 
     init {
@@ -153,21 +171,17 @@ class CurveLineChartView @JvmOverloads constructor(
 
     fun setXLegendTextColor(@ColorInt textColor: Int) {
         xAxis.textColor = textColor
-        xAxis.invalidate()
     }
 
     fun setYLegendTextColor(@ColorInt textColor: Int) {
         yAxis.textColor = textColor
-        yAxis.invalidate()
     }
 
     fun setYLegendLineColor(@ColorInt lineColor: Int) {
         yAxis.lineColor = lineColor
-        yAxis.invalidate()
     }
 
     fun setPopupLineColor(@ColorInt popupLineColor: Int) {
         popup.setPopupLineColor(popupLineColor)
-        popup.invalidate()
     }
 }

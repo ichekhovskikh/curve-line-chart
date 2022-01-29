@@ -17,15 +17,13 @@ import com.zero.chartview.tools.yValueToPixel
 import kotlin.math.max
 
 internal class YAxisDelegate(
-    private var legendCount: Int,
-    private val legendMarginStart: Float,
-    private val legendMarginBottom: Float,
     internal val legendPaint: Paint,
     internal val linePaint: Paint,
+    legendCount: Int,
+    private val legendMarginStart: Float,
+    private val legendMarginBottom: Float,
     private val onUpdate: () -> Unit
 ) {
-
-    var axisFormatter: AxisFormatter = DefaultAxisFormatter()
 
     private var minY = 0f
     private var maxY = 0f
@@ -33,6 +31,16 @@ internal class YAxisDelegate(
     private var viewSize = Size()
     private var legendPositions = emptyList<Float>()
     private var series = mutableListOf<AnimatingYLegendSeries>()
+
+    internal var axisFormatter: AxisFormatter = DefaultAxisFormatter()
+
+    internal var legendCount: Int = legendCount
+        set(value) {
+            if (field == value) return
+            field = value
+            onLegendPositionsChanged()
+            series.find { it.isAppearing }?.let { setYAxis(it.minY, it.maxY) }
+        }
 
     private val tensionAnimator = TensionAnimator { tension, minY, maxY ->
         series.forEach { series ->
@@ -59,14 +67,6 @@ internal class YAxisDelegate(
 
     private fun removeDisappearingLegendSeries() {
         series.removeAll { !it.isAppearing }
-    }
-
-    fun getLegendCount() = legendCount
-
-    fun setLegendCount(legendCount: Int) {
-        this.legendCount = legendCount
-        onLegendPositionsChanged()
-        series.find { it.isAppearing }?.let { setYAxis(it.minY, it.maxY) }
     }
 
     fun setOrdinates(ordinates: List<Float>) {
@@ -122,13 +122,17 @@ internal class YAxisDelegate(
     }
 
     fun drawLegends(canvas: Canvas) {
+        canvas.drawYLegends(legendPaint, linePaint)
+    }
+
+    fun Canvas.drawYLegends(legendPaint: Paint, linePaint: Paint) {
         series.forEach { series ->
             linePaint.color = series.animatingColor(linePaint.color)
             legendPaint.color = series.animatingColor(legendPaint.color)
             series.legends.forEach { legend ->
                 val yPixel = legend.interpolatedPosition
-                canvas.drawLine(0f, yPixel, viewSize.width.toFloat(), yPixel, linePaint)
-                canvas.drawText(
+                drawLine(0f, yPixel, viewSize.width.toFloat(), yPixel, linePaint)
+                drawText(
                     legend.label,
                     legendMarginStart,
                     yPixel - legendMarginBottom,
@@ -151,7 +155,8 @@ internal class YAxisDelegate(
         absoluteMaxY: Float = maxY
     ) = map {
         val absoluteDistance = absoluteMaxY - absoluteMinY
-        val zoom = if (yAxisDistance == 0f || absoluteDistance == 0f) 1f else yAxisDistance / absoluteDistance
+        val zoom =
+            if (yAxisDistance == 0f || absoluteDistance == 0f) 1f else yAxisDistance / absoluteDistance
         val absolutePosition = yPixelToValue(it, viewSize.height, absoluteMinY, absoluteMaxY)
         AnimatingYLegend(
             position = absolutePosition,

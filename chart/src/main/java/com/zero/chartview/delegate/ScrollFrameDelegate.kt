@@ -12,11 +12,14 @@ import kotlin.math.max
 import kotlin.math.min
 
 internal class ScrollFrameDelegate(
+    internal val framePaint: Paint,
+    internal val fogPaint: Paint,
+    private val dragIndicatorPaint: Paint,
     private val frameCornerRadius: Float,
     private val frameThicknessHorizontal: Float,
     private val frameThicknessVertical: Float,
-    private val frameMaxWidthPercent: Float,
-    private val frameMinWidthPercent: Float,
+    internal val frameMaxWidthPercent: Float,
+    internal val frameMinWidthPercent: Float,
     private val dragIndicatorCornerRadius: Float,
     private val dragIndicatorWidth: Float,
     private val dragIndicatorMaxHeight: Float,
@@ -153,12 +156,7 @@ internal class ScrollFrameDelegate(
         onFrameCountersChanged(range)
     }
 
-    fun drawScrollFrame(
-        canvas: Canvas,
-        framePaint: Paint,
-        fogPaint: Paint,
-        dragIndicatorPaint: Paint
-    ) {
+    fun drawScrollFrame(canvas: Canvas) {
         path.rewind()
         canvas.drawFog(fogPaint)
         canvas.drawFrame(framePaint)

@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import androidx.annotation.Px
 import com.zero.chartview.delegate.CurveLineGraphDelegate
 import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.extensions.on
@@ -20,18 +21,28 @@ class CurveLineGraphView @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
 
+    private val delegate: CurveLineGraphDelegate
+
     val range get() = delegate.range
 
     var isScrollEnabled = false
 
-    private val paint = Paint().apply {
-        style = Paint.Style.STROKE
-        isAntiAlias = true
-    }
-
-    private val delegate = CurveLineGraphDelegate(onUpdate = ::postInvalidateOnAnimation)
+    @get:Px
+    @setparam:Px
+    var lineWidth: Float
+        get() = delegate.paint.strokeWidth
+        set(value) {
+            if (delegate.paint.strokeWidth != value) {
+                delegate.paint.strokeWidth = value
+                invalidate()
+            }
+        }
 
     init {
+        val paint = Paint().apply {
+            style = Paint.Style.STROKE
+            isAntiAlias = true
+        }
         applyStyledAttributes(attrs, R.styleable.CurveLineGraphView, defStyleAttr, defStyleRes) {
             isScrollEnabled = getBoolean(R.styleable.CurveLineGraphView_scrollEnabled, false)
             paint.strokeWidth = getDimensionPixelSize(
@@ -39,6 +50,10 @@ class CurveLineGraphView @JvmOverloads constructor(
                 resources.getDimensionPixelSize(R.dimen.line_width_default)
             ).toFloat()
         }
+        delegate = CurveLineGraphDelegate(
+            paint,
+            onUpdate = ::postInvalidateOnAnimation
+        )
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -92,6 +107,6 @@ class CurveLineGraphView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        delegate.drawLines(canvas, paint)
+        delegate.drawLines(canvas)
     }
 }

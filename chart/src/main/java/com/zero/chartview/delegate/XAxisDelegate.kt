@@ -21,22 +21,30 @@ import kotlin.math.log2
 import kotlin.math.pow
 
 internal class XAxisDelegate(
-    private var legendCount: Int,
+    internal val legendPaint: Paint,
+    legendCount: Int,
     private val textMarginTop: Float,
     private val textMarginHorizontalPercent: Float,
-    internal val legendPaint: Paint,
     private val onUpdate: () -> Unit
 ) {
-
-    var axisFormatter: AxisFormatter = DefaultAxisFormatter()
-
-    internal var range: FloatRange = FloatRange(0f, 1f)
-        private set
 
     private val legendPath = Path()
     private var viewSize = Size()
     private var abscissas: List<Float> = emptyList()
     private var legends: List<XLegend> = emptyList()
+
+    internal var axisFormatter: AxisFormatter = DefaultAxisFormatter()
+
+    internal var legendCount: Int = legendCount
+        set(value) {
+            if (field == value) return
+            field = value
+            onXLegendsChanged()
+            onUpdate()
+        }
+
+    internal var range: FloatRange = FloatRange(0f, 1f)
+        private set
 
     internal val legendTextHeightUsed
         get() = (legendPaint.textSize + textMarginTop).toInt()
@@ -114,6 +122,10 @@ internal class XAxisDelegate(
     }
 
     fun drawLegends(canvas: Canvas) {
+        canvas.drawXLegends(legendPaint)
+    }
+
+    private fun Canvas.drawXLegends(legendPaint: Paint) {
         legends.forEach { legend ->
             legendPaint.color = legend.alphaColor(legendPaint.color)
             legendPath.apply {
@@ -126,7 +138,7 @@ internal class XAxisDelegate(
                     Path.Direction.CW
                 )
             }
-            canvas.drawTextOnPath(legend.label, legendPath, 0f, 0f, legendPaint)
+            drawTextOnPath(legend.label, legendPath, 0f, 0f, legendPaint)
         }
     }
 

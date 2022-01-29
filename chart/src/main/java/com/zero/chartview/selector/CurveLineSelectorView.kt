@@ -2,7 +2,6 @@ package com.zero.chartview.selector
 
 import android.annotation.SuppressLint
 import android.content.Context
-import androidx.annotation.ColorInt
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import com.zero.chartview.CurveLineGraphView
@@ -24,6 +23,24 @@ class CurveLineSelectorView @JvmOverloads constructor(
         get() = scrollFrame.isSmoothScrollEnabled
         set(value) {
             scrollFrame.isSmoothScrollEnabled = value
+        }
+
+    val frameMinWidthPercent
+        get() = scrollFrame.frameMinWidthPercent
+
+    val frameMaxWidthPercent
+        get() = scrollFrame.frameMaxWidthPercent
+
+    var frameColor: Int
+        get() = scrollFrame.frameColor
+        set(value) {
+            scrollFrame.frameColor = value
+        }
+
+    var fogColor: Int
+        get() = scrollFrame.fogColor
+        set(value) {
+            scrollFrame.fogColor = value
         }
 
     init {
@@ -58,14 +75,6 @@ class CurveLineSelectorView @JvmOverloads constructor(
 
     fun removeLine(line: CurveLine) {
         graph.removeLine(line)
-    }
-
-    fun setFrameColor(@ColorInt frameColor: Int) {
-        scrollFrame.setFrameColor(frameColor)
-    }
-
-    fun setFogColor(@ColorInt fogColor: Int) {
-        scrollFrame.setFogColor(fogColor)
     }
 
     @SuppressLint("ClickableViewAccessibility")

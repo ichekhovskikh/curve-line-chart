@@ -26,7 +26,10 @@ internal class XAxisView @JvmOverloads constructor(
     var axisFormatter: AxisFormatter
         get() = delegate.axisFormatter
         set(value) {
-            delegate.axisFormatter = value
+            if (delegate.axisFormatter != value) {
+                delegate.axisFormatter = value
+                invalidate()
+            }
         }
 
     @get:ColorInt
@@ -34,7 +37,16 @@ internal class XAxisView @JvmOverloads constructor(
     var textColor: Int
         get() = delegate.legendPaint.color
         set(value) {
-            delegate.legendPaint.color = value
+            if (delegate.legendPaint.color != value) {
+                delegate.legendPaint.color = value
+                invalidate()
+            }
+        }
+
+    var legendCount: Int
+        get() = delegate.legendCount
+        set(value) {
+            delegate.legendCount = value
         }
 
     val range get() = delegate.range
@@ -70,10 +82,10 @@ internal class XAxisView @JvmOverloads constructor(
             legendCount = getInteger(R.styleable.XAxisView_xLegendCount, legendCount)
         }
         delegate = XAxisDelegate(
-            legendCount = legendCount,
-            textMarginTop = textMarginTop,
-            textMarginHorizontalPercent = textMarginHorizontalPercent,
-            legendPaint = legendPaint,
+            legendPaint,
+            legendCount,
+            textMarginTop,
+            textMarginHorizontalPercent,
             onUpdate = ::postInvalidateOnAnimation
         )
     }

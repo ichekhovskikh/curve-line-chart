@@ -25,7 +25,10 @@ internal class YAxisView @JvmOverloads constructor(
     var axisFormatter: AxisFormatter
         get() = delegate.axisFormatter
         set(value) {
-            delegate.axisFormatter = value
+            if (delegate.axisFormatter != value) {
+                delegate.axisFormatter = value
+                invalidate()
+            }
         }
 
     @get:ColorInt
@@ -33,7 +36,10 @@ internal class YAxisView @JvmOverloads constructor(
     var textColor: Int
         get() = delegate.legendPaint.color
         set(value) {
-            delegate.legendPaint.color = value
+            if (delegate.legendPaint.color != value) {
+                delegate.legendPaint.color = value
+                invalidate()
+            }
         }
 
     @get:ColorInt
@@ -41,12 +47,17 @@ internal class YAxisView @JvmOverloads constructor(
     var lineColor: Int
         get() = delegate.linePaint.color
         set(value) {
-            delegate.linePaint.color = value
+            if (delegate.linePaint.color != value) {
+                delegate.linePaint.color = value
+                invalidate()
+            }
         }
 
     var legendCount: Int
-        get() = delegate.getLegendCount()
-        set(value) = delegate.setLegendCount(value)
+        get() = delegate.legendCount
+        set(value) {
+            delegate.legendCount = value
+        }
 
     init {
         val legendPaint = Paint()
@@ -88,11 +99,11 @@ internal class YAxisView @JvmOverloads constructor(
             )
         }
         delegate = YAxisDelegate(
+            legendPaint,
+            linePaint,
             legendCount,
             legendMarginStart,
             legendMarginBottom,
-            legendPaint,
-            linePaint,
             onUpdate = ::postInvalidateOnAnimation
         )
     }

@@ -154,6 +154,7 @@ internal class PopupLineView @JvmOverloads constructor(
     fun setPopupLineColor(@ColorInt popupLineColor: Int) {
         if (popupLineColor != linePaint.color) {
             linePaint.color = popupLineColor
+            invalidate()
         }
     }
 

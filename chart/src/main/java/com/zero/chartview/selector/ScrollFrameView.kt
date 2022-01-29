@@ -22,18 +22,7 @@ internal class ScrollFrameView @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
 
-    private val framePaint = Paint().apply {
-        style = Paint.Style.FILL
-    }
-
-    private val fogPaint = Paint().apply {
-        style = Paint.Style.FILL
-    }
-
-    private val dragIndicatorPaint = Paint().apply {
-        style = Paint.Style.FILL
-        color = context.getColorCompat(R.color.colorFrameDragIndicator)
-    }
+    private val delegate: ScrollFrameDelegate
 
     val range get() = delegate.range
 
@@ -43,9 +32,45 @@ internal class ScrollFrameView @JvmOverloads constructor(
             delegate.isSmoothScrollEnabled = value
         }
 
-    private val delegate: ScrollFrameDelegate
+    val frameMinWidthPercent
+        get() = delegate.frameMinWidthPercent
+
+    val frameMaxWidthPercent
+        get() = delegate.frameMaxWidthPercent
+
+    @get:ColorInt
+    @setparam:ColorInt
+    var frameColor: Int
+        get() = delegate.framePaint.color
+        set(value) {
+            if (delegate.framePaint.color != value) {
+                delegate.framePaint.color = value
+                invalidate()
+            }
+        }
+
+    @get:ColorInt
+    @setparam:ColorInt
+    var fogColor: Int
+        get() = delegate.fogPaint.color
+        set(value) {
+            if (delegate.fogPaint.color != value) {
+                delegate.fogPaint.color = value
+                invalidate()
+            }
+        }
 
     init {
+        val framePaint = Paint().apply {
+            style = Paint.Style.FILL
+        }
+        val fogPaint = Paint().apply {
+            style = Paint.Style.FILL
+        }
+        val dragIndicatorPaint = Paint().apply {
+            style = Paint.Style.FILL
+            color = context.getColorCompat(R.color.colorFrameDragIndicator)
+        }
         var frameMaxWidthPercent = resources.getFraction(
             R.fraction.frame_max_width_percent_default, 1, 1
         )
@@ -91,10 +116,13 @@ internal class ScrollFrameView @JvmOverloads constructor(
             )
             isSmoothScrollEnabled = getBoolean(
                 R.styleable.ScrollFrameView_smoothScrollEnabled,
-                true
+                isSmoothScrollEnabled
             )
         }
         delegate = ScrollFrameDelegate(
+            framePaint,
+            fogPaint,
+            dragIndicatorPaint,
             frameCornerRadius,
             frameThicknessHorizontal,
             frameThicknessVertical,
@@ -106,20 +134,6 @@ internal class ScrollFrameView @JvmOverloads constructor(
             isSmoothScrollEnabled,
             onUpdate = ::postInvalidateOnAnimation
         )
-    }
-
-    fun setFrameColor(@ColorInt frameColor: Int) {
-        if (frameColor != framePaint.color) {
-            framePaint.color = frameColor
-            invalidate()
-        }
-    }
-
-    fun setFogColor(@ColorInt fogColor: Int) {
-        if (fogColor != fogPaint.color) {
-            fogPaint.color = fogColor
-            invalidate()
-        }
     }
 
     fun setRange(start: Float, endInclusive: Float, smoothScroll: Boolean = false) {
@@ -158,6 +172,6 @@ internal class ScrollFrameView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        delegate.drawScrollFrame(canvas, framePaint, fogPaint, dragIndicatorPaint)
+        delegate.drawScrollFrame(canvas)
     }
 }

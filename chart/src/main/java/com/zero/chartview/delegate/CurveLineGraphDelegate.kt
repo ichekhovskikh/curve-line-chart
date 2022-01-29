@@ -15,6 +15,7 @@ import com.zero.chartview.tools.xValueToPixel
 import com.zero.chartview.tools.yValueToPixel
 
 internal class CurveLineGraphDelegate(
+    internal val paint: Paint,
     private val onUpdate: () -> Unit
 ) {
 
@@ -27,11 +28,12 @@ internal class CurveLineGraphDelegate(
     internal var range = FloatRange(0f, 1f)
         private set
 
-    private val currentLines get() = animatingLines.map { it.curveLine }
-    val linesAfterAnimate get() = animatingLines.filter { it.isAppearing }.map { it.curveLine }
+    internal val linesAfterAnimate get() = animatingLines
+        .filter { it.isAppearing }
+        .map { it.curveLine }
 
     private val path = Path()
-
+    private val currentLines get() = animatingLines.map { it.curveLine }
     private val animatingLines = mutableListOf<AnimatingCurveLine>()
 
     private var onYAxisChangedListener: ((minY: Float, maxY: Float) -> Unit)? = null
@@ -208,7 +210,7 @@ internal class CurveLineGraphDelegate(
         viewSize = size
     }
 
-    fun drawLines(canvas: Canvas, paint: Paint) {
+    fun drawLines(canvas: Canvas) {
         canvas.drawCurveLines(paint)
     }
 
