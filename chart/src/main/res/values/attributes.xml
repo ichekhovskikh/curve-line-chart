@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="ChartView">
+        <attr name="colorBackground" format="color" />
         <attr name="lineWidth" format="dimension" />
         <attr name="scrollEnabled" format="boolean" />
 
-        <attr name="gridLineWidth" format="dimension" />
-        <attr name="legendLineCount" format="integer" />
-        <attr name="legendTextSize" format="dimension" />
-        <attr name="bottomLegendMargin" format="dimension" />
-        <attr name="startLegendMargin" format="dimension" />
+        <attr name="yLegendLineWidth" format="dimension" />
+        <attr name="yLegendCount" format="integer" />
+        <attr name="yLegendTextSize" format="dimension" />
+        <attr name="yLegendMarginBottom" format="dimension" />
+        <attr name="yLegendMarginStart" format="dimension" />
+        <attr name="yLegendTextColor" format="color" />
+        <attr name="yLegendLineColor" format="color" />
 
-        <attr name="abscissaLegendMarginTop" format="dimension" />
-        <attr name="abscissaLegendCount" format="integer" />
+        <attr name="xLegendTextColor" format="color" />
+        <attr name="xLegendTextSize" format="dimension" />
+        <attr name="xLegendMarginTop" format="dimension" />
+        <attr name="xLegendMarginHorizontalPercent" format="fraction" />
+        <attr name="xLegendCount" format="integer" />
 
-        <attr name="colorBackground" format="color" />
-        <attr name="legendTextColor" format="color" />
-        <attr name="gridColor" format="color" />
         <attr name="colorPopupLine" format="color" />
     </declare-styleable>
 
@@ -25,19 +28,21 @@
     </declare-styleable>
 
     <declare-styleable name="XAxisView" parent="ChartView">
-        <attr name="legendTextSize" />
-        <attr name="abscissaLegendMarginTop" />
-        <attr name="abscissaLegendCount" />
+        <attr name="xLegendTextColor" />
+        <attr name="xLegendTextSize" />
+        <attr name="xLegendMarginTop" />
+        <attr name="xLegendMarginHorizontalPercent" />
+        <attr name="xLegendCount" />
     </declare-styleable>
 
     <declare-styleable name="YAxisView" parent="ChartView">
-        <attr name="legendTextColor" />
-        <attr name="gridColor" />
-        <attr name="legendTextSize" />
-        <attr name="gridLineWidth" />
-        <attr name="legendLineCount" />
-        <attr name="bottomLegendMargin" />
-        <attr name="startLegendMargin" />
+        <attr name="yLegendTextColor" />
+        <attr name="yLegendTextSize" />
+        <attr name="yLegendLineColor" />
+        <attr name="yLegendLineWidth" />
+        <attr name="yLegendCount" />
+        <attr name="yLegendMarginBottom" />
+        <attr name="yLegendMarginStart" />
     </declare-styleable>
 
     <declare-styleable name="ChartSelectorView">

@@ -32,6 +32,8 @@ class CurveLineChartView @JvmOverloads constructor(
 
     private lateinit var chartColors: Themeable.ChartColors
 
+    val range get() = graph.range
+
     var isScrollEnabled
         get() = graph.isScrollEnabled
         set(value) {
@@ -123,14 +125,7 @@ class CurveLineChartView @JvmOverloads constructor(
     }
 
     private fun updateCorrespondingLegends(abscissas: List<Float>, correspondingLegends: Map<Float, String>?) {
-        if (correspondingLegends == null) {
-            val legends = createCorrespondingLegends(abscissas)
-            xAxis.setCorrespondingLegends(legends)
-            popup.setCorrespondingLegends(legends)
-        } else {
-            xAxis.setCorrespondingLegends(correspondingLegends)
-            popup.setCorrespondingLegends(correspondingLegends)
-        }
+        popup.setCorrespondingLegends(correspondingLegends ?: createCorrespondingLegends(abscissas))
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
@@ -178,17 +173,17 @@ class CurveLineChartView @JvmOverloads constructor(
         super.setBackgroundColor(backgroundColor)
     }
 
-    fun setLegendColor(@ColorInt legendColor: Int) {
-        chartColors.colorLegend = legendColor
-        xAxis.setLegendColor(legendColor)
-        yAxis.legendColor = legendColor
+    fun setLegendTextColor(@ColorInt textColor: Int) {
+        chartColors.colorLegend = textColor
+        xAxis.textColor = textColor
+        yAxis.textColor = textColor
         xAxis.invalidate()
         yAxis.invalidate()
     }
 
-    fun setGridColor(@ColorInt gridColor: Int) {
-        chartColors.colorGrid = gridColor
-        yAxis.gridColor = gridColor
+    fun setYLegendLineColor(@ColorInt colorYLegendLine: Int) {
+        chartColors.colorYLegendLine = colorYLegendLine
+        yAxis.lineColor = colorYLegendLine
         yAxis.invalidate()
     }
 
@@ -199,9 +194,9 @@ class CurveLineChartView @JvmOverloads constructor(
     }
 
     private fun onThemeColorChanged() {
-        yAxis.gridColor = chartColors.colorGrid
-        xAxis.setLegendColor(chartColors.colorLegend)
-        yAxis.legendColor = chartColors.colorLegend
+        yAxis.lineColor = chartColors.colorYLegendLine
+        xAxis.textColor = chartColors.colorLegend
+        yAxis.textColor = chartColors.colorLegend
         popup.setPopupLineColor(chartColors.colorPopupLine)
         popup.setPointColor(chartColors.colorBackground)
         window.setBackgroundColor(chartColors.colorBackground)
@@ -215,8 +210,8 @@ class CurveLineChartView @JvmOverloads constructor(
         typedArray.apply {
             val colorBackground =
                 getColor(R.styleable.ChartView_colorBackground, resources.getColor(R.color.colorBackground))
-            val colorLegend = getColor(R.styleable.ChartView_legendTextColor, resources.getColor(R.color.colorLegend))
-            val colorGrid = getColor(R.styleable.ChartView_gridColor, resources.getColor(R.color.colorGrid))
+            val colorLegend = getColor(R.styleable.ChartView_yLegendTextColor, resources.getColor(R.color.colorYLegendText))
+            val colorGrid = getColor(R.styleable.ChartView_yLegendLineColor, resources.getColor(R.color.colorYLegendLine))
             val colorPopupLine =
                 getColor(R.styleable.ChartView_colorPopupLine, resources.getColor(R.color.colorPopupLine))
             return Themeable.ChartColors(colorBackground, colorLegend, colorGrid, colorPopupLine)

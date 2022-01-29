@@ -8,9 +8,9 @@ import com.zero.chartview.axis.formatter.DefaultAxisFormatter
 import com.zero.chartview.extensions.animatingColor
 import com.zero.chartview.extensions.orZero
 import com.zero.chartview.extensions.setDisappearing
-import com.zero.chartview.model.AnimatingLegend
-import com.zero.chartview.model.AnimatingLegendSeries
-import com.zero.chartview.model.AppearingLegendSeries
+import com.zero.chartview.model.AnimatingYLegend
+import com.zero.chartview.model.AnimatingYLegendSeries
+import com.zero.chartview.model.AppearingYLegendSeries
 import com.zero.chartview.model.Size
 import com.zero.chartview.tools.yPixelToValue
 import com.zero.chartview.tools.yValueToPixel
@@ -18,8 +18,10 @@ import kotlin.math.max
 
 internal class YAxisDelegate(
     private var legendCount: Int,
-    private val startLegendMargin: Float,
-    private val bottomLegendMargin: Float,
+    private val legendMarginStart: Float,
+    private val legendMarginBottom: Float,
+    internal val legendPaint: Paint,
+    internal val linePaint: Paint,
     private val onUpdate: () -> Unit
 ) {
 
@@ -28,10 +30,9 @@ internal class YAxisDelegate(
     private var minY = 0f
     private var maxY = 0f
     private var yAxisDistance = 0f
-    private var textHeight = 0f
     private var viewSize = Size()
     private var legendPositions = emptyList<Float>()
-    private var series = mutableListOf<AnimatingLegendSeries>()
+    private var series = mutableListOf<AnimatingYLegendSeries>()
 
     private val tensionAnimator = TensionAnimator { tension, minY, maxY ->
         series.forEach { series ->
@@ -53,7 +54,7 @@ internal class YAxisDelegate(
                 )
             }
         }
-        onUpdate.invoke()
+        onUpdate()
     }.doOnEnd(::removeDisappearingLegendSeries)
 
     private fun removeDisappearingLegendSeries() {
@@ -64,7 +65,7 @@ internal class YAxisDelegate(
 
     fun setLegendCount(legendCount: Int) {
         this.legendCount = legendCount
-        calculateLegendPositions()
+        onLegendPositionsChanged()
         series.find { it.isAppearing }?.let { setYAxis(it.minY, it.maxY) }
     }
 
@@ -80,7 +81,7 @@ internal class YAxisDelegate(
 
         series.forEach { it.setDisappearing() }
         series.add(
-            AppearingLegendSeries(
+            AppearingYLegendSeries(
                 minY = minY,
                 maxY = maxY,
                 legends = legendPositions.toLegends(
@@ -102,43 +103,42 @@ internal class YAxisDelegate(
         )
     }
 
-    fun onMeasure(viewSize: Size, textHeight: Float) {
-        this.textHeight = textHeight
+    fun onMeasure(viewSize: Size) {
         this.viewSize = viewSize
     }
 
     fun onLayout() {
-        calculateLegendPositions()
+        onLegendPositionsChanged()
         series.setLegendPositions(legendPositions)
     }
 
-    private fun calculateLegendPositions() {
+    private fun onLegendPositionsChanged() {
         val availableHeight = viewSize.height
-        val legendHeight = textHeight + bottomLegendMargin
+        val legendHeight = legendPaint.textSize + legendMarginBottom
         val legendHeightWithMargin = (availableHeight - legendHeight) / (legendCount - 1)
         legendPositions = (0 until legendCount).map { index ->
             legendHeightWithMargin * index
         }
     }
 
-    fun drawLegends(canvas: Canvas, legendPaint: Paint, gridPaint: Paint) {
+    fun drawLegends(canvas: Canvas) {
         series.forEach { series ->
-            gridPaint.color = series.animatingColor(gridPaint.color)
+            linePaint.color = series.animatingColor(linePaint.color)
             legendPaint.color = series.animatingColor(legendPaint.color)
             series.legends.forEach { legend ->
                 val yPixel = legend.interpolatedPosition
-                canvas.drawLine(0f, yPixel, viewSize.width.toFloat(), yPixel, gridPaint)
+                canvas.drawLine(0f, yPixel, viewSize.width.toFloat(), yPixel, linePaint)
                 canvas.drawText(
                     legend.label,
-                    startLegendMargin,
-                    yPixel - bottomLegendMargin,
+                    legendMarginStart,
+                    yPixel - legendMarginBottom,
                     legendPaint
                 )
             }
         }
     }
 
-    private fun List<AnimatingLegendSeries>.setLegendPositions(
+    private fun List<AnimatingYLegendSeries>.setLegendPositions(
         legendPositions: List<Float>
     ) = forEach {
         it.legends = legendPositions.toLegends(absoluteMinY = it.minY, absoluteMaxY = it.maxY)
@@ -153,7 +153,7 @@ internal class YAxisDelegate(
         val absoluteDistance = absoluteMaxY - absoluteMinY
         val zoom = if (yAxisDistance == 0f || absoluteDistance == 0f) 1f else yAxisDistance / absoluteDistance
         val absolutePosition = yPixelToValue(it, viewSize.height, absoluteMinY, absoluteMaxY)
-        AnimatingLegend(
+        AnimatingYLegend(
             position = absolutePosition,
             label = axisFormatter.format(absolutePosition, zoom),
             interpolatedPosition = yValueToPixel(

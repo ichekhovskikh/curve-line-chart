@@ -7,7 +7,7 @@ fun convertThemeColorsToChartColors(themeColors: Stainable.ThemeColors): Themeab
     val chartColors = Themeable.ChartColors()
     chartColors.colorBackground = themeColors.colorBackground
     chartColors.colorLegend = themeColors.colorLegend
-    chartColors.colorGrid = themeColors.colorGrid
+    chartColors.colorYLegendLine = themeColors.colorGrid
     chartColors.colorPopupLine = themeColors.colorPopupLine
     chartColors.colorFrameSelector = themeColors.colorFrameSelector
     chartColors.colorFogSelector = themeColors.colorFogSelector
@@ -18,7 +18,7 @@ fun convertChartColorsToThemeColors(chartColors: Themeable.ChartColors): Stainab
     val themeColors = Stainable.ThemeColors()
     themeColors.colorBackground = chartColors.colorBackground
     themeColors.colorLegend = chartColors.colorLegend
-    themeColors.colorGrid = chartColors.colorGrid
+    themeColors.colorGrid = chartColors.colorYLegendLine
     themeColors.colorPopupLine = chartColors.colorPopupLine
     themeColors.colorFrameSelector = chartColors.colorFrameSelector
     themeColors.colorFogSelector = chartColors.colorFogSelector

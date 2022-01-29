@@ -20,12 +20,6 @@ internal class YAxisView @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
 
-    private val legendPaint = Paint()
-
-    private val gridPaint = Paint().apply {
-        style = Paint.Style.STROKE
-    }
-
     private val delegate: YAxisDelegate
 
     var axisFormatter: AxisFormatter
@@ -36,18 +30,18 @@ internal class YAxisView @JvmOverloads constructor(
 
     @get:ColorInt
     @setparam:ColorInt
-    var legendColor: Int
-        get() = legendPaint.color
+    var textColor: Int
+        get() = delegate.legendPaint.color
         set(value) {
-            legendPaint.color = value
+            delegate.legendPaint.color = value
         }
 
     @get:ColorInt
     @setparam:ColorInt
-    var gridColor: Int
-        get() = gridPaint.color
+    var lineColor: Int
+        get() = delegate.linePaint.color
         set(value) {
-            gridPaint.color = value
+            delegate.linePaint.color = value
         }
 
     var legendCount: Int
@@ -55,44 +49,50 @@ internal class YAxisView @JvmOverloads constructor(
         set(value) = delegate.setLegendCount(value)
 
     init {
+        val legendPaint = Paint()
+        val linePaint = Paint().apply {
+            style = Paint.Style.STROKE
+        }
         var legendCount = resources.getInteger(R.integer.legend_line_count_default)
-        var startLegendMargin = resources.getDimension(R.dimen.start_legend_margin_default)
-        var bottomLegendMargin = resources.getDimension(R.dimen.bottom_legend_margin_default)
+        var legendMarginStart = resources.getDimension(R.dimen.start_legend_margin_default)
+        var legendMarginBottom = resources.getDimension(R.dimen.bottom_legend_margin_default)
 
         applyStyledAttributes(attrs, R.styleable.YAxisView, defStyleAttr, defStyleRes) {
             legendCount = getInteger(
-                R.styleable.YAxisView_legendLineCount,
+                R.styleable.YAxisView_yLegendCount,
                 legendCount
             )
-            startLegendMargin = getDimension(
-                R.styleable.YAxisView_startLegendMargin,
-                startLegendMargin
+            legendMarginStart = getDimension(
+                R.styleable.YAxisView_yLegendMarginStart,
+                legendMarginStart
             )
-            bottomLegendMargin = getDimension(
-                R.styleable.YAxisView_bottomLegendMargin,
-                bottomLegendMargin
+            legendMarginBottom = getDimension(
+                R.styleable.YAxisView_yLegendMarginBottom,
+                legendMarginBottom
             )
             legendPaint.color = getColor(
-                R.styleable.YAxisView_legendTextColor,
-                context.getColorCompat(R.color.colorLegend)
+                R.styleable.YAxisView_yLegendTextColor,
+                context.getColorCompat(R.color.colorYLegendText)
             )
             legendPaint.textSize = getDimension(
-                R.styleable.YAxisView_legendTextSize,
+                R.styleable.YAxisView_yLegendTextSize,
                 resources.getDimension(R.dimen.legend_text_size_default)
             )
-            gridPaint.color = getColor(
-                R.styleable.YAxisView_gridColor,
-                context.getColorCompat(R.color.colorGrid)
+            linePaint.color = getColor(
+                R.styleable.YAxisView_yLegendLineColor,
+                context.getColorCompat(R.color.colorYLegendLine)
             )
-            gridPaint.strokeWidth = getDimension(
-                R.styleable.YAxisView_gridLineWidth,
+            linePaint.strokeWidth = getDimension(
+                R.styleable.YAxisView_yLegendLineWidth,
                 resources.getDimension(R.dimen.grid_line_width_default)
             )
         }
         delegate = YAxisDelegate(
             legendCount,
-            startLegendMargin,
-            bottomLegendMargin,
+            legendMarginStart,
+            legendMarginBottom,
+            legendPaint,
+            linePaint,
             onUpdate = ::postInvalidateOnAnimation
         )
     }
@@ -107,7 +107,7 @@ internal class YAxisView @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        delegate.onMeasure(measuredWidth on measuredHeight, legendPaint.textSize)
+        delegate.onMeasure(measuredWidth on measuredHeight)
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -116,6 +116,6 @@ internal class YAxisView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        delegate.drawLegends(canvas, legendPaint, gridPaint)
+        delegate.drawLegends(canvas)
     }
 }

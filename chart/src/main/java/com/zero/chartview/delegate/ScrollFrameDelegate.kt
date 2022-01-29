@@ -20,7 +20,7 @@ internal class ScrollFrameDelegate(
     private val dragIndicatorCornerRadius: Float,
     private val dragIndicatorWidth: Float,
     private val dragIndicatorMaxHeight: Float,
-    var isSmoothScrollEnabled: Boolean,
+    internal var isSmoothScrollEnabled: Boolean,
     private val onUpdate: () -> Unit
 ) {
 
@@ -35,13 +35,14 @@ internal class ScrollFrameDelegate(
     private var activeComponent = ComponentType.NOTHING
     private val onRangeChangedListeners = mutableListOf<(start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit>()
 
-    var range = FloatRange(0f, frameMaxWidthPercent)
+    internal var range = FloatRange(0f, frameMaxWidthPercent)
         private set
 
     private var viewSize = Size()
 
     private val axisAnimator = AxisAnimator(ANIMATION_DURATION_MS) { start, end, _, _ ->
-        updateFrameCounters(FloatRange(start, end))
+        onFrameCountersChanged(FloatRange(start, end))
+        onUpdate()
     }
 
     fun setRange(range: FloatRange, smoothScroll: Boolean = false) {
@@ -51,7 +52,8 @@ internal class ScrollFrameDelegate(
             axisAnimator.reStart(this.range, range)
         } else {
             axisAnimator.cancel()
-            updateFrameCounters(range)
+            onFrameCountersChanged(range)
+            onUpdate()
         }
         this.range = range
         onRangeChanged(range, smoothScroll)
@@ -148,7 +150,7 @@ internal class ScrollFrameDelegate(
 
     fun onMeasure(size: Size) {
         viewSize = size
-        updateFrameCounters(range)
+        onFrameCountersChanged(range)
     }
 
     fun drawScrollFrame(
@@ -226,7 +228,7 @@ internal class ScrollFrameDelegate(
         )
     }
 
-    private fun updateFrameCounters(range: FloatRange) {
+    private fun onFrameCountersChanged(range: FloatRange) {
         val startPixel = xValueToPixel(range.start, viewSize.width, 0f, 1f)
         val endInclusivePixel = xValueToPixel(range.endInclusive, viewSize.width, 0f, 1f)
         frameOuterContour.set(
@@ -259,7 +261,6 @@ internal class ScrollFrameDelegate(
             frameOuterContour.right - dragIndicatorHorizontalOffset,
             dragIndicatorBottom
         )
-        onUpdate.invoke()
     }
 
     private fun Float.pxToPercent() = xPixelToValue(this, viewSize.width, 0f, 1f)

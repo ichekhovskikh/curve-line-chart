@@ -4,8 +4,9 @@
     <color name="colorPrimaryDark">#426381</color>
     <color name="colorAccent">#D81B60</color>
     <color name="colorBackground">#FFFFFF</color>
-    <color name="colorLegend">#9DA4AC</color>
-    <color name="colorGrid">#D3DBE7</color>
+    <color name="colorXLegendText">#9DA4AC</color>
+    <color name="colorYLegendText">#9DA4AC</color>
+    <color name="colorYLegendLine">#D3DBE7</color>
     <color name="colorFrameSelector">#38416990</color>
     <color name="colorFogSelector">#14416990</color>
     <color name="colorFrameDragIndicator">#CCFFFFFF</color>

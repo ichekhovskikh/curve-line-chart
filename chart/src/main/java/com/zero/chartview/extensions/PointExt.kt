@@ -9,7 +9,7 @@ internal fun List<PointF>.getAbscissaBoundaries(interpolatedRange: FloatRange): 
     var left: PointF? = null
     var right: PointF? = null
     val sortedPoints = sortedBy { it.x }
-    sortedPoints.forEachIndexed { index, point ->
+    sortedPoints.forEachIndexed { index, _ ->
         when {
             sortedPoints.isFirstLeftOverRangePoint(index, interpolatedRange) -> {
                 val yValue = getYValue(
@@ -33,7 +33,7 @@ internal fun List<PointF>.getAbscissaBoundaries(interpolatedRange: FloatRange): 
 }
 
 private fun List<PointF>.isFirstLeftOverRangePoint(index: Int, abscissaRange: FloatRange) =
-    index + 1 < size && !abscissaRange.contains(get(index).x) && abscissaRange.contains(get(index + 1).x)
+    index + 1 < size && get(index).x < abscissaRange.start && get(index + 1).x >= abscissaRange.start
 
 private fun List<PointF>.isFirstRightOverRangePoint(index: Int, abscissaRange: FloatRange) =
-    index > 0 && !abscissaRange.contains(get(index).x) && abscissaRange.contains(get(index - 1).x)
+    index > 0 && get(index).x > abscissaRange.endInclusive && get(index - 1).x <= abscissaRange.endInclusive

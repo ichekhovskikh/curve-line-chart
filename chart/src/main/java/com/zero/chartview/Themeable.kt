@@ -9,7 +9,7 @@ interface Themeable {
     data class ChartColors(
         var colorBackground: Int = 0,
         var colorLegend: Int = 0,
-        var colorGrid: Int = 0,
+        var colorYLegendLine: Int = 0,
         var colorPopupLine: Int = 0,
         var colorFrameSelector: Int = 0,
         var colorFogSelector: Int = 0

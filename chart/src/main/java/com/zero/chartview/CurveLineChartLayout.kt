@@ -59,7 +59,7 @@ class CurveLineChartLayout @JvmOverloads constructor(
         val controlColors = selector?.getChartColors()
         chartColors?.apply {
             this@CurveLineChartLayout.chartColors.colorLegend = colorLegend
-            this@CurveLineChartLayout.chartColors.colorGrid = colorGrid
+            this@CurveLineChartLayout.chartColors.colorYLegendLine = colorYLegendLine
             this@CurveLineChartLayout.chartColors.colorPopupLine = colorPopupLine
         }
         controlColors?.apply {

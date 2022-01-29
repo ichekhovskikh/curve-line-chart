@@ -24,7 +24,7 @@ internal class CurveLineGraphDelegate(
     private var minYAfterAnimate = 0f
     private var viewSize = Size()
 
-    var range = FloatRange(0f, 1f)
+    internal var range = FloatRange(0f, 1f)
         private set
 
     private val currentLines get() = animatingLines.map { it.curveLine }
@@ -45,7 +45,7 @@ internal class CurveLineGraphDelegate(
         animatingLines.forEach { line ->
             if (line.animationValue <= value) {
                 line.animationValue = value
-                onUpdate.invoke()
+                onUpdate()
             }
         }
     }.doOnEnd(::removeDisappearingLines)
@@ -59,7 +59,7 @@ internal class CurveLineGraphDelegate(
         animatingLines.forEach { line ->
             line.interpolatedPoints = transformAxis(line.curveLine.points, interpolatedRange)
         }
-        onUpdate.invoke()
+        onUpdate()
     }
 
     private fun removeDisappearingLines() {
@@ -206,7 +206,6 @@ internal class CurveLineGraphDelegate(
 
     fun onMeasure(size: Size) {
         viewSize = size
-        onUpdate.invoke()
     }
 
     fun drawLines(canvas: Canvas, paint: Paint) {

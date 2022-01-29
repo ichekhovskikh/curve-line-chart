@@ -42,7 +42,8 @@
                 android:id="@+id/chart"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                app:startLegendMargin="8dp"
+                app:yLegendMarginStart="8dp"
+                app:xLegendMarginHorizontalPercent="30%"
                 app:scrollEnabled="true" />
 
         <com.zero.chartview.selector.CurveLineSelectorView
