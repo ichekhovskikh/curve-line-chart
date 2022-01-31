@@ -71,7 +71,7 @@ internal class ScrollFrameDelegate(
     }
 
     private fun onRangeChanged(range: FloatRange, smoothScroll: Boolean) {
-        onRangeChangedListeners.forEach { it.invoke(range.start, range.endInclusive, smoothScroll) }
+        onRangeChangedListeners.forEach { it(range.start, range.endInclusive, smoothScroll) }
     }
 
     fun onActionDown(event: MotionEvent) {

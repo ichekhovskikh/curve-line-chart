@@ -13,4 +13,5 @@
     <color name="colorSelectorFrame">#803E5D79</color>
     <color name="colorSelectorFog">#B3141C32</color>
     <color name="colorPopupLine">#B3141C32</color>
+    <color name="colorPopupLinePointInner">#1D2733</color>
 </resources>

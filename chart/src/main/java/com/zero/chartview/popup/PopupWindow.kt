@@ -13,6 +13,7 @@ import com.zero.chartview.model.CurveLine
 import kotlinx.android.synthetic.main.popup_window.view.*
 import android.view.animation.AnimationUtils
 import com.zero.chartview.axis.formatter.ShortAxisFormatter
+import com.zero.chartview.model.IntersectionPoint
 import com.zero.chartview.tools.AnimatorListenerAdapter
 
 internal class PopupWindow @JvmOverloads constructor(
@@ -54,14 +55,14 @@ internal class PopupWindow @JvmOverloads constructor(
         }
     }
 
-    fun fill(xPixel: Float?, pointsLine: List<PopupLineView.ChartPoint>) {
+    fun fill(xPixel: Float?, pointsLine: List<IntersectionPoint>) {
         coordinateViews.forEach { view ->
             val nameView: TextView = view.findViewById(R.id.name)
             val chartPoint = pointsLine.getByName(nameView.text.toString())
             if (chartPoint != null) {
                 val xValueView: TextView = view.findViewById(R.id.xValue)
                 val yValueView: TextView = view.findViewById(R.id.yValue)
-                xValueView.text = chartPoint.correspondingLegend
+                xValueView.text = axisFormatter.format(chartPoint.x, 1f)
                 yValueView.text = axisFormatter.format(chartPoint.y, 1f)
             }
             val isAppearing = chartPoint != null
@@ -103,5 +104,5 @@ internal class PopupWindow @JvmOverloads constructor(
         windowView.setBackgroundColor(color)
     }
 
-    private fun List<PopupLineView.ChartPoint>.getByName(name: String) = this.find { it.name == name }
+    private fun List<IntersectionPoint>.getByName(name: String) = this.find { it.lineName == name }
 }

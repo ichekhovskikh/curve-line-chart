@@ -24,3 +24,9 @@ internal fun View.applyStyledAttributes(
         recycle()
     }
 }
+
+internal var View.isVisible
+    get() = visibility == View.VISIBLE
+    set(value) {
+        visibility = if (value) View.VISIBLE else View.GONE
+    }

@@ -10,4 +10,5 @@
     <color name="colorSelectorFog">#14416990</color>
     <color name="colorFrameDragIndicator">#CCFFFFFF</color>
     <color name="colorPopupLine">#EBF0F3</color>
+    <color name="colorPopupLinePointInner">#FFFFFF</color>
 </resources>

@@ -30,8 +30,8 @@ internal class XAxisDelegate(
 
     private val legendPath = Path()
     private var viewSize = Size()
-    private var abscissas: List<Float> = emptyList()
-    private var legends: List<XLegend> = emptyList()
+    private var abscissas = emptyList<Float>()
+    private var legends = emptyList<XLegend>()
 
     internal var axisFormatter: AxisFormatter = DefaultAxisFormatter()
 
@@ -43,7 +43,7 @@ internal class XAxisDelegate(
             onUpdate()
         }
 
-    internal var range: FloatRange = FloatRange(0f, 1f)
+    internal var range = FloatRange(0f, 1f)
         private set
 
     internal val legendTextHeightUsed

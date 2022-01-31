@@ -3,24 +3,20 @@ package com.zero.chartview.popup
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.PointF
 import androidx.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import androidx.annotation.Px
 import com.zero.chartview.R
-import com.zero.chartview.axis.formatter.ShortAxisFormatter
+import com.zero.chartview.delegate.PopupLineDelegate
 import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.extensions.getColorCompat
-import com.zero.chartview.extensions.interpolateByLineAbscissas
-import com.zero.chartview.extensions.getMinMaxY
+import com.zero.chartview.extensions.isVisible
+import com.zero.chartview.extensions.on
 import com.zero.chartview.model.CurveLine
-import com.zero.chartview.model.FloatRange
 import com.zero.chartview.model.PercentRange
-import com.zero.chartview.tools.*
-import kotlin.math.abs
 
 internal class PopupLineView @JvmOverloads constructor(
     context: Context,
@@ -29,140 +25,116 @@ internal class PopupLineView @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
 
-    private var pointInnerRadius = resources.getDimension(R.dimen.point_inner_radius)
-    private var pointOuterRadius = resources.getDimension(R.dimen.point_outer_radius)
-    private var pointColor = Color.WHITE
+    private val delegate: PopupLineDelegate
 
-    private val linePaint = Paint()
-    private val pointPaint = Paint()
+    var popupWindow: PopupView? = null
 
-    private val axisFormatter = ShortAxisFormatter()
+    @get:ColorInt
+    @setparam:ColorInt
+    var lineColor: Int
+        get() = delegate.linePaint.color
+        set(value) {
+            if (delegate.linePaint.color != value) {
+                delegate.linePaint.color = value
+                invalidate()
+            }
+        }
 
-    private var range = FloatRange(0F, 1F)
+    @get:ColorInt
+    @setparam:ColorInt
+    var pointInnerColor: Int
+        get() = delegate.pointInnerPaint.color
+        set(value) {
+            if (delegate.pointInnerPaint.color != value) {
+                delegate.pointInnerPaint.color = value
+                invalidate()
+            }
+        }
 
-    private lateinit var lines: List<CurveLine>
-    private lateinit var correspondingLegends: Map<Float, String>
-
-    var popupWindow: PopupWindow? = null
-
-    private var epsilonXPercent = resources.getFraction(R.fraction.epsilon_x_tracking_touch, 1, 1)
-    private var dyStopTrackingTouch = resources.getDimension(R.dimen.dy_stop_tracking_touch)
-    private var touchX: Float? = null
-    private var touchY: Float = 0f
+    @get:Px
+    @setparam:Px
+    var lineWidth: Float
+        get() = delegate.linePaint.strokeWidth
+        set(value) {
+            if (delegate.linePaint.strokeWidth != value) {
+                delegate.linePaint.strokeWidth = value
+                invalidate()
+            }
+        }
 
     init {
-        linePaint.color = context.getColorCompat(R.color.colorPopupLine)
-        linePaint.strokeWidth = resources.getDimension(R.dimen.popup_line_width)
-        pointPaint.style = Paint.Style.FILL
+        val linePaint = Paint()
+        val pointInnerPaint = Paint().apply {
+            style = Paint.Style.FILL
+        }
+        val pointOuterPaint = Paint().apply {
+            style = Paint.Style.FILL
+        }
+        val pointInnerRadius = resources.getDimension(R.dimen.point_inner_radius)
+        val pointOuterRadius = resources.getDimension(R.dimen.point_outer_radius)
+        val deltaTrackingTouchPercent = resources.getFraction(
+            R.fraction.delta_tracking_touch_percent,
+            1,
+            1
+        )
         applyStyledAttributes(attrs, R.styleable.CurveLineChartView, defStyleAttr, defStyleRes) {
             linePaint.color = getColor(
                 R.styleable.CurveLineChartView_popupLineColor,
                 context.getColorCompat(R.color.colorPopupLine)
             )
+            pointInnerPaint.color = getColor(
+                R.styleable.CurveLineChartView_popupLinePointInnerColor,
+                context.getColorCompat(R.color.colorPopupLinePointInner)
+            )
+            linePaint.strokeWidth = getDimensionPixelSize(
+                R.styleable.CurveLineChartView_popupLineWidth,
+                resources.getDimensionPixelSize(R.dimen.popup_line_width)
+            ).toFloat()
+        }
+        delegate = PopupLineDelegate(
+            linePaint,
+            pointInnerPaint,
+            pointOuterPaint,
+            pointInnerRadius,
+            pointOuterRadius,
+            deltaTrackingTouchPercent,
+            onUpdate = ::postInvalidateOnAnimation
+        )
+        setupListeners()
+    }
+
+    private fun setupListeners() {
+        delegate.addOnIntersectionsChangedListener {
+            popupWindow?.isVisible = it.isNotEmpty()
+            popupWindow?.bind(it)
         }
     }
 
     fun setRange(start: Float, endInclusive: Float) {
-        range = PercentRange(start, endInclusive)
-        popupWindow?.visibility = GONE
-        touchX = null
-        postInvalidateOnAnimation()
+        delegate.setRange(PercentRange(start, endInclusive))
     }
 
     fun setLines(lines: List<CurveLine>) {
-        this.lines = lines
-        popupWindow?.setLines(lines)
-        popupWindow?.visibility = GONE
-        touchX = null
-        postInvalidateOnAnimation()
-    }
-
-    fun setCorrespondingLegends(correspondingLegends: Map<Float, String>) {
-        this.correspondingLegends = correspondingLegends
+        delegate.setLines(lines)
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        when (event.actionMasked) {
-            MotionEvent.ACTION_DOWN -> {
-                touchX = event.x
-                touchY = event.y
-            }
-            MotionEvent.ACTION_MOVE -> {
-                popupWindow?.visibility = GONE
-                touchX = null
-            }
-        }
-        postInvalidateOnAnimation()
-        return false
+    override fun onTouchEvent(event: MotionEvent) = when {
+        delegate.onTouchEvent(event) -> true
+        else -> super.onTouchEvent(event)
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        delegate.onMeasure(measuredWidth on measuredHeight)
+    }
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+        delegate.onLayout()
     }
 
     override fun onDraw(canvas: Canvas) {
-        val x = touchX ?: return
-        val (startValue, endValue) = range.interpolateByLineAbscissas(lines)
-        val (minY, maxY) = lines.getMinMaxY(range)
-        val intersectionPoints = getIntersectionPoint(x, startValue, endValue)
-        if (intersectionPoints.isNotEmpty()) {
-            val intersectionXValue = intersectionPoints.first().x
-            val xDrawPixel = xValueToPixel(intersectionXValue, measuredWidth, startValue, endValue)
-            canvas.drawLine(xDrawPixel, 0F, xDrawPixel, height.toFloat(), linePaint)
-            intersectionPoints.forEach {
-                val yDrawPixel = yValueToPixel(it.y, measuredHeight, minY, maxY)
-                drawIntersectionPoint(canvas, xDrawPixel, yDrawPixel, it.color)
-            }
-            popupWindow?.fill(touchX, intersectionPoints)
-        } else {
-            popupWindow?.visibility = GONE
-        }
+        delegate.drawPopupLine(canvas)
     }
-
-    private fun drawIntersectionPoint(canvas: Canvas, x: Float, y: Float, outerColor: Int) {
-        pointPaint.color = outerColor
-        canvas.drawCircle(x, y, pointOuterRadius, pointPaint)
-        pointPaint.color = pointColor
-        canvas.drawCircle(x, y, pointInnerRadius, pointPaint)
-    }
-
-    private fun getIntersectionPoint(xPixel: Float, minX: Float, maxX: Float): List<ChartPoint> {
-        val xValue = xPixelToValue(xPixel, measuredWidth, minX, maxX)
-        val points = mutableListOf<ChartPoint>()
-        var minDistance = (maxX - minX) * epsilonXPercent
-        var nearestX: Float? = null
-        lines.forEach { line ->
-            line.points.forEach { point ->
-                points.add(ChartPoint(line.name, line.color, point.x, point.y, getIntersectionLegend(point)))
-                val distance = abs(xValue - point.x)
-                if (distance <= minDistance) {
-                    nearestX = point.x
-                    minDistance = distance
-                }
-            }
-        }
-        return points.filter { it.x == nearestX }
-    }
-
-    private fun getIntersectionLegend(point: PointF) =
-        if (::correspondingLegends.isInitialized) correspondingLegends[point.x] ?: ""
-        else axisFormatter.format(point.x, 1f)
-
-    fun setPointColor(@ColorInt pointColor: Int) {
-        if (pointColor != this.pointColor) {
-            this.pointColor = pointColor
-        }
-    }
-
-    fun setPopupLineColor(@ColorInt popupLineColor: Int) {
-        if (popupLineColor != linePaint.color) {
-            linePaint.color = popupLineColor
-            invalidate()
-        }
-    }
-
-    data class ChartPoint(
-        var name: String,
-        var color: Int,
-        var x: Float,
-        var y: Float,
-        var correspondingLegend: String
-    )
 }

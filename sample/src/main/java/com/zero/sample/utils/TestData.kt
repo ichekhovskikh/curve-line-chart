@@ -6,7 +6,7 @@ import com.zero.chartview.model.CurveLine
 
 val testLines = listOf(
     CurveLine(
-        Color.parseColor("#3DC23F"), "green", listOf(
+        "green", Color.parseColor("#3DC23F"), listOf(
             PointF(1542412800000f, 37f),
             PointF(1542499200000f, 20f),
             PointF(1542585600000f, 32f),
@@ -76,7 +76,7 @@ val testLines = listOf(
         )
     ),
     CurveLine(
-        Color.parseColor("#F34C44"), "red", listOf(
+        "red", Color.parseColor("#F34C44"), listOf(
             PointF(1544140800000f, 48f),
             PointF(1544227200000f, 32f),
             PointF(1544313600000f, 40f),

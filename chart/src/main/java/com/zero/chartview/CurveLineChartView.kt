@@ -5,6 +5,7 @@ import androidx.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.FrameLayout
+import androidx.annotation.Px
 import com.zero.chartview.axis.YAxisView
 import com.zero.chartview.axis.XAxisView
 import com.zero.chartview.axis.formatter.AxisFormatter
@@ -13,7 +14,6 @@ import com.zero.chartview.extensions.ordinates
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.popup.PopupLineView
 import com.zero.chartview.popup.PopupWindow
-import com.zero.chartview.tools.*
 
 class CurveLineChartView @JvmOverloads constructor(
     context: Context,
@@ -48,10 +48,20 @@ class CurveLineChartView @JvmOverloads constructor(
             yAxis.axisFormatter = value
         }
 
+    @get:Px
+    @setparam:Px
     var lineWidth: Float
         get() = graph.lineWidth
         set(value) {
             graph.lineWidth = value
+        }
+
+    @get:Px
+    @setparam:Px
+    var popupLineWidth: Float
+        get() = popup.lineWidth
+        set(value) {
+            popup.lineWidth = value
         }
 
     var yAxisLegendCount: Int
@@ -72,7 +82,7 @@ class CurveLineChartView @JvmOverloads constructor(
         addView(graph)
         addView(popup)
         addView(window)
-        popup.popupWindow = window
+        // TODO popup.popupView = window
         graph.setOnYAxisChangedListener(yAxis::setYAxis)
         graph.addOnRangeChangedListener { start: Float, endInclusive: Float, smoothScroll: Boolean ->
             xAxis.setRange(start, endInclusive, smoothScroll)
@@ -86,23 +96,21 @@ class CurveLineChartView @JvmOverloads constructor(
 
     fun getLines() = graph.getLines()
 
-    fun setLines(lines: List<CurveLine>, correspondingLegends: Map<Float, String>? = null) {
+    fun setLines(lines: List<CurveLine>) {
         val abscissas = lines.abscissas
         graph.setLines(lines)
         popup.setLines(lines)
         yAxis.setOrdinates(lines.ordinates)
         xAxis.setAbscissas(abscissas)
-        updateCorrespondingLegends(abscissas, correspondingLegends)
     }
 
-    fun addLine(line: CurveLine, correspondingLegends: Map<Float, String>? = null) {
+    fun addLine(line: CurveLine) {
         val lines = graph.getLines() + line
         val abscissas = lines.abscissas
         graph.addLine(line)
         popup.setLines(lines)
         yAxis.setOrdinates(lines.ordinates)
         xAxis.setAbscissas(abscissas)
-        updateCorrespondingLegends(abscissas, correspondingLegends)
     }
 
     fun removeLine(index: Int) {
@@ -132,10 +140,6 @@ class CurveLineChartView @JvmOverloads constructor(
 
     fun removeOnRangeChangedListener(onRangeChangedListener: (start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit) {
         graph.removeOnRangeChangedListener(onRangeChangedListener)
-    }
-
-    private fun updateCorrespondingLegends(abscissas: List<Float>, correspondingLegends: Map<Float, String>?) {
-        popup.setCorrespondingLegends(correspondingLegends ?: createCorrespondingLegends(abscissas))
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
@@ -182,6 +186,10 @@ class CurveLineChartView @JvmOverloads constructor(
     }
 
     fun setPopupLineColor(@ColorInt popupLineColor: Int) {
-        popup.setPopupLineColor(popupLineColor)
+        popup.lineColor = popupLineColor
+    }
+
+    fun setPopupLinePointInnerColor(@ColorInt popupLinePointInnerColor: Int) {
+        popup.pointInnerColor = popupLinePointInnerColor
     }
 }

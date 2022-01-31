@@ -157,11 +157,11 @@ internal class CurveLineGraphDelegate(
     }
 
     private fun onLinesChanged(lines: List<CurveLine>) {
-        onLinesChangedListeners.forEach { it.invoke(lines) }
+        onLinesChangedListeners.forEach { it(lines) }
     }
 
     private fun onRangeChanged(range: FloatRange, smoothScroll: Boolean) {
-        onRangeChangedListeners.forEach { it.invoke(range.start, range.endInclusive, smoothScroll) }
+        onRangeChangedListeners.forEach { it(range.start, range.endInclusive, smoothScroll) }
     }
 
     fun onTouchEvent(event: MotionEvent) = when (event.actionMasked) {
