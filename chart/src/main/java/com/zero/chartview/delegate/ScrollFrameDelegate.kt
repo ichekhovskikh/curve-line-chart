@@ -115,11 +115,11 @@ internal class ScrollFrameDelegate(
     }
 
     private fun setLeftCurtainPosition(abscissa: Float) {
-        setRange(range.copy(start = abscissa.pxToPercent()))
+        setRange(range.copy(start = max(0f, abscissa.pxToPercent())))
     }
 
     private fun setRightCurtainPosition(abscissa: Float) {
-        setRange(range.copy(endInclusive = abscissa.pxToPercent()))
+        setRange(range.copy(endInclusive = min(1f, abscissa.pxToPercent())))
     }
 
     private fun moveFrame(abscissa: Float) {
