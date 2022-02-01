@@ -1,14 +1,8 @@
 package com.zero.chartview.tools
 
 import android.animation.Animator
-import android.view.animation.Animation
 
-internal open class AnimatorListenerAdapter : Animator.AnimatorListener, Animation.AnimationListener {
-    override fun onAnimationRepeat(animation: Animation?) {}
-
-    override fun onAnimationEnd(animation: Animation?) {}
-
-    override fun onAnimationStart(animation: Animation?) {}
+internal open class AnimatorListenerAdapter : Animator.AnimatorListener {
 
     override fun onAnimationRepeat(animation: Animator?) {}
 

@@ -80,9 +80,6 @@ internal class XAxisDelegate(
 
     fun onMeasure(viewSize: Size) {
         this.viewSize = viewSize
-    }
-
-    fun onLayout() {
         onXLegendsChanged()
     }
 

@@ -1,19 +1,19 @@
 package com.zero.chartview
 
 import android.content.Context
-import androidx.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.FrameLayout
+import androidx.annotation.ColorInt
 import androidx.annotation.Px
-import com.zero.chartview.axis.YAxisView
 import com.zero.chartview.axis.XAxisView
+import com.zero.chartview.axis.YAxisView
 import com.zero.chartview.axis.formatter.AxisFormatter
-import com.zero.chartview.extensions.abscissas
-import com.zero.chartview.extensions.ordinates
+import com.zero.chartview.extensions.*
+import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.popup.PopupLineView
-import com.zero.chartview.popup.PopupWindow
+import com.zero.chartview.popup.PopupView
 
 class CurveLineChartView @JvmOverloads constructor(
     context: Context,
@@ -25,8 +25,18 @@ class CurveLineChartView @JvmOverloads constructor(
     private val graph = CurveLineGraphView(context, attrs, defStyleAttr, defStyleRes)
     private val yAxis = YAxisView(context, attrs, defStyleAttr, defStyleRes)
     private val xAxis = XAxisView(context, attrs, defStyleAttr, defStyleRes)
-    private val popup = PopupLineView(context, attrs, defStyleAttr, defStyleRes)
-    private val window = PopupWindow(context, attrs, defStyleAttr, defStyleRes)
+    private val popupLine = PopupLineView(context, attrs, defStyleAttr, defStyleRes)
+
+    var popupView: PopupView?
+        get() = popupLine.popupView
+        set(value) {
+            popupLine.popupView?.let(::removeView)
+            popupLine.popupView = null
+            value?.let { view ->
+                addView(view)
+                popupLine.popupView = view
+            }
+        }
 
     val range get() = graph.range
 
@@ -59,9 +69,9 @@ class CurveLineChartView @JvmOverloads constructor(
     @get:Px
     @setparam:Px
     var popupLineWidth: Float
-        get() = popup.lineWidth
+        get() = popupLine.lineWidth
         set(value) {
-            popup.lineWidth = value
+            popupLine.lineWidth = value
         }
 
     var yAxisLegendCount: Int
@@ -80,13 +90,21 @@ class CurveLineChartView @JvmOverloads constructor(
         addView(xAxis)
         addView(yAxis)
         addView(graph)
-        addView(popup)
-        addView(window)
-        // TODO popup.popupView = window
+        addView(popupLine)
+
+        applyStyledAttributes(attrs, R.styleable.CurveLineChartView, defStyleAttr, defStyleRes) {
+            popupView = PopupView(
+                parent = this@CurveLineChartView,
+                className = getString(R.styleable.CurveLineChartView_popupView),
+                attrs = attrs,
+                defStyleAttr = defStyleAttr,
+                defStyleRes = defStyleRes
+            )
+        }
         graph.setOnYAxisChangedListener(yAxis::setYAxis)
         graph.addOnRangeChangedListener { start: Float, endInclusive: Float, smoothScroll: Boolean ->
             xAxis.setRange(start, endInclusive, smoothScroll)
-            popup.setRange(start, endInclusive)
+            popupLine.setRange(start, endInclusive)
         }
     }
 
@@ -99,7 +117,7 @@ class CurveLineChartView @JvmOverloads constructor(
     fun setLines(lines: List<CurveLine>) {
         val abscissas = lines.abscissas
         graph.setLines(lines)
-        popup.setLines(lines)
+        popupLine.setLines(lines)
         yAxis.setOrdinates(lines.ordinates)
         xAxis.setAbscissas(abscissas)
     }
@@ -108,7 +126,7 @@ class CurveLineChartView @JvmOverloads constructor(
         val lines = graph.getLines() + line
         val abscissas = lines.abscissas
         graph.addLine(line)
-        popup.setLines(lines)
+        popupLine.setLines(lines)
         yAxis.setOrdinates(lines.ordinates)
         xAxis.setAbscissas(abscissas)
     }
@@ -121,7 +139,7 @@ class CurveLineChartView @JvmOverloads constructor(
     fun removeLine(line: CurveLine) {
         val lines = graph.getLines() - line
         graph.removeLine(line)
-        popup.setLines(lines)
+        popupLine.setLines(lines)
         yAxis.setOrdinates(lines.ordinates)
         xAxis.setAbscissas(lines.abscissas)
     }
@@ -143,7 +161,7 @@ class CurveLineChartView @JvmOverloads constructor(
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
-        popup.dispatchTouchEvent(event)
+        popupLine.dispatchTouchEvent(event)
         return super.dispatchTouchEvent(event)
     }
 
@@ -165,7 +183,7 @@ class CurveLineChartView @JvmOverloads constructor(
             legendTextHeightUsed
         )
         measureChildWithMargins(
-            popup,
+            popupLine,
             widthMeasureSpec,
             0,
             heightMeasureSpec,
@@ -186,10 +204,10 @@ class CurveLineChartView @JvmOverloads constructor(
     }
 
     fun setPopupLineColor(@ColorInt popupLineColor: Int) {
-        popup.lineColor = popupLineColor
+        popupLine.lineColor = popupLineColor
     }
 
     fun setPopupLinePointInnerColor(@ColorInt popupLinePointInnerColor: Int) {
-        popup.pointInnerColor = popupLinePointInnerColor
+        popupLine.pointInnerColor = popupLinePointInnerColor
     }
 }

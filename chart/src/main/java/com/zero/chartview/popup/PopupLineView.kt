@@ -11,9 +11,9 @@ import android.view.View
 import androidx.annotation.Px
 import com.zero.chartview.R
 import com.zero.chartview.delegate.PopupLineDelegate
+import com.zero.chartview.extensions.*
 import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.extensions.getColorCompat
-import com.zero.chartview.extensions.isVisible
 import com.zero.chartview.extensions.on
 import com.zero.chartview.model.CurveLine
 import com.zero.chartview.model.PercentRange
@@ -27,7 +27,17 @@ internal class PopupLineView @JvmOverloads constructor(
 
     private val delegate: PopupLineDelegate
 
-    var popupWindow: PopupView? = null
+    var popupView: PopupView? = null
+        set(value) {
+            field = value
+            when (value) {
+                null -> delegate.setOnIntersectionsChangedListener(null)
+                else -> delegate.setOnIntersectionsChangedListener { x, intersections ->
+                    popupView?.isInvisible = intersections.isEmpty()
+                    popupView?.bind(x, intersections)
+                }
+            }
+        }
 
     @get:ColorInt
     @setparam:ColorInt
@@ -100,14 +110,6 @@ internal class PopupLineView @JvmOverloads constructor(
             deltaTrackingTouchPercent,
             onUpdate = ::postInvalidateOnAnimation
         )
-        setupListeners()
-    }
-
-    private fun setupListeners() {
-        delegate.addOnIntersectionsChangedListener {
-            popupWindow?.isVisible = it.isNotEmpty()
-            popupWindow?.bind(it)
-        }
     }
 
     fun setRange(start: Float, endInclusive: Float) {
@@ -127,11 +129,6 @@ internal class PopupLineView @JvmOverloads constructor(
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         delegate.onMeasure(measuredWidth on measuredHeight)
-    }
-
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        super.onLayout(changed, left, top, right, bottom)
-        delegate.onLayout()
     }
 
     override fun onDraw(canvas: Canvas) {

@@ -21,6 +21,7 @@
         <attr name="popupLineColor" format="color" />
         <attr name="popupLinePointInnerColor" format="color" />
         <attr name="popupLineWidth" format="dimension" />
+        <attr name="popupView" format="string" />
     </declare-styleable>
 
     <declare-styleable name="CurveLineGraphView" parent="CurveLineChartView">

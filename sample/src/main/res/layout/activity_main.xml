@@ -35,6 +35,7 @@
                 app:yLegendLineColor="@color/colorYLegendLine"
                 app:popupLineColor="@color/colorPopupLine"
                 app:popupLinePointInnerColor="@color/colorPopupLinePointInner"
+                app:popupView="com.zero.sample.PopupWindow"
                 app:scrollEnabled="true" />
 
         <com.zero.chartview.selector.CurveLineSelectorView

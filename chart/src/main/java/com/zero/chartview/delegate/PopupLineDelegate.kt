@@ -33,7 +33,7 @@ internal class PopupLineDelegate(
     private val intersections
         get() = popupLine?.intersections?.map { it.point }.orEmpty()
 
-    private val onIntersectionsChangedListeners = mutableListOf<(List<IntersectionPoint>) -> Unit>()
+    private var onIntersectionsChanged: ((xPixel: Float?, intersections: List<IntersectionPoint>) -> Unit)? = null
 
     fun setRange(range: FloatRange) {
         this.range = range
@@ -49,16 +49,15 @@ internal class PopupLineDelegate(
         onUpdate()
     }
 
-    fun addOnIntersectionsChangedListener(onIntersectionsChangedListener: (List<IntersectionPoint>) -> Unit) {
-        onIntersectionsChangedListeners.add(onIntersectionsChangedListener)
-    }
-
-    fun removeOnIntersectionsChangedListener(onIntersectionsChangedListener: (List<IntersectionPoint>) -> Unit) {
-        onIntersectionsChangedListeners.remove(onIntersectionsChangedListener)
+    fun setOnIntersectionsChangedListener(
+        onIntersectionsChangedListener: ((xPixel: Float?, intersections: List<IntersectionPoint>) -> Unit)?
+    ) {
+        onIntersectionsChanged = onIntersectionsChangedListener
+        onIntersectionsChanged()
     }
 
     private fun onIntersectionsChanged() {
-        onIntersectionsChangedListeners.forEach { it(intersections) }
+        onIntersectionsChanged?.invoke(popupLine?.xDrawPixel, intersections)
     }
 
     fun onTouchEvent(event: MotionEvent) = when (event.actionMasked) {
@@ -79,11 +78,6 @@ internal class PopupLineDelegate(
 
     fun onMeasure(viewSize: Size) {
         this.viewSize = viewSize
-    }
-
-    fun onLayout() {
-        touchX = null
-        onPopupLineChanged()
     }
 
     private fun onPopupLineChanged() {

@@ -121,11 +121,6 @@ internal class YAxisView @JvmOverloads constructor(
         delegate.onMeasure(measuredWidth on measuredHeight)
     }
 
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        super.onLayout(changed, left, top, right, bottom)
-        delegate.onLayout()
-    }
-
     override fun onDraw(canvas: Canvas) {
         delegate.drawLegends(canvas)
     }

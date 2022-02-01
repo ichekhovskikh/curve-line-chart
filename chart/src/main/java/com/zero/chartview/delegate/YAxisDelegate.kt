@@ -105,9 +105,6 @@ internal class YAxisDelegate(
 
     fun onMeasure(viewSize: Size) {
         this.viewSize = viewSize
-    }
-
-    fun onLayout() {
         onLegendPositionsChanged()
         series.setLegendPositions(legendPositions)
     }

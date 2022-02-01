@@ -25,8 +25,11 @@ internal fun View.applyStyledAttributes(
     }
 }
 
-internal var View.isVisible
-    get() = visibility == View.VISIBLE
+internal var View.isInvisible
+    get() = visibility == View.INVISIBLE
     set(value) {
-        visibility = if (value) View.VISIBLE else View.GONE
+        visibility = if (value) View.INVISIBLE else View.VISIBLE
     }
+
+internal val View.classLoader: ClassLoader?
+    get() = if (isInEditMode) this.javaClass.classLoader else context.classLoader
