@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.CheckBox
 import android.widget.LinearLayout
-import com.zero.chartview.CurveLineChartView
 import com.zero.chartview.model.CurveLine
 
 class ChartLabelsView @JvmOverloads constructor(
@@ -17,44 +16,41 @@ class ChartLabelsView @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr, defStyleRes) {
 
-    var chart: CurveLineChartView? = null
-    private var items = mutableListOf<View>()
+    private var onCheckboxChanged: ((isChecked: Boolean, line: CurveLine) -> Unit)? = null
 
     init {
         orientation = VERTICAL
     }
 
-    fun addLineLabel(line: CurveLine) {
-        if (chart == null) return
-        val itemView = createLabelItem(line)
-        items.add(itemView)
-        addView(itemView)
+    fun setOnCheckboxChangedListener(onCheckboxChangedListener: ((isChecked: Boolean, line: CurveLine) -> Unit)?) {
+        onCheckboxChanged = onCheckboxChangedListener
     }
 
-    private fun createLabelItem(line: CurveLine): View {
-        val itemView = LayoutInflater.from(context).inflate(R.layout.item_label, this, false)
-        val labelCheckbox = itemView.findViewById<CheckBox>(R.id.labelCheckbox).apply {
-            buttonTintList = getColorStateList(line)
+    fun addLabel(line: CurveLine) {
+        addView(createLabel(line))
+    }
+
+    private fun createLabel(line: CurveLine): View {
+        val flLabel = LayoutInflater
+            .from(context)
+            .inflate(R.layout.view_item_label, this, false)
+
+        val cbLabel = flLabel.findViewById<CheckBox>(R.id.cbLabel).apply {
+            buttonTintList = line.color.toColorStateList()
             text = line.name
             isChecked = true
-            chart?.addLine(line)
+            onCheckboxChanged?.invoke(isChecked, line)
         }
-        itemView.setOnClickListener {
-            if (labelCheckbox.isChecked) {
-                labelCheckbox.isChecked = false
-                chart?.removeLine(line)
-            } else {
-                labelCheckbox.isChecked = true
-                chart?.addLine(line)
-
-            }
+        flLabel.setOnClickListener {
+            cbLabel.isChecked = !cbLabel.isChecked
+            onCheckboxChanged?.invoke(cbLabel.isChecked, line)
         }
-        return itemView
+        return flLabel
     }
 
-    private fun getColorStateList(line: CurveLine): ColorStateList {
+    private fun Int.toColorStateList(): ColorStateList {
         val states = arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf())
-        val colors = intArrayOf(line.color, line.color)
+        val colors = intArrayOf(this, this)
         return ColorStateList(states, colors)
     }
 }

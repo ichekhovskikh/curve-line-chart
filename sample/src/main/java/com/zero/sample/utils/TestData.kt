@@ -4,9 +4,14 @@ import android.graphics.Color
 import android.graphics.PointF
 import com.zero.chartview.model.CurveLine
 
-val testLines = listOf(
+private val greenColor get() = Color.parseColor("#3DC23F")
+private val redColor get() = Color.parseColor("#F34C44")
+
+internal val testLines = listOf(
     CurveLine(
-        "green", Color.parseColor("#3DC23F"), listOf(
+        name = "green",
+        color = greenColor,
+        points = listOf(
             PointF(1542412800000f, 37f),
             PointF(1542499200000f, 20f),
             PointF(1542585600000f, 32f),
@@ -76,7 +81,9 @@ val testLines = listOf(
         )
     ),
     CurveLine(
-        "red", Color.parseColor("#F34C44"), listOf(
+        name = "red",
+        color = redColor,
+        points = listOf(
             PointF(1544140800000f, 48f),
             PointF(1544227200000f, 32f),
             PointF(1544313600000f, 40f),

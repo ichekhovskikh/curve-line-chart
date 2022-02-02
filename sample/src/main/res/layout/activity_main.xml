@@ -10,7 +10,7 @@
         tools:context=".MainActivity">
 
     <TextView
-            android:id="@+id/titleView"
+            android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|start"
@@ -20,12 +20,12 @@
             android:textSize="20sp" />
 
     <com.zero.chartview.CurveLineChartLayout
-            android:id="@+id/chartLayout"
+            android:id="@+id/clclChartLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
         <com.zero.chartview.CurveLineChartView
-                android:id="@+id/chart"
+                android:id="@+id/clcvChart"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
                 app:yLegendMarginStart="8dp"
@@ -35,11 +35,11 @@
                 app:yLegendLineColor="@color/colorYLegendLine"
                 app:popupLineColor="@color/colorPopupLine"
                 app:popupLinePointInnerColor="@color/colorPopupLinePointInner"
-                app:popupView="com.zero.sample.PopupWindow"
+                app:popupView=".CustomPopupView"
                 app:scrollEnabled="true" />
 
         <com.zero.chartview.selector.CurveLineSelectorView
-                android:id="@+id/selector"
+                android:id="@+id/clsvSelector"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="20dp"
@@ -49,7 +49,7 @@
     </com.zero.chartview.CurveLineChartLayout>
 
     <com.zero.sample.ChartLabelsView
-            android:id="@+id/labels"
+            android:id="@+id/clvLabels"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp" />

@@ -1,35 +1,28 @@
 package com.zero.sample
 
-import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
+import com.zero.chartview.CurveLineChartView
 import com.zero.chartview.axis.formatter.ShortAxisFormatter
-import com.zero.chartview.model.CurveLine
 import com.zero.sample.utils.testLines
-import kotlinx.android.synthetic.main.activity_main.labels
-import kotlinx.android.synthetic.main.activity_main.chart
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
-    private lateinit var view: View
-
-    @SuppressLint("InflateParams")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         supportActionBar?.hide()
-        view = layoutInflater.inflate(R.layout.activity_main, null)
-        setContentView(view)
-        initLabels()
-        addLabels(testLines)
+        setupViews()
     }
 
-    private fun initLabels() {
-        labels.chart = chart.apply { yAxisFormatter = ShortAxisFormatter() }
-    }
-
-    private fun addLabels(lines: List<CurveLine>) {
-        lines.forEach { labels.addLineLabel(it) }
+    private fun setupViews() {
+        val clcvChart = findViewById<CurveLineChartView>(R.id.clcvChart).apply {
+            xAxisFormatter = ShortAxisFormatter()
+            yAxisFormatter = ShortAxisFormatter()
+        }
+        val clvLabels = findViewById<ChartLabelsView>(R.id.clvLabels)
+        clvLabels.setOnCheckboxChangedListener { isChecked, line ->
+            if (isChecked) clcvChart.addLine(line) else clcvChart.removeLine(line)
+        }
+        testLines.forEach(clvLabels::addLabel)
     }
 }

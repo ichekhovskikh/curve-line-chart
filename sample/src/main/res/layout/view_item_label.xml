@@ -2,20 +2,19 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:background="?selectableItemBackground"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground">
 
     <CheckBox
-            android:id="@+id/labelCheckbox"
-            android:textColor="@color/colorLabel"
+            android:id="@+id/cbLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginVertical="8dp"
             android:layout_marginStart="16dp"
             android:clickable="false"
             android:textSize="18sp"
+            android:textColor="@color/colorLabel"
             tools:text="Label" />
 
 </FrameLayout>

@@ -33,8 +33,8 @@ internal class PopupLineView @JvmOverloads constructor(
             when (value) {
                 null -> delegate.setOnIntersectionsChangedListener(null)
                 else -> delegate.setOnIntersectionsChangedListener { x, intersections ->
-                    popupView?.isInvisible = intersections.isEmpty()
                     popupView?.bind(x, intersections)
+                    popupView?.isInvisible = intersections.isEmpty()
                 }
             }
         }
