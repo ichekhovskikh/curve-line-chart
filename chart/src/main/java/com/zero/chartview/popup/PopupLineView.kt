@@ -72,6 +72,10 @@ internal class PopupLineView @JvmOverloads constructor(
             }
         }
 
+    @get:Px
+    internal val paddingVerticalUsed
+        get() = delegate.paddingVerticalUsed
+
     init {
         val linePaint = Paint()
         val pointInnerPaint = Paint().apply {

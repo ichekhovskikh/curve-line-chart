@@ -167,27 +167,31 @@ class CurveLineChartView @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        val legendTextHeightUsed = xAxis.legendTextHeightUsed
+        val legendHeightUsed = xAxis.legendTextHeightUsed
+        val marginTopUsed = popupLine.paddingVerticalUsed.toInt()
+        val marginBottomUsed = legendHeightUsed + popupLine.paddingVerticalUsed.toInt()
+        graph.marginTop = marginTopUsed
+        yAxis.marginTop = marginTopUsed
         measureChildWithMargins(
             graph,
             widthMeasureSpec,
             0,
             heightMeasureSpec,
-            legendTextHeightUsed
+            marginBottomUsed
         )
         measureChildWithMargins(
             yAxis,
             widthMeasureSpec,
             0,
             heightMeasureSpec,
-            legendTextHeightUsed
+            marginBottomUsed
         )
         measureChildWithMargins(
             popupLine,
             widthMeasureSpec,
             0,
             heightMeasureSpec,
-            legendTextHeightUsed
+            legendHeightUsed
         )
     }
 

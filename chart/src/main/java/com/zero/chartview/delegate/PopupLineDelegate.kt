@@ -27,13 +27,16 @@ internal class PopupLineDelegate(
     private var touchX: Float? = null
     private var popupLine: PopupLine? = null
 
+    internal val paddingVerticalUsed = pointOuterRadius
+
     internal var range = FloatRange(0f, 1f)
         private set
 
     private val intersections
         get() = popupLine?.intersections?.map { it.point }.orEmpty()
 
-    private var onIntersectionsChanged: ((xPixel: Float?, intersections: List<IntersectionPoint>) -> Unit)? = null
+    private var onIntersectionsChanged: ((xPixel: Float?, intersections: List<IntersectionPoint>) -> Unit)? =
+        null
 
     fun setRange(range: FloatRange) {
         this.range = range
@@ -92,13 +95,19 @@ internal class PopupLineDelegate(
         val intersectionX = intersections.firstOrNull()?.x ?: return null
         val (minY, maxY) = lines.getMinMaxY(range)
         val xDrawPixel = xValueToPixel(intersectionX, viewSize.width, startValue, endValue)
+        val availableHeight = (viewSize.height - 2 * paddingVerticalUsed).toInt()
         return PopupLine(
             xDrawPixel = xDrawPixel,
             intersections = intersections.map {
                 PopupLine.Intersection(
                     point = it,
                     xDrawPixel = xDrawPixel,
-                    yDrawPixel = yValueToPixel(it.y, viewSize.height, minY, maxY)
+                    yDrawPixel = yValueToPixel(
+                        it.y,
+                        availableHeight,
+                        minY,
+                        maxY
+                    ) + paddingVerticalUsed
                 )
             }
         )
