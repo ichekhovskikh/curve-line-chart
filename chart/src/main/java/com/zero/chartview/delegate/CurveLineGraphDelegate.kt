@@ -33,7 +33,7 @@ internal class CurveLineGraphDelegate(
         .map { it.curveLine }
 
     private val path = Path()
-    private val currentLines get() = animatingLines.map { it.curveLine }
+    private var currentLines = emptyList<CurveLine>()
     private val animatingLines = mutableListOf<AnimatingCurveLine>()
 
     private var onYAxisChangedListener: ((minY: Float, maxY: Float) -> Unit)? = null
@@ -55,9 +55,7 @@ internal class CurveLineGraphDelegate(
     private val axisAnimator = AxisAnimator { startX, endX, startY, endY ->
         this.currentMinY = startY
         this.currentMaxY = endY
-        this.range = FloatRange(startX, endX)
-
-        val interpolatedRange = range.interpolateByValues(currentLines.abscissas)
+        val interpolatedRange = FloatRange(startX, endX)
         animatingLines.forEach { line ->
             line.interpolatedPoints = transformAxis(line.curveLine.points, interpolatedRange)
         }
@@ -129,11 +127,13 @@ internal class CurveLineGraphDelegate(
             onYAxisChangedListener?.invoke(minY, maxY)
         }
         axisAnimator.reStart(
-            fromXRange = this.range,
-            toXRange = newRange,
+            fromXRange = range.interpolateByValues(currentLines.abscissas),
+            toXRange = newRange.interpolateByValues(newLines.abscissas),
             fromYRange = FloatRange(this.currentMinY, this.currentMaxY),
             toYRange = FloatRange(minY, maxY)
         )
+        range = newRange
+        currentLines = newLines
     }
 
     fun setOnYAxisChangedListener(onYAxisChangedListener: ((minY: Float, maxY: Float) -> Unit)?) {
