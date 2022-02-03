@@ -1,6 +1,7 @@
 package com.zero.chartview.extensions
 
 import android.graphics.Color
+import androidx.annotation.ColorInt
 import com.zero.chartview.model.AnimatingYLegendSeries
 
 internal fun AnimatingYLegendSeries.setDisappearing() {
@@ -10,6 +11,7 @@ internal fun AnimatingYLegendSeries.setDisappearing() {
     isAppearing = false
 }
 
+@ColorInt
 internal fun AnimatingYLegendSeries.animatingColor(staticColor: Int): Int =
     Color.argb(alpha, Color.red(staticColor), Color.green(staticColor), Color.blue(staticColor))
 

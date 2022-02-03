@@ -4,8 +4,10 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.FrameLayout
+import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
+import androidx.annotation.StyleRes
 import com.zero.chartview.axis.XAxisView
 import com.zero.chartview.axis.YAxisView
 import com.zero.chartview.axis.formatter.AxisFormatter
@@ -18,8 +20,8 @@ import com.zero.chartview.popup.PopupView
 class CurveLineChartView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
-    defStyleAttr: Int = 0,
-    defStyleRes: Int = 0
+    @AttrRes defStyleAttr: Int = 0,
+    @StyleRes defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
 
     private val graph = CurveLineGraphView(context, attrs, defStyleAttr, defStyleRes)
@@ -58,6 +60,46 @@ class CurveLineChartView @JvmOverloads constructor(
             yAxis.axisFormatter = value
         }
 
+    @get:ColorInt
+    @setparam:ColorInt
+    var xAxisTextColor: Int
+        get() = xAxis.textColor
+        set(value) {
+            xAxis.textColor = value
+        }
+
+    @get:ColorInt
+    @setparam:ColorInt
+    var yAxisTextColor: Int
+        get() = yAxis.textColor
+        set(value) {
+            yAxis.textColor = value
+        }
+
+    @get:ColorInt
+    @setparam:ColorInt
+    var yAxisLineColor: Int
+        get() = yAxis.lineColor
+        set(value) {
+            yAxis.lineColor = value
+        }
+
+    @get:ColorInt
+    @setparam:ColorInt
+    var popupLineColor: Int
+        get() = popupLine.lineColor
+        set(value) {
+            popupLine.lineColor = value
+        }
+
+    @get:ColorInt
+    @setparam:ColorInt
+    var popupLinePointInnerColor: Int
+        get() = popupLine.pointInnerColor
+        set(value) {
+            popupLine.pointInnerColor = value
+        }
+
     @get:Px
     @setparam:Px
     var lineWidth: Float
@@ -74,16 +116,40 @@ class CurveLineChartView @JvmOverloads constructor(
             popupLine.lineWidth = value
         }
 
-    var yAxisLegendCount: Int
-        get() = yAxis.legendCount
+    @get:Px
+    @setparam:Px
+    var xAxisTextSize: Float
+        get() = xAxis.textSize
         set(value) {
-            yAxis.legendCount = value
+            xAxis.textSize = value
+        }
+
+    @get:Px
+    @setparam:Px
+    var yAxisTextSize: Float
+        get() = yAxis.textSize
+        set(value) {
+            yAxis.textSize = value
+        }
+
+    @get:Px
+    @setparam:Px
+    var yAxisLineWidth: Float
+        get() = yAxis.lineWidth
+        set(value) {
+            yAxis.lineWidth = value
         }
 
     var xAxisLegendCount: Int
         get() = xAxis.legendCount
         set(value) {
             xAxis.legendCount = value
+        }
+
+    var yAxisLegendCount: Int
+        get() = yAxis.legendCount
+        set(value) {
+            yAxis.legendCount = value
         }
 
     init {
@@ -193,25 +259,5 @@ class CurveLineChartView @JvmOverloads constructor(
             heightMeasureSpec,
             legendHeightUsed
         )
-    }
-
-    fun setXLegendTextColor(@ColorInt textColor: Int) {
-        xAxis.textColor = textColor
-    }
-
-    fun setYLegendTextColor(@ColorInt textColor: Int) {
-        yAxis.textColor = textColor
-    }
-
-    fun setYLegendLineColor(@ColorInt lineColor: Int) {
-        yAxis.lineColor = lineColor
-    }
-
-    fun setPopupLineColor(@ColorInt popupLineColor: Int) {
-        popupLine.lineColor = popupLineColor
-    }
-
-    fun setPopupLinePointInnerColor(@ColorInt popupLinePointInnerColor: Int) {
-        popupLine.pointInnerColor = popupLinePointInnerColor
     }
 }

@@ -7,7 +7,9 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import androidx.annotation.AttrRes
 import androidx.annotation.Px
+import androidx.annotation.StyleRes
 import com.zero.chartview.delegate.CurveLineGraphDelegate
 import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.extensions.on
@@ -17,8 +19,8 @@ import com.zero.chartview.model.PercentRange
 class CurveLineGraphView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
-    defStyleAttr: Int = 0,
-    defStyleRes: Int = 0
+    @AttrRes defStyleAttr: Int = 0,
+    @StyleRes defStyleRes: Int = 0
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
 
     private val delegate: CurveLineGraphDelegate
@@ -79,11 +81,7 @@ class CurveLineGraphView @JvmOverloads constructor(
 
     fun setRange(start: Float, endInclusive: Float, smoothScroll: Boolean = false) {
         delegate.setRange(PercentRange(start, endInclusive), smoothScroll)
-    }
-
-    fun setOnYAxisChangedListener(onYAxisChangedListener: ((minY: Float, maxY: Float) -> Unit)?) {
-        delegate.setOnYAxisChangedListener(onYAxisChangedListener)
-    }
+     }
 
     fun addOnLinesChangedListener(onLinesChangedListener: (List<CurveLine>) -> Unit) {
         delegate.addOnLinesChangedListener(onLinesChangedListener)
@@ -99,6 +97,10 @@ class CurveLineGraphView @JvmOverloads constructor(
 
     fun removeOnRangeChangedListener(onRangeChangedListener: (start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit) {
         delegate.removeOnRangeChangedListener(onRangeChangedListener)
+    }
+
+    internal fun setOnYAxisChangedListener(onYAxisChangedListener: ((minY: Float, maxY: Float) -> Unit)?) {
+        delegate.setOnYAxisChangedListener(onYAxisChangedListener)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

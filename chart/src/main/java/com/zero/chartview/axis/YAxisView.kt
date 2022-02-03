@@ -6,6 +6,9 @@ import android.graphics.Paint
 import androidx.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.View
+import androidx.annotation.AttrRes
+import androidx.annotation.Px
+import androidx.annotation.StyleRes
 import com.zero.chartview.R
 import com.zero.chartview.axis.formatter.AxisFormatter
 import com.zero.chartview.delegate.YAxisDelegate
@@ -16,8 +19,8 @@ import com.zero.chartview.extensions.on
 internal class YAxisView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
-    defStyleAttr: Int = 0,
-    defStyleRes: Int = 0
+    @AttrRes defStyleAttr: Int = 0,
+    @StyleRes defStyleRes: Int = 0
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
 
     private val delegate: YAxisDelegate
@@ -49,6 +52,28 @@ internal class YAxisView @JvmOverloads constructor(
         set(value) {
             if (delegate.linePaint.color != value) {
                 delegate.linePaint.color = value
+                invalidate()
+            }
+        }
+
+    @get:Px
+    @setparam:Px
+    var textSize: Float
+        get() = delegate.legendPaint.textSize
+        set(value) {
+            if (delegate.legendPaint.textSize != value) {
+                delegate.legendPaint.textSize = value
+                invalidate()
+            }
+        }
+
+    @get:Px
+    @setparam:Px
+    var lineWidth: Float
+        get() = delegate.linePaint.strokeWidth
+        set(value) {
+            if (delegate.linePaint.strokeWidth != value) {
+                delegate.linePaint.strokeWidth = value
                 invalidate()
             }
         }

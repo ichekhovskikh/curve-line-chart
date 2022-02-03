@@ -1,14 +1,16 @@
 package com.zero.chartview.model
 
+import androidx.annotation.Px
+
 internal data class PopupLine(
-    val xDrawPixel: Float,
+    @Px val xDrawPixel: Float,
     val intersections: List<Intersection>
 ) {
 
     data class Intersection(
         val point: IntersectionPoint,
-        val xDrawPixel: Float,
-        val yDrawPixel: Float
+        @Px val xDrawPixel: Float,
+        @Px val yDrawPixel: Float
     )
 }
 

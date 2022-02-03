@@ -3,6 +3,7 @@ package com.zero.chartview.delegate
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
+import androidx.annotation.Px
 import com.zero.chartview.anim.AxisAnimator
 import com.zero.chartview.axis.formatter.AxisFormatter
 import com.zero.chartview.axis.formatter.DefaultAxisFormatter
@@ -23,7 +24,7 @@ import kotlin.math.pow
 internal class XAxisDelegate(
     internal val legendPaint: Paint,
     legendCount: Int,
-    private val textMarginTop: Float,
+    @Px private val textMarginTop: Float,
     private val textMarginHorizontalPercent: Float,
     private val onUpdate: () -> Unit
 ) {
@@ -43,15 +44,17 @@ internal class XAxisDelegate(
             onUpdate()
         }
 
-    internal var range = FloatRange(0f, 1f)
+    internal var range = BinaryRange()
         private set
 
+    @get:Px
     internal val legendTextHeightUsed
         get() = (legendPaint.textSize + textMarginTop).toInt()
 
     private val maxStep
         get() = (abscissas.last() - abscissas.first()) / legendCount.times(2)
 
+    @get:Px
     private val maxLegendWidth
         get() = (viewSize.width.toFloat() / legendCount) * (1 - textMarginHorizontalPercent)
 

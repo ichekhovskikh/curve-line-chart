@@ -7,13 +7,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.CheckBox
 import android.widget.LinearLayout
+import androidx.annotation.AttrRes
+import androidx.annotation.StyleRes
 import com.zero.chartview.model.CurveLine
 
 class ChartLabelsView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
-    defStyleAttr: Int = 0,
-    defStyleRes: Int = 0
+    @AttrRes defStyleAttr: Int = 0,
+    @StyleRes defStyleRes: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr, defStyleRes) {
 
     private var onCheckboxChanged: ((isChecked: Boolean, line: CurveLine) -> Unit)? = null

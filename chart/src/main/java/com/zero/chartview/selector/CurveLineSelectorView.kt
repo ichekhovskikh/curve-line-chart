@@ -4,20 +4,23 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
+import androidx.annotation.StyleRes
 import com.zero.chartview.CurveLineGraphView
 import com.zero.chartview.model.CurveLine
 
 class CurveLineSelectorView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
-    defStyleAttr: Int = 0,
-    defStyleRes: Int = 0
+    @AttrRes defStyleAttr: Int = 0,
+    @StyleRes defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
 
     private val scrollFrame = ScrollFrameView(context, attrs, defStyleAttr, defStyleRes)
-    private val graph = CurveLineGraphView(context, attrs, defStyleAttr, defStyleRes).apply {
-        isScrollEnabled = false
-    }
+    private val graph = CurveLineGraphView(context, attrs, defStyleAttr, defStyleRes)
+
+    val range get() = scrollFrame.range
 
     var isSmoothScrollEnabled
         get() = scrollFrame.isSmoothScrollEnabled
@@ -31,12 +34,16 @@ class CurveLineSelectorView @JvmOverloads constructor(
     val frameMaxWidthPercent
         get() = scrollFrame.frameMaxWidthPercent
 
+    @get:ColorInt
+    @setparam:ColorInt
     var frameColor: Int
         get() = scrollFrame.frameColor
         set(value) {
             scrollFrame.frameColor = value
         }
 
+    @get:ColorInt
+    @setparam:ColorInt
     var fogColor: Int
         get() = scrollFrame.fogColor
         set(value) {

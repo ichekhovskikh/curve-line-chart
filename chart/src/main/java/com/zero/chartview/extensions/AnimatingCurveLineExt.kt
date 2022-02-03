@@ -1,6 +1,7 @@
 package com.zero.chartview.extensions
 
 import android.graphics.Color
+import androidx.annotation.ColorInt
 import com.zero.chartview.model.AnimatingCurveLine
 
 internal fun AnimatingCurveLine.setDisappearing() {
@@ -10,6 +11,7 @@ internal fun AnimatingCurveLine.setDisappearing() {
     isAppearing = false
 }
 
+@get:ColorInt
 internal val AnimatingCurveLine.animatingColor: Int
     get() {
         val color = curveLine.color

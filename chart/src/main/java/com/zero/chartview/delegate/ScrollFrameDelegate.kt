@@ -2,6 +2,7 @@ package com.zero.chartview.delegate
 
 import android.graphics.*
 import android.view.MotionEvent
+import androidx.annotation.Px
 import com.zero.chartview.anim.AxisAnimator
 import com.zero.chartview.extensions.distance
 import com.zero.chartview.extensions.offset
@@ -15,25 +16,27 @@ internal class ScrollFrameDelegate(
     internal val framePaint: Paint,
     internal val fogPaint: Paint,
     private val dragIndicatorPaint: Paint,
-    private val frameCornerRadius: Float,
-    private val frameThicknessHorizontal: Float,
-    private val frameThicknessVertical: Float,
+    @Px private val frameCornerRadius: Float,
+    @Px private val frameThicknessHorizontal: Float,
+    @Px private val frameThicknessVertical: Float,
     internal val frameMaxWidthPercent: Float,
     internal val frameMinWidthPercent: Float,
-    private val dragIndicatorCornerRadius: Float,
-    private val dragIndicatorWidth: Float,
-    private val dragIndicatorMaxHeight: Float,
+    @Px private val dragIndicatorCornerRadius: Float,
+    @Px private val dragIndicatorWidth: Float,
+    @Px private val dragIndicatorMaxHeight: Float,
     internal var isSmoothScrollEnabled: Boolean,
     private val onUpdate: () -> Unit
 ) {
 
+    @Px
+    private val touchPadding = frameThicknessVertical / 2
     private val path = Path()
     private val frameInnerContour = RectF()
     private val frameOuterContour = RectF()
     private val leftDragIndicatorContour = RectF()
     private val rightDragIndicatorContour = RectF()
-    private val touchPadding = frameThicknessVertical / 2
 
+    @Px
     private var downTouchPosition = 0f
     private var activeComponent = ComponentType.NOTHING
     private val onRangeChangedListeners = mutableListOf<(start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit>()
@@ -261,6 +264,7 @@ internal class ScrollFrameDelegate(
         )
     }
 
+    @Px
     private fun Float.pxToPercent() = xPixelToValue(this, viewSize.width, 0f, 1f)
 
     private enum class ComponentType {

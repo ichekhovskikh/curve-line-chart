@@ -14,3 +14,8 @@ object ZeroRange {
 
     operator fun invoke() = FloatRange(0f, 0f)
 }
+
+object BinaryRange {
+
+    operator fun invoke() = FloatRange(0f, 1f)
+}

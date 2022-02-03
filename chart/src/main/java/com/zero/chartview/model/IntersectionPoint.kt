@@ -1,8 +1,10 @@
 package com.zero.chartview.model
 
+import androidx.annotation.ColorInt
+
 data class IntersectionPoint(
     val lineName: String,
-    val lineColor: Int,
+    @ColorInt val lineColor: Int,
     val x: Float,
     val y: Float
 )

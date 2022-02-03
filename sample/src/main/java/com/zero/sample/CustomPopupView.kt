@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.AttrRes
+import androidx.annotation.StyleRes
 import com.zero.chartview.axis.formatter.ShortAxisFormatter
 import com.zero.chartview.model.IntersectionPoint
 import com.zero.chartview.popup.PopupView
@@ -13,8 +15,8 @@ import com.zero.chartview.popup.PopupView
 class CustomPopupView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
-    defStyleAttr: Int = 0,
-    defStyleRes: Int = 0
+    @AttrRes defStyleAttr: Int = 0,
+    @StyleRes defStyleRes: Int = 0
 ) : PopupView(context, attrs, defStyleAttr, defStyleRes) {
 
     private val axisFormatter = ShortAxisFormatter()

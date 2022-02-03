@@ -1,12 +1,10 @@
 package com.zero.chartview.extensions
 
 import android.content.res.TypedArray
-import androidx.annotation.AttrRes
-import androidx.annotation.StyleRes
-import androidx.annotation.StyleableRes
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.*
 
 internal inline fun View.applyStyledAttributes(
     set: AttributeSet,
@@ -32,6 +30,8 @@ internal inline var View.isInvisible
         visibility = if (value) View.INVISIBLE else View.VISIBLE
     }
 
+@get:Px
+@setparam:Px
 internal inline var View.marginTop: Int
     get() = (layoutParams as? ViewGroup.MarginLayoutParams)?.topMargin ?: 0
     set(value) {

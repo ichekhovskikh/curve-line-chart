@@ -3,6 +3,7 @@ package com.zero.chartview.delegate
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.view.MotionEvent
+import androidx.annotation.Px
 import com.zero.chartview.extensions.getIntersections
 import com.zero.chartview.extensions.getMinMaxY
 import com.zero.chartview.extensions.interpolateByLineAbscissas
@@ -16,20 +17,22 @@ internal class PopupLineDelegate(
     internal val linePaint: Paint,
     internal val pointInnerPaint: Paint,
     internal val pointOuterPaint: Paint,
-    private val pointInnerRadius: Float,
-    private val pointOuterRadius: Float,
+    @Px private val pointInnerRadius: Float,
+    @Px private val pointOuterRadius: Float,
     private val deltaTrackingTouchPercent: Float,
     private val onUpdate: () -> Unit
 ) {
 
+    @Px
+    private var touchX: Float? = null
     private var viewSize = Size()
     private var lines = emptyList<CurveLine>()
-    private var touchX: Float? = null
     private var popupLine: PopupLine? = null
 
+    @Px
     internal val paddingVerticalUsed = pointOuterRadius
 
-    internal var range = FloatRange(0f, 1f)
+    internal var range = BinaryRange()
         private set
 
     private val intersections
@@ -146,7 +149,7 @@ internal class PopupLineDelegate(
     }
 
     private fun List<CurveLine>.getIntersections(
-        xPixel: Float,
+        @Px xPixel: Float,
         minX: Float,
         maxX: Float
     ): List<IntersectionPoint> {

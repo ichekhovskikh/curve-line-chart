@@ -3,6 +3,7 @@ package com.zero.chartview.delegate
 import android.graphics.*
 import android.view.MotionEvent
 import android.view.VelocityTracker
+import androidx.annotation.Px
 import com.zero.chartview.anim.AppearanceAnimator
 import com.zero.chartview.anim.AxisAnimator
 import com.zero.chartview.extensions.*
@@ -25,7 +26,7 @@ internal class CurveLineGraphDelegate(
     private var minYAfterAnimate = 0f
     private var viewSize = Size()
 
-    internal var range = FloatRange(0f, 1f)
+    internal var range = BinaryRange()
         private set
 
     internal val linesAfterAnimate get() = animatingLines
@@ -40,8 +41,9 @@ internal class CurveLineGraphDelegate(
     private val onLinesChangedListeners = mutableListOf<(List<CurveLine>) -> Unit>()
     private val onRangeChangedListeners = mutableListOf<(start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit>()
 
-    private var velocityTracker: VelocityTracker? = null
+    @Px
     private var lastMotionX = 0f
+    private var velocityTracker: VelocityTracker? = null
 
     private val appearanceAnimator = AppearanceAnimator { value ->
         animatingLines.forEach { line ->
@@ -136,10 +138,6 @@ internal class CurveLineGraphDelegate(
         currentLines = newLines
     }
 
-    fun setOnYAxisChangedListener(onYAxisChangedListener: ((minY: Float, maxY: Float) -> Unit)?) {
-        this.onYAxisChangedListener = onYAxisChangedListener
-    }
-
     fun addOnLinesChangedListener(onLinesChangedListener: (List<CurveLine>) -> Unit) {
         onLinesChangedListeners.add(onLinesChangedListener)
     }
@@ -154,6 +152,10 @@ internal class CurveLineGraphDelegate(
 
     fun removeOnRangeChangedListener(onRangeChangedListener: (start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit) {
         onRangeChangedListeners.remove(onRangeChangedListener)
+    }
+
+    internal fun setOnYAxisChangedListener(onYAxisChangedListener: ((minY: Float, maxY: Float) -> Unit)?) {
+        this.onYAxisChangedListener = onYAxisChangedListener
     }
 
     private fun onLinesChanged(lines: List<CurveLine>) {

@@ -4,6 +4,9 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.annotation.AttrRes
+import androidx.annotation.Px
+import androidx.annotation.StyleRes
 import com.zero.chartview.extensions.classLoader
 import com.zero.chartview.extensions.getFullClassName
 import com.zero.chartview.model.IntersectionPoint
@@ -12,8 +15,8 @@ import java.lang.reflect.InvocationTargetException
 abstract class PopupView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
-    defStyleAttr: Int = 0,
-    defStyleRes: Int = 0
+    @AttrRes defStyleAttr: Int = 0,
+    @StyleRes defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
 
     /**
@@ -22,7 +25,7 @@ abstract class PopupView @JvmOverloads constructor(
      * equal null if there are no intersections
      * [intersections] list of intersections with curve lines
      */
-    abstract fun bind(xPixel: Float?, intersections: List<IntersectionPoint>)
+    abstract fun bind(@Px xPixel: Float?, intersections: List<IntersectionPoint>)
 
     internal companion object {
 
@@ -40,8 +43,8 @@ abstract class PopupView @JvmOverloads constructor(
             parent: ViewGroup,
             className: String?,
             attrs: AttributeSet,
-            defStyleAttr: Int,
-            defStyleRes: Int
+            @AttrRes defStyleAttr: Int,
+            @StyleRes defStyleRes: Int
         ): PopupView? {
             val fullClassName = className?.takeIf { it.isNotBlank() }?.let {
                 parent.context.getFullClassName(it)

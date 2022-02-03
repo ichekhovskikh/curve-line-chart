@@ -5,7 +5,10 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
+import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
+import androidx.annotation.Px
+import androidx.annotation.StyleRes
 import com.zero.chartview.R
 import com.zero.chartview.axis.formatter.AxisFormatter
 import com.zero.chartview.delegate.XAxisDelegate
@@ -17,8 +20,8 @@ import com.zero.chartview.model.PercentRange
 internal class XAxisView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
-    defStyleAttr: Int = 0,
-    defStyleRes: Int = 0
+    @AttrRes defStyleAttr: Int = 0,
+    @StyleRes defStyleRes: Int = 0
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
 
     private val delegate: XAxisDelegate
@@ -43,6 +46,17 @@ internal class XAxisView @JvmOverloads constructor(
             }
         }
 
+    @get:Px
+    @setparam:Px
+    var textSize: Float
+        get() = delegate.legendPaint.textSize
+        set(value) {
+            if (delegate.legendPaint.textSize != value) {
+                delegate.legendPaint.textSize = value
+                invalidate()
+            }
+        }
+
     var legendCount: Int
         get() = delegate.legendCount
         set(value) {
@@ -51,6 +65,7 @@ internal class XAxisView @JvmOverloads constructor(
 
     val range get() = delegate.range
 
+    @get:Px
     internal val legendTextHeightUsed
         get() = delegate.legendTextHeightUsed
 

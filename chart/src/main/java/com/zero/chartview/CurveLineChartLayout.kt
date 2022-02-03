@@ -4,14 +4,15 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
-import com.zero.chartview.extensions.getColorCompat
+import androidx.annotation.AttrRes
+import androidx.annotation.StyleRes
 import com.zero.chartview.selector.CurveLineSelectorView
 
 class CurveLineChartLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
-    defStyleAttr: Int = 0,
-    defStyleRes: Int = 0
+    @AttrRes defStyleAttr: Int = 0,
+    @StyleRes defStyleRes: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr, defStyleRes) {
 
     private var chart: CurveLineChartView? = null
@@ -19,7 +20,6 @@ class CurveLineChartLayout @JvmOverloads constructor(
 
     init {
         orientation = VERTICAL
-        super.setBackgroundColor(context.getColorCompat(android.R.color.transparent))
     }
 
     @SuppressLint("ClickableViewAccessibility")

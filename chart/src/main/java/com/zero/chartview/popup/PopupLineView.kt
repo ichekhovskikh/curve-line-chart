@@ -8,7 +8,9 @@ import androidx.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import androidx.annotation.AttrRes
 import androidx.annotation.Px
+import androidx.annotation.StyleRes
 import com.zero.chartview.R
 import com.zero.chartview.delegate.PopupLineDelegate
 import com.zero.chartview.extensions.*
@@ -21,8 +23,8 @@ import com.zero.chartview.model.PercentRange
 internal class PopupLineView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
-    defStyleAttr: Int = 0,
-    defStyleRes: Int = 0
+    @AttrRes defStyleAttr: Int = 0,
+    @StyleRes defStyleRes: Int = 0
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
 
     private val delegate: PopupLineDelegate

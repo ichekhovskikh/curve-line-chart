@@ -8,6 +8,8 @@ import androidx.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import androidx.annotation.AttrRes
+import androidx.annotation.StyleRes
 import com.zero.chartview.R
 import com.zero.chartview.delegate.ScrollFrameDelegate
 import com.zero.chartview.extensions.applyStyledAttributes
@@ -18,8 +20,8 @@ import com.zero.chartview.model.PercentRange
 internal class ScrollFrameView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
-    defStyleAttr: Int = 0,
-    defStyleRes: Int = 0
+    @AttrRes defStyleAttr: Int = 0,
+    @StyleRes defStyleRes: Int = 0
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
 
     private val delegate: ScrollFrameDelegate
@@ -72,10 +74,14 @@ internal class ScrollFrameView @JvmOverloads constructor(
             color = context.getColorCompat(R.color.colorFrameDragIndicator)
         }
         var frameMaxWidthPercent = resources.getFraction(
-            R.fraction.frame_max_width_percent_default, 1, 1
+            R.fraction.frame_max_width_percent_default,
+            1,
+            1
         )
         var frameMinWidthPercent = resources.getFraction(
-            R.fraction.frame_min_width_percent_default, 1, 1
+            R.fraction.frame_min_width_percent_default,
+            1,
+            1
         )
         var isSmoothScrollEnabled = true
         val frameCornerRadius = resources.getDimension(

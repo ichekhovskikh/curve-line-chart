@@ -2,6 +2,7 @@ package com.zero.chartview.delegate
 
 import android.graphics.Canvas
 import android.graphics.Paint
+import androidx.annotation.Px
 import com.zero.chartview.anim.TensionAnimator
 import com.zero.chartview.axis.formatter.AxisFormatter
 import com.zero.chartview.axis.formatter.DefaultAxisFormatter
@@ -20,8 +21,8 @@ internal class YAxisDelegate(
     internal val legendPaint: Paint,
     internal val linePaint: Paint,
     legendCount: Int,
-    private val legendMarginStart: Float,
-    private val legendMarginBottom: Float,
+    @Px private val legendMarginStart: Float,
+    @Px private val legendMarginBottom: Float,
     private val onUpdate: () -> Unit
 ) {
 
@@ -122,7 +123,7 @@ internal class YAxisDelegate(
         canvas.drawYLegends(legendPaint, linePaint)
     }
 
-    fun Canvas.drawYLegends(legendPaint: Paint, linePaint: Paint) {
+    private fun Canvas.drawYLegends(legendPaint: Paint, linePaint: Paint) {
         series.forEach { series ->
             linePaint.color = series.animatingColor(linePaint.color)
             legendPaint.color = series.animatingColor(legendPaint.color)
