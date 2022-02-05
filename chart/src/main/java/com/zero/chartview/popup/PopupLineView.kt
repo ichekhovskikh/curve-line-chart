@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.os.Parcelable
 import androidx.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -18,7 +19,9 @@ import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.extensions.getColorCompat
 import com.zero.chartview.extensions.on
 import com.zero.chartview.model.CurveLine
+import com.zero.chartview.model.FloatRange
 import com.zero.chartview.model.PercentRange
+import kotlinx.parcelize.Parcelize
 
 internal class PopupLineView @JvmOverloads constructor(
     context: Context,
@@ -28,6 +31,8 @@ internal class PopupLineView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
 
     private val delegate: PopupLineDelegate
+
+    private val pendingSavedState = SavedState()
 
     var popupView: PopupView? = null
         set(value) {
@@ -47,6 +52,7 @@ internal class PopupLineView @JvmOverloads constructor(
         get() = delegate.linePaint.color
         set(value) {
             if (delegate.linePaint.color != value) {
+                pendingSavedState.lineColor = value
                 delegate.linePaint.color = value
                 invalidate()
             }
@@ -58,6 +64,7 @@ internal class PopupLineView @JvmOverloads constructor(
         get() = delegate.pointInnerPaint.color
         set(value) {
             if (delegate.pointInnerPaint.color != value) {
+                pendingSavedState.pointInnerColor = value
                 delegate.pointInnerPaint.color = value
                 invalidate()
             }
@@ -69,6 +76,7 @@ internal class PopupLineView @JvmOverloads constructor(
         get() = delegate.linePaint.strokeWidth
         set(value) {
             if (delegate.linePaint.strokeWidth != value) {
+                pendingSavedState.lineWidth = value
                 delegate.linePaint.strokeWidth = value
                 invalidate()
             }
@@ -119,7 +127,9 @@ internal class PopupLineView @JvmOverloads constructor(
     }
 
     fun setRange(start: Float, endInclusive: Float) {
-        delegate.setRange(PercentRange(start, endInclusive))
+        val range = PercentRange(start, endInclusive)
+        pendingSavedState.range = range
+        delegate.setRange(range)
     }
 
     fun setLines(lines: List<CurveLine>) {
@@ -140,4 +150,52 @@ internal class PopupLineView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         delegate.drawPopupLine(canvas)
     }
+
+    override fun onSaveInstanceState(): Parcelable = pendingSavedState.apply {
+        superSavedState = super.onSaveInstanceState()
+        touchX = delegate.touchX
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        if (state !is SavedState) {
+            super.onRestoreInstanceState(state)
+            return
+        }
+        super.onRestoreInstanceState(state.superSavedState)
+
+        state.touchX?.takeIfNull(pendingSavedState.touchX)?.also {
+            pendingSavedState.touchX = it
+        }
+        state.range?.takeIfNull(pendingSavedState.range)?.also {
+            pendingSavedState.range = it
+        }
+        state.lineColor?.takeIfNull(pendingSavedState.lineColor)?.also {
+            pendingSavedState.lineColor = it
+        }
+        state.pointInnerColor?.takeIfNull(pendingSavedState.pointInnerColor)?.also {
+            pendingSavedState.pointInnerColor = it
+        }
+        state.lineWidth?.takeIfNull(pendingSavedState.lineWidth)?.also {
+            pendingSavedState.lineWidth = it
+        }
+        post {
+            delegate.onRestoreInstanceState(
+                pendingSavedState.touchX,
+                pendingSavedState.range,
+                pendingSavedState.lineColor,
+                pendingSavedState.pointInnerColor,
+                pendingSavedState.lineWidth
+            )
+        }
+    }
+
+    @Parcelize
+    private data class SavedState(
+        var superSavedState: Parcelable? = null,
+        var touchX: Float? = null,
+        var range: FloatRange? = null,
+        var lineColor: Int? = null,
+        var pointInnerColor: Int? = null,
+        var lineWidth: Float? = null
+    ) : Parcelable
 }

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.os.Parcelable
 import androidx.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -15,7 +16,10 @@ import com.zero.chartview.delegate.ScrollFrameDelegate
 import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.extensions.getColorCompat
 import com.zero.chartview.extensions.on
+import com.zero.chartview.extensions.takeIfNull
+import com.zero.chartview.model.FloatRange
 import com.zero.chartview.model.PercentRange
+import kotlinx.parcelize.Parcelize
 
 internal class ScrollFrameView @JvmOverloads constructor(
     context: Context,
@@ -26,11 +30,14 @@ internal class ScrollFrameView @JvmOverloads constructor(
 
     private val delegate: ScrollFrameDelegate
 
+    private val pendingSavedState = SavedState()
+
     val range get() = delegate.range
 
     var isSmoothScrollEnabled
         get() = delegate.isSmoothScrollEnabled
         set(value) {
+            pendingSavedState.isSmoothScrollEnabled = value
             delegate.isSmoothScrollEnabled = value
         }
 
@@ -46,6 +53,7 @@ internal class ScrollFrameView @JvmOverloads constructor(
         get() = delegate.framePaint.color
         set(value) {
             if (delegate.framePaint.color != value) {
+                pendingSavedState.frameColor = value
                 delegate.framePaint.color = value
                 invalidate()
             }
@@ -57,6 +65,7 @@ internal class ScrollFrameView @JvmOverloads constructor(
         get() = delegate.fogPaint.color
         set(value) {
             if (delegate.fogPaint.color != value) {
+                pendingSavedState.fogColor = value
                 delegate.fogPaint.color = value
                 invalidate()
             }
@@ -140,6 +149,9 @@ internal class ScrollFrameView @JvmOverloads constructor(
             isSmoothScrollEnabled,
             onUpdate = ::postInvalidateOnAnimation
         )
+        delegate.addOnRangeChangedListener { _, _, _ ->
+            pendingSavedState.range = range
+        }
     }
 
     fun setRange(start: Float, endInclusive: Float, smoothScroll: Boolean = false) {
@@ -180,4 +192,47 @@ internal class ScrollFrameView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         delegate.drawScrollFrame(canvas)
     }
+
+    override fun onSaveInstanceState(): Parcelable = pendingSavedState.apply {
+        superSavedState = super.onSaveInstanceState()
+        range = delegate.range
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        if (state !is SavedState) {
+            super.onRestoreInstanceState(state)
+            return
+        }
+        super.onRestoreInstanceState(state.superSavedState)
+
+        state.range?.takeIfNull(pendingSavedState.range)?.also {
+            pendingSavedState.range = it
+        }
+        state.isSmoothScrollEnabled?.takeIfNull(pendingSavedState.isSmoothScrollEnabled)?.also {
+            pendingSavedState.isSmoothScrollEnabled = it
+        }
+        state.frameColor?.takeIfNull(pendingSavedState.frameColor)?.also {
+            pendingSavedState.frameColor = it
+        }
+        state.fogColor?.takeIfNull(pendingSavedState.fogColor)?.also {
+            pendingSavedState.fogColor = it
+        }
+        post {
+            delegate.onRestoreInstanceState(
+                pendingSavedState.range,
+                pendingSavedState.isSmoothScrollEnabled,
+                pendingSavedState.frameColor,
+                pendingSavedState.fogColor
+            )
+        }
+    }
+
+    @Parcelize
+    private data class SavedState(
+        var superSavedState: Parcelable? = null,
+        var range: FloatRange? = null,
+        var isSmoothScrollEnabled: Boolean? = null,
+        var frameColor: Int? = null,
+        var fogColor: Int? = null
+    ) : Parcelable
 }

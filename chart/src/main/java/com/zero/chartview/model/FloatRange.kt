@@ -1,6 +1,10 @@
 package com.zero.chartview.model
 
-data class FloatRange(val start: Float, val endInclusive: Float)
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+data class FloatRange(val start: Float, val endInclusive: Float): Parcelable
 
 object PercentRange {
 

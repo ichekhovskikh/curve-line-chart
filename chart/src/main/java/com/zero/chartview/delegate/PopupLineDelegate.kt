@@ -7,6 +7,7 @@ import androidx.annotation.Px
 import com.zero.chartview.extensions.getIntersections
 import com.zero.chartview.extensions.getMinMaxY
 import com.zero.chartview.extensions.interpolateByLineAbscissas
+import com.zero.chartview.extensions.isEqualsOrNull
 import com.zero.chartview.model.*
 import com.zero.chartview.model.Size
 import com.zero.chartview.tools.xPixelToValue
@@ -24,7 +25,7 @@ internal class PopupLineDelegate(
 ) {
 
     @Px
-    private var touchX: Float? = null
+    internal var touchX: Float? = null
     private var viewSize = Size()
     private var lines = emptyList<CurveLine>()
     private var popupLine: PopupLine? = null
@@ -114,6 +115,34 @@ internal class PopupLineDelegate(
                 )
             }
         )
+    }
+
+    fun onRestoreInstanceState(
+        touchX: Float?,
+        range: FloatRange?,
+        lineColor: Int?,
+        pointInnerColor: Int?,
+        lineWidth: Float?
+    ) {
+        if (this.touchX == touchX &&
+            this.range == range &&
+            linePaint.color == lineColor &&
+            pointInnerPaint.color == pointInnerColor &&
+            linePaint.strokeWidth == lineWidth
+        ) return
+
+        lineColor?.let(linePaint::setColor)
+        pointInnerColor?.let(pointInnerPaint::setColor)
+        lineWidth?.let(linePaint::setStrokeWidth)
+
+        if (range.isEqualsOrNull(this.range) && touchX.isEqualsOrNull(this.touchX)) {
+            onUpdate()
+        } else {
+            range?.let { this.range = it }
+            touchX?.let { this.touchX = it }
+            onPopupLineChanged()
+            onUpdate()
+        }
     }
 
     fun drawPopupLine(canvas: Canvas) {

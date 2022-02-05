@@ -153,6 +153,11 @@ class CurveLineChartView @JvmOverloads constructor(
         }
 
     init {
+        xAxis.id = R.id.curve_line_x_axis_view
+        yAxis.id = R.id.curve_line_y_axis_view
+        graph.id = R.id.curve_line_graph_view
+        popupLine.id = R.id.curve_line_popup_line_view
+
         addView(xAxis)
         addView(yAxis)
         addView(graph)

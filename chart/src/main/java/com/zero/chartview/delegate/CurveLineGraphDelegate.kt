@@ -22,6 +22,7 @@ internal class CurveLineGraphDelegate(
 
     private var currentMaxY = 0f
     private var currentMinY = 0f
+    private var isAnimateYAxis = true
     private var maxYAfterAnimate = 0f
     private var minYAfterAnimate = 0f
     private var viewSize = Size()
@@ -29,15 +30,16 @@ internal class CurveLineGraphDelegate(
     internal var range = BinaryRange()
         private set
 
-    internal val linesAfterAnimate get() = animatingLines
-        .filter { it.isAppearing }
-        .map { it.curveLine }
+    internal val linesAfterAnimate
+        get() = animatingLines
+            .filter { it.isAppearing }
+            .map { it.curveLine }
 
     private val path = Path()
     private var currentLines = emptyList<CurveLine>()
     private val animatingLines = mutableListOf<AnimatingCurveLine>()
 
-    private var onYAxisChangedListener: ((minY: Float, maxY: Float) -> Unit)? = null
+    private var onYAxisChangedListener: ((minY: Float, maxY: Float, smoothScroll: Boolean) -> Unit)? = null
     private val onLinesChangedListeners = mutableListOf<(List<CurveLine>) -> Unit>()
     private val onRangeChangedListeners = mutableListOf<(start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit>()
 
@@ -57,9 +59,8 @@ internal class CurveLineGraphDelegate(
     private val axisAnimator = AxisAnimator { startX, endX, startY, endY ->
         this.currentMinY = startY
         this.currentMaxY = endY
-        val interpolatedRange = FloatRange(startX, endX)
         animatingLines.forEach { line ->
-            line.interpolatedPoints = transformAxis(line.curveLine.points, interpolatedRange)
+            line.interpolatedPoints = transformAxis(line.curveLine.points, FloatRange(startX, endX))
         }
         onUpdate()
     }
@@ -82,10 +83,10 @@ internal class CurveLineGraphDelegate(
         if (newLines == current) return
 
         appearanceAnimator.cancel()
-        val appearing = newLines.minus(current)
+        val appearing = newLines.minus(current.toSet())
         appearing.forEach { line -> animatingLines.add(AppearingCurveLine(line)) }
 
-        val disappearing = current.minus(newLines)
+        val disappearing = current.minus(newLines.toSet())
         disappearing.forEach { line ->
             animatingLines.find { it.curveLine == line }?.setDisappearing()
         }
@@ -120,22 +121,42 @@ internal class CurveLineGraphDelegate(
 
     private fun updateAxis(
         newLines: List<CurveLine> = currentLines,
-        newRange: FloatRange = range
+        newRange: FloatRange = range,
+        isAnimate: Boolean = true
     ) {
         val (minY, maxY) = newLines.getMinMaxY(newRange)
-        if (this.maxYAfterAnimate != maxY || this.minYAfterAnimate != minY) {
+        if (this.maxYAfterAnimate != maxY || this.minYAfterAnimate != minY || isAnimateYAxis != isAnimate) {
             maxYAfterAnimate = maxY
             minYAfterAnimate = minY
-            onYAxisChangedListener?.invoke(minY, maxY)
+            isAnimateYAxis = isAnimate
+            onYAxisChangedListener?.invoke(minY, maxY, isAnimate)
         }
-        axisAnimator.reStart(
-            fromXRange = range.interpolateByValues(currentLines.abscissas),
-            toXRange = newRange.interpolateByValues(newLines.abscissas),
-            fromYRange = FloatRange(this.currentMinY, this.currentMaxY),
-            toYRange = FloatRange(minY, maxY)
-        )
-        range = newRange
-        currentLines = newLines
+        if (isAnimate) {
+            axisAnimator.reStart(
+                fromXRange = range.interpolateByValues(currentLines.abscissas),
+                toXRange = newRange.interpolateByValues(newLines.abscissas),
+                fromYRange = FloatRange(this.currentMinY, this.currentMaxY),
+                toYRange = FloatRange(minY, maxY)
+            )
+            range = newRange
+            currentLines = newLines
+        } else {
+            appearanceAnimator.cancel()
+            axisAnimator.cancel()
+            currentMinY = minYAfterAnimate
+            currentMaxY = maxYAfterAnimate
+            range = newRange
+            currentLines = newLines
+            val interpolatedRange = range.interpolateByValues(currentLines.abscissas)
+            animatingLines.forEach { line ->
+                line.animationValue = 1f
+                line.interpolatedPoints = transformAxis(
+                    line.curveLine.points,
+                    interpolatedRange
+                )
+            }
+            onUpdate()
+        }
     }
 
     fun addOnLinesChangedListener(onLinesChangedListener: (List<CurveLine>) -> Unit) {
@@ -154,7 +175,7 @@ internal class CurveLineGraphDelegate(
         onRangeChangedListeners.remove(onRangeChangedListener)
     }
 
-    internal fun setOnYAxisChangedListener(onYAxisChangedListener: ((minY: Float, maxY: Float) -> Unit)?) {
+    internal fun setOnYAxisChangedListener(onYAxisChangedListener: ((minY: Float, maxY: Float, smoothScroll: Boolean) -> Unit)?) {
         this.onYAxisChangedListener = onYAxisChangedListener
     }
 
@@ -210,6 +231,14 @@ internal class CurveLineGraphDelegate(
 
     fun onMeasure(size: Size) {
         viewSize = size
+    }
+
+    fun onRestoreInstanceState(range: FloatRange?, lineWidth: Float?) {
+        if (this.range == range && paint.strokeWidth == lineWidth) return
+
+        lineWidth?.let(paint::setStrokeWidth)
+        val isAnimate = range == this.range
+        updateAxis(newRange = range ?: this.range, isAnimate = isAnimate)
     }
 
     fun drawLines(canvas: Canvas) {

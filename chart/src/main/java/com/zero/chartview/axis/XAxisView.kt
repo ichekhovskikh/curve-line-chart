@@ -3,6 +3,7 @@ package com.zero.chartview.axis
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.AttrRes
@@ -15,7 +16,9 @@ import com.zero.chartview.delegate.XAxisDelegate
 import com.zero.chartview.extensions.*
 import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.extensions.getColorCompat
+import com.zero.chartview.model.FloatRange
 import com.zero.chartview.model.PercentRange
+import kotlinx.parcelize.Parcelize
 
 internal class XAxisView @JvmOverloads constructor(
     context: Context,
@@ -25,6 +28,8 @@ internal class XAxisView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
 
     private val delegate: XAxisDelegate
+
+    private val pendingSavedState = SavedState()
 
     var axisFormatter: AxisFormatter
         get() = delegate.axisFormatter
@@ -41,6 +46,7 @@ internal class XAxisView @JvmOverloads constructor(
         get() = delegate.legendPaint.color
         set(value) {
             if (delegate.legendPaint.color != value) {
+                pendingSavedState.textColor = value
                 delegate.legendPaint.color = value
                 invalidate()
             }
@@ -52,6 +58,7 @@ internal class XAxisView @JvmOverloads constructor(
         get() = delegate.legendPaint.textSize
         set(value) {
             if (delegate.legendPaint.textSize != value) {
+                pendingSavedState.textSize = value
                 delegate.legendPaint.textSize = value
                 invalidate()
             }
@@ -60,7 +67,8 @@ internal class XAxisView @JvmOverloads constructor(
     var legendCount: Int
         get() = delegate.legendCount
         set(value) {
-            delegate.legendCount = value
+            pendingSavedState.legendCount = value
+            delegate.setLegendCount(value)
         }
 
     val range get() = delegate.range
@@ -110,7 +118,9 @@ internal class XAxisView @JvmOverloads constructor(
     }
 
     fun setRange(start: Float, endInclusive: Float, smoothScroll: Boolean) {
-        delegate.setRange(PercentRange(start, endInclusive), smoothScroll)
+        val range = PercentRange(start, endInclusive)
+        pendingSavedState.range = range
+        delegate.setRange(range, smoothScroll)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -121,4 +131,47 @@ internal class XAxisView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         delegate.drawLegends(canvas)
     }
+
+    override fun onSaveInstanceState(): Parcelable = pendingSavedState.apply {
+        superSavedState = super.onSaveInstanceState()
+        range = delegate.range
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        if (state !is SavedState) {
+            super.onRestoreInstanceState(state)
+            return
+        }
+        super.onRestoreInstanceState(state.superSavedState)
+
+        state.range?.takeIfNull(pendingSavedState.range)?.also {
+            pendingSavedState.range = it
+        }
+        state.legendCount?.takeIfNull(pendingSavedState.legendCount)?.also {
+            pendingSavedState.legendCount = it
+        }
+        state.textColor?.takeIfNull(pendingSavedState.textColor)?.also {
+            pendingSavedState.textColor = it
+        }
+        state.textSize?.takeIfNull(pendingSavedState.textSize)?.also {
+            pendingSavedState.textSize = it
+        }
+        post {
+            delegate.onRestoreInstanceState(
+                pendingSavedState.range,
+                pendingSavedState.legendCount,
+                pendingSavedState.textColor,
+                pendingSavedState.textSize
+            )
+        }
+    }
+
+    @Parcelize
+    private data class SavedState(
+        var superSavedState: Parcelable? = null,
+        var range: FloatRange? = null,
+        var legendCount: Int? = null,
+        var textColor: Int? = null,
+        var textSize: Float? = null
+    ) : Parcelable
 }

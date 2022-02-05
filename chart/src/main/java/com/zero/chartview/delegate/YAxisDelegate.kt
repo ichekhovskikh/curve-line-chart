@@ -7,6 +7,7 @@ import com.zero.chartview.anim.TensionAnimator
 import com.zero.chartview.axis.formatter.AxisFormatter
 import com.zero.chartview.axis.formatter.DefaultAxisFormatter
 import com.zero.chartview.extensions.animatingColor
+import com.zero.chartview.extensions.isEqualsOrNull
 import com.zero.chartview.extensions.orZero
 import com.zero.chartview.extensions.setDisappearing
 import com.zero.chartview.model.AnimatingYLegend
@@ -36,18 +37,13 @@ internal class YAxisDelegate(
     internal var axisFormatter: AxisFormatter = DefaultAxisFormatter()
 
     internal var legendCount: Int = legendCount
-        set(value) {
-            if (field == value) return
-            field = value
-            onLegendPositionsChanged()
-            series.find { it.isAppearing }?.let { setYAxis(it.minY, it.maxY) }
-        }
+        private set
 
     private val tensionAnimator = TensionAnimator { tension, minY, maxY ->
-        series.forEach { series ->
-            this.minY = minY
-            this.maxY = maxY
+        this.minY = minY
+        this.maxY = maxY
 
+        series.forEach { series ->
             series.animationValue = if (series.isAppearing) {
                 val appearingTension = tension * APPEARING_TENSION_SCALE + APPEARING_TENSION_OFFSET
                 max(series.animationValue, appearingTension)
@@ -70,38 +66,68 @@ internal class YAxisDelegate(
         series.removeAll { !it.isAppearing }
     }
 
+    fun setLegendCount(legendCount: Int) {
+        if (this.legendCount == legendCount) return
+        this.legendCount = legendCount
+        onLegendPositionsChanged()
+        series.find { it.isAppearing }?.let { setYAxis(it.minY, it.maxY) }
+    }
+
     fun setOrdinates(ordinates: List<Float>) {
         yAxisDistance = ordinates.maxOrNull().orZero - ordinates.minOrNull().orZero
     }
 
-    fun setYAxis(minY: Float, maxY: Float) {
+    fun setYAxis(minY: Float, maxY: Float, smoothScroll: Boolean = true) {
         val hasSeries = series.any {
-            it.isAppearing && it.legends.size == legendCount && it.maxY == maxY && it.minY == minY
+            it.isAppearing && it.legends.size == legendCount &&
+                    it.maxY == maxY && it.minY == minY &&
+                    (smoothScroll || it.animationValue == 1f)
         }
         if (hasSeries) return
 
-        series.forEach { it.setDisappearing() }
-        series.add(
-            AppearingYLegendSeries(
-                minY = minY,
-                maxY = maxY,
-                legends = legendPositions.toLegends(
-                    localMinY = this.minY,
-                    localMaxY = this.maxY,
-                    absoluteMinY = minY,
-                    absoluteMaxY = maxY
+        if (smoothScroll) {
+            series.forEach { it.setDisappearing() }
+            series.add(
+                AppearingYLegendSeries(
+                    minY = minY,
+                    maxY = maxY,
+                    legends = legendPositions.toLegends(
+                        localMinY = this.minY,
+                        localMaxY = this.maxY,
+                        absoluteMinY = minY,
+                        absoluteMaxY = maxY
+                    )
                 )
             )
-        )
-
-        tensionAnimator.reStart(
-            fromTension = FROM_TENSION,
-            toTension = TO_TENSION,
-            fromMin = this.minY,
-            toMin = minY,
-            fromMax = this.maxY,
-            toMax = maxY
-        )
+            tensionAnimator.reStart(
+                fromTension = FROM_TENSION,
+                toTension = TO_TENSION,
+                fromMin = this.minY,
+                toMin = minY,
+                fromMax = this.maxY,
+                toMax = maxY
+            )
+        } else {
+            tensionAnimator.cancel()
+            this.minY = minY
+            this.maxY = maxY
+            series.clear()
+            series.add(
+                AnimatingYLegendSeries(
+                    minY = minY,
+                    maxY = maxY,
+                    isAppearing = true,
+                    animationValue = 1f,
+                    legends = legendPositions.toLegends(
+                        localMinY = minY,
+                        localMaxY = maxY,
+                        absoluteMinY = minY,
+                        absoluteMaxY = maxY
+                    )
+                )
+            )
+            onUpdate()
+        }
     }
 
     fun onMeasure(viewSize: Size) {
@@ -116,6 +142,33 @@ internal class YAxisDelegate(
         val legendHeightWithMargin = (availableHeight - legendHeight) / (legendCount - 1)
         legendPositions = (0 until legendCount).map { index ->
             legendHeightWithMargin * index
+        }
+    }
+
+    fun onRestoreInstanceState(
+        legendCount: Int?,
+        textColor: Int?,
+        lineColor: Int?,
+        textSize: Float?,
+        lineWidth: Float?
+    ) {
+        if (this.legendCount == legendCount &&
+            legendPaint.color == textColor &&
+            linePaint.color == lineColor &&
+            legendPaint.strokeWidth == textSize &&
+            linePaint.strokeWidth == lineWidth
+        ) return
+
+        textColor?.let(legendPaint::setColor)
+        lineColor?.let(linePaint::setColor)
+        textSize?.let(legendPaint::setStrokeWidth)
+        lineWidth?.let(linePaint::setStrokeWidth)
+        if (legendCount.isEqualsOrNull(this.legendCount)) {
+            onUpdate()
+        } else {
+            legendCount?.let { this.legendCount = it }
+            onLegendPositionsChanged()
+            setYAxis(minY, maxY, smoothScroll = false)
         }
     }
 

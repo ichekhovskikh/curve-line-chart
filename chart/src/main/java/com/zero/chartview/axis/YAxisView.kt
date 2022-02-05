@@ -3,6 +3,7 @@ package com.zero.chartview.axis
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.os.Parcelable
 import androidx.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.View
@@ -15,6 +16,8 @@ import com.zero.chartview.delegate.YAxisDelegate
 import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.extensions.getColorCompat
 import com.zero.chartview.extensions.on
+import com.zero.chartview.extensions.takeIfNull
+import kotlinx.parcelize.Parcelize
 
 internal class YAxisView @JvmOverloads constructor(
     context: Context,
@@ -24,6 +27,8 @@ internal class YAxisView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
 
     private val delegate: YAxisDelegate
+
+    private val pendingSavedState = SavedState()
 
     var axisFormatter: AxisFormatter
         get() = delegate.axisFormatter
@@ -40,6 +45,7 @@ internal class YAxisView @JvmOverloads constructor(
         get() = delegate.legendPaint.color
         set(value) {
             if (delegate.legendPaint.color != value) {
+                pendingSavedState.textColor = value
                 delegate.legendPaint.color = value
                 invalidate()
             }
@@ -51,6 +57,7 @@ internal class YAxisView @JvmOverloads constructor(
         get() = delegate.linePaint.color
         set(value) {
             if (delegate.linePaint.color != value) {
+                pendingSavedState.lineColor = value
                 delegate.linePaint.color = value
                 invalidate()
             }
@@ -62,6 +69,7 @@ internal class YAxisView @JvmOverloads constructor(
         get() = delegate.legendPaint.textSize
         set(value) {
             if (delegate.legendPaint.textSize != value) {
+                pendingSavedState.textSize = value
                 delegate.legendPaint.textSize = value
                 invalidate()
             }
@@ -73,6 +81,7 @@ internal class YAxisView @JvmOverloads constructor(
         get() = delegate.linePaint.strokeWidth
         set(value) {
             if (delegate.linePaint.strokeWidth != value) {
+                pendingSavedState.lineWidth = value
                 delegate.linePaint.strokeWidth = value
                 invalidate()
             }
@@ -81,7 +90,8 @@ internal class YAxisView @JvmOverloads constructor(
     var legendCount: Int
         get() = delegate.legendCount
         set(value) {
-            delegate.legendCount = value
+            pendingSavedState.legendCount = value
+            delegate.setLegendCount(value)
         }
 
     init {
@@ -137,8 +147,8 @@ internal class YAxisView @JvmOverloads constructor(
         delegate.setOrdinates(ordinates)
     }
 
-    fun setYAxis(minY: Float, maxY: Float) {
-        delegate.setYAxis(minY, maxY)
+    fun setYAxis(minY: Float, maxY: Float, smoothScroll: Boolean) {
+        delegate.setYAxis(minY, maxY, smoothScroll)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -149,4 +159,51 @@ internal class YAxisView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         delegate.drawLegends(canvas)
     }
+
+    override fun onSaveInstanceState(): Parcelable = pendingSavedState.apply {
+        superSavedState = super.onSaveInstanceState()
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        if (state !is SavedState) {
+            super.onRestoreInstanceState(state)
+            return
+        }
+        super.onRestoreInstanceState(state.superSavedState)
+
+        state.legendCount?.takeIfNull(pendingSavedState.legendCount)?.also {
+            pendingSavedState.legendCount = it
+        }
+        state.textColor?.takeIfNull(pendingSavedState.textColor)?.also {
+            pendingSavedState.textColor = it
+        }
+        state.lineColor?.takeIfNull(pendingSavedState.lineColor)?.also {
+            pendingSavedState.lineColor = it
+        }
+        state.textSize?.takeIfNull(pendingSavedState.textSize)?.also {
+            pendingSavedState.textSize = it
+        }
+        state.lineWidth?.takeIfNull(pendingSavedState.lineWidth)?.also {
+            pendingSavedState.lineWidth = it
+        }
+        post {
+            delegate.onRestoreInstanceState(
+                pendingSavedState.legendCount,
+                pendingSavedState.textColor,
+                pendingSavedState.lineColor,
+                pendingSavedState.textSize,
+                pendingSavedState.lineWidth
+            )
+        }
+    }
+
+    @Parcelize
+    private data class SavedState(
+        var superSavedState: Parcelable? = null,
+        var legendCount: Int? = null,
+        var textColor: Int? = null,
+        var lineColor: Int? = null,
+        var textSize: Float? = null,
+        var lineWidth: Float? = null
+    ) : Parcelable
 }

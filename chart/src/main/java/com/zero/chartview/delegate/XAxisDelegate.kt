@@ -10,6 +10,7 @@ import com.zero.chartview.axis.formatter.DefaultAxisFormatter
 import com.zero.chartview.extensions.alphaColor
 import com.zero.chartview.extensions.distance
 import com.zero.chartview.extensions.interpolateByValues
+import com.zero.chartview.extensions.isEqualsOrNull
 import com.zero.chartview.model.*
 import com.zero.chartview.model.Size
 import com.zero.chartview.model.XLegend
@@ -37,12 +38,7 @@ internal class XAxisDelegate(
     internal var axisFormatter: AxisFormatter = DefaultAxisFormatter()
 
     internal var legendCount: Int = legendCount
-        set(value) {
-            if (field == value) return
-            field = value
-            onXLegendsChanged()
-            onUpdate()
-        }
+        private set
 
     internal var range = BinaryRange()
         private set
@@ -60,6 +56,13 @@ internal class XAxisDelegate(
 
     private val axisAnimator = AxisAnimator { start, end, _, _ ->
         range = FloatRange(start, end)
+        onXLegendsChanged()
+        onUpdate()
+    }
+
+    fun setLegendCount(legendCount: Int) {
+        if (this.legendCount == legendCount) return
+        this.legendCount = legendCount
         onXLegendsChanged()
         onUpdate()
     }
@@ -118,6 +121,30 @@ internal class XAxisDelegate(
                 vertical = viewSize.height.toFloat(),
                 alpha = if (index % 2 != 0) alpha(exponent) else VISIBLE
             )
+        }
+    }
+
+    fun onRestoreInstanceState(
+        range: FloatRange?,
+        legendCount: Int?,
+        textColor: Int?,
+        textSize: Float?
+    ) {
+        if (this.range == range &&
+            this.legendCount == legendCount &&
+            legendPaint.color == textColor &&
+            legendPaint.strokeWidth == textSize
+        ) return
+
+        textColor?.let(legendPaint::setColor)
+        textSize?.let(legendPaint::setStrokeWidth)
+        if (legendCount.isEqualsOrNull(this.legendCount) && range.isEqualsOrNull(this.range)) {
+            onUpdate()
+        } else {
+            legendCount?.let { this.legendCount = it }
+            range?.let { this.range = it }
+            onXLegendsChanged()
+            onUpdate()
         }
     }
 

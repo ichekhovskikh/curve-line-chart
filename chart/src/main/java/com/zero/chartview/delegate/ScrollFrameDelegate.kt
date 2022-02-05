@@ -5,6 +5,7 @@ import android.view.MotionEvent
 import androidx.annotation.Px
 import com.zero.chartview.anim.AxisAnimator
 import com.zero.chartview.extensions.distance
+import com.zero.chartview.extensions.isEqualsOrNull
 import com.zero.chartview.extensions.offset
 import com.zero.chartview.model.*
 import com.zero.chartview.tools.xPixelToValue
@@ -39,7 +40,8 @@ internal class ScrollFrameDelegate(
     @Px
     private var downTouchPosition = 0f
     private var activeComponent = ComponentType.NOTHING
-    private val onRangeChangedListeners = mutableListOf<(start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit>()
+    private val onRangeChangedListeners =
+        mutableListOf<(start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit>()
 
     internal var range = FloatRange(0f, frameMaxWidthPercent)
         private set
@@ -157,6 +159,28 @@ internal class ScrollFrameDelegate(
     fun onMeasure(size: Size) {
         viewSize = size
         onFrameCountersChanged(range)
+    }
+
+    fun onRestoreInstanceState(
+        range: FloatRange?,
+        isSmoothScrollEnabled: Boolean?,
+        frameColor: Int?,
+        fogColor: Int?
+    ) {
+        if (this.range == range &&
+            this.isSmoothScrollEnabled == isSmoothScrollEnabled &&
+            framePaint.color == frameColor &&
+            fogPaint.color == fogColor
+        ) return
+
+        isSmoothScrollEnabled?.let { this.isSmoothScrollEnabled = it }
+        frameColor?.let(framePaint::setColor)
+        fogColor?.let(fogPaint::setColor)
+        if (range.isEqualsOrNull(this.range)) {
+            onUpdate()
+        } else {
+            range?.let(::setRange) ?: onUpdate()
+        }
     }
 
     fun drawScrollFrame(canvas: Canvas) {

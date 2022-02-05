@@ -8,6 +8,7 @@ import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.StyleRes
 import com.zero.chartview.CurveLineGraphView
+import com.zero.chartview.R
 import com.zero.chartview.model.CurveLine
 
 class CurveLineSelectorView @JvmOverloads constructor(
@@ -51,6 +52,9 @@ class CurveLineSelectorView @JvmOverloads constructor(
         }
 
     init {
+        graph.id = R.id.curve_line_selector_graph_view
+        scrollFrame.id = R.id.curve_line_selector_scroll_frame_view
+
         addView(graph)
         addView(scrollFrame)
     }
