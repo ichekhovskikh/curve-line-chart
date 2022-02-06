@@ -7,8 +7,8 @@ import androidx.annotation.Px
 import com.zero.chartview.anim.AxisAnimator
 import com.zero.chartview.axis.formatter.AxisFormatter
 import com.zero.chartview.axis.formatter.DefaultAxisFormatter
+import com.zero.chartview.extensions.*
 import com.zero.chartview.extensions.alphaColor
-import com.zero.chartview.extensions.distance
 import com.zero.chartview.extensions.interpolateByValues
 import com.zero.chartview.extensions.isEqualsOrNull
 import com.zero.chartview.model.*
@@ -25,6 +25,7 @@ import kotlin.math.pow
 internal class XAxisDelegate(
     internal val legendPaint: Paint,
     legendCount: Int,
+    isLegendLinesAvailable: Boolean,
     @Px private val textMarginTop: Float,
     private val textMarginHorizontalPercent: Float,
     private val onUpdate: () -> Unit
@@ -38,6 +39,9 @@ internal class XAxisDelegate(
     internal var axisFormatter: AxisFormatter = DefaultAxisFormatter()
 
     internal var legendCount: Int = legendCount
+        private set
+
+    internal var isLegendLinesAvailable: Boolean = isLegendLinesAvailable
         private set
 
     internal var range = BinaryRange()
@@ -54,6 +58,8 @@ internal class XAxisDelegate(
     private val maxLegendWidth
         get() = (viewSize.width.toFloat() / legendCount) * (1 - textMarginHorizontalPercent)
 
+    private var onXAxisLinesChangedListener: ((xAxisLines: List<AxisLine>) -> Unit)? = null
+
     private val axisAnimator = AxisAnimator { start, end, _, _ ->
         range = FloatRange(start, end)
         onXLegendsChanged()
@@ -65,6 +71,14 @@ internal class XAxisDelegate(
         this.legendCount = legendCount
         onXLegendsChanged()
         onUpdate()
+    }
+
+    fun setLegendLinesAvailable(isAvailable: Boolean) {
+        if (isLegendLinesAvailable == isAvailable) return
+        isLegendLinesAvailable = isAvailable
+
+        val xAxisLines = legends.takeIf { isAvailable }?.toAxisLines().orEmpty()
+        onXAxisLinesChangedListener?.invoke(xAxisLines)
     }
 
     fun setAbscissas(abscissas: List<Float>) {
@@ -82,6 +96,10 @@ internal class XAxisDelegate(
             onXLegendsChanged()
             onUpdate()
         }
+    }
+
+    internal fun setOnXAxisLinesChangedListener(onXAxisLinesChangedListener: ((xAxisLines: List<AxisLine>) -> Unit)?) {
+        this.onXAxisLinesChangedListener = onXAxisLinesChangedListener
     }
 
     fun onMeasure(viewSize: Size) {
@@ -122,26 +140,35 @@ internal class XAxisDelegate(
                 alpha = if (index % 2 != 0) alpha(exponent) else VISIBLE
             )
         }
+
+        val xAxisLines = legends.takeIf { isLegendLinesAvailable }?.toAxisLines().orEmpty()
+        onXAxisLinesChangedListener?.invoke(xAxisLines)
     }
 
     fun onRestoreInstanceState(
         range: FloatRange?,
         legendCount: Int?,
+        isLegendLinesAvailable: Boolean?,
         textColor: Int?,
         textSize: Float?
     ) {
         if (this.range == range &&
             this.legendCount == legendCount &&
+            this.isLegendLinesAvailable == isLegendLinesAvailable &&
             legendPaint.color == textColor &&
             legendPaint.strokeWidth == textSize
         ) return
 
         textColor?.let(legendPaint::setColor)
         textSize?.let(legendPaint::setStrokeWidth)
-        if (legendCount.isEqualsOrNull(this.legendCount) && range.isEqualsOrNull(this.range)) {
+        if (legendCount.isEqualsOrNull(this.legendCount) &&
+            range.isEqualsOrNull(this.range) &&
+            isLegendLinesAvailable.isEqualsOrNull(this.isLegendLinesAvailable)
+        ) {
             onUpdate()
         } else {
             legendCount?.let { this.legendCount = it }
+            isLegendLinesAvailable?.let { this.isLegendLinesAvailable = it }
             range?.let { this.range = it }
             onXLegendsChanged()
             onUpdate()

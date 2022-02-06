@@ -127,9 +127,7 @@ internal class PopupLineView @JvmOverloads constructor(
     }
 
     fun setRange(start: Float, endInclusive: Float) {
-        val range = PercentRange(start, endInclusive)
-        pendingSavedState.range = range
-        delegate.setRange(range)
+        delegate.setRange(PercentRange(start, endInclusive))
     }
 
     fun setLines(lines: List<CurveLine>) {
@@ -153,6 +151,7 @@ internal class PopupLineView @JvmOverloads constructor(
 
     override fun onSaveInstanceState(): Parcelable = pendingSavedState.apply {
         superSavedState = super.onSaveInstanceState()
+        range = delegate.range
         touchX = delegate.touchX
     }
 

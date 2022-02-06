@@ -11,7 +11,7 @@ internal data class AnimatingYLegendSeries(
 internal data class AnimatingYLegend(
     val position: Float,
     val label: String,
-    var interpolatedPosition: Float
+    var yDrawPixel: Float
 )
 
 internal object AppearingYLegendSeries {

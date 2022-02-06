@@ -7,10 +7,11 @@
 
     <dimen name="line_width_default">2dp</dimen>
 
+    <dimen name="axis_line_width_default">1dp</dimen>
+
     <dimen name="y_legend_margin_start_default">0dp</dimen>
     <dimen name="y_legend_margin_bottom_default">6dp</dimen>
     <dimen name="y_legend_text_size_default">13sp</dimen>
-    <dimen name="y_legend_line_width_default">1dp</dimen>
     <integer name="y_legend_count_default">6</integer>
 
     <dimen name="x_legend_margin_top_default">4dp</dimen>

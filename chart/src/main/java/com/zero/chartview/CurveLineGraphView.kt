@@ -115,8 +115,12 @@ class CurveLineGraphView @JvmOverloads constructor(
         delegate.removeOnRangeChangedListener(onRangeChangedListener)
     }
 
-    internal fun setOnYAxisChangedListener(onYAxisChangedListener: ((minY: Float, maxY: Float, smoothScroll: Boolean) -> Unit)?) {
-        delegate.setOnYAxisChangedListener(onYAxisChangedListener)
+    fun addOnYAxisChangedListener(onYAxisChangedListener: ((minY: Float, maxY: Float, smoothScroll: Boolean) -> Unit)) {
+        delegate.addOnYAxisChangedListener(onYAxisChangedListener)
+    }
+
+    fun removeOnYAxisChangedListener(onYAxisChangedListener: ((minY: Float, maxY: Float, smoothScroll: Boolean) -> Unit)) {
+        delegate.removeOnYAxisChangedListener(onYAxisChangedListener)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

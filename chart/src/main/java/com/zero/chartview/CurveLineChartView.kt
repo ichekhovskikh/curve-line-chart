@@ -8,6 +8,7 @@ import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
 import androidx.annotation.StyleRes
+import com.zero.chartview.axis.AxisGridView
 import com.zero.chartview.axis.XAxisView
 import com.zero.chartview.axis.YAxisView
 import com.zero.chartview.axis.formatter.AxisFormatter
@@ -24,9 +25,10 @@ class CurveLineChartView @JvmOverloads constructor(
     @StyleRes defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
 
+    private val grid = AxisGridView(context, attrs, defStyleAttr, defStyleRes)
     private val graph = CurveLineGraphView(context, attrs, defStyleAttr, defStyleRes)
-    private val yAxis = YAxisView(context, attrs, defStyleAttr, defStyleRes)
     private val xAxis = XAxisView(context, attrs, defStyleAttr, defStyleRes)
+    private val yAxis = YAxisView(context, attrs, defStyleAttr, defStyleRes)
     private val popupLine = PopupLineView(context, attrs, defStyleAttr, defStyleRes)
 
     var popupView: PopupView?
@@ -78,10 +80,10 @@ class CurveLineChartView @JvmOverloads constructor(
 
     @get:ColorInt
     @setparam:ColorInt
-    var yAxisLineColor: Int
-        get() = yAxis.lineColor
+    var axisLineColor: Int
+        get() = grid.lineColor
         set(value) {
-            yAxis.lineColor = value
+            grid.lineColor = value
         }
 
     @get:ColorInt
@@ -134,10 +136,10 @@ class CurveLineChartView @JvmOverloads constructor(
 
     @get:Px
     @setparam:Px
-    var yAxisLineWidth: Float
-        get() = yAxis.lineWidth
+    var axisLineWidth: Float
+        get() = grid.lineWidth
         set(value) {
-            yAxis.lineWidth = value
+            grid.lineWidth = value
         }
 
     var xAxisLegendCount: Int
@@ -152,15 +154,29 @@ class CurveLineChartView @JvmOverloads constructor(
             yAxis.legendCount = value
         }
 
+    var isXAxisLegendLinesVisible: Boolean
+        get() = xAxis.isLegendLinesAvailable
+        set(value) {
+            xAxis.isLegendLinesAvailable = value
+        }
+
+    var isYAxisLegendLinesVisible: Boolean
+        get() = yAxis.isLegendLinesAvailable
+        set(value) {
+            yAxis.isLegendLinesAvailable = value
+        }
+
     init {
+        grid.id = R.id.curve_line_chart_grid_view
+        graph.id = R.id.curve_line_graph_view
         xAxis.id = R.id.curve_line_x_axis_view
         yAxis.id = R.id.curve_line_y_axis_view
-        graph.id = R.id.curve_line_graph_view
         popupLine.id = R.id.curve_line_popup_line_view
 
+        addView(grid)
+        addView(graph)
         addView(xAxis)
         addView(yAxis)
-        addView(graph)
         addView(popupLine)
 
         applyStyledAttributes(attrs, R.styleable.CurveLineChartView, defStyleAttr, defStyleRes) {
@@ -172,7 +188,9 @@ class CurveLineChartView @JvmOverloads constructor(
                 defStyleRes = defStyleRes
             )
         }
-        graph.setOnYAxisChangedListener(yAxis::setYAxis)
+        xAxis.setOnXAxisLinesChangedListener(grid::setXAxisLines)
+        yAxis.setOnYAxisLinesChangedListener(grid::setYAxisLines)
+        graph.addOnYAxisChangedListener(yAxis::setYAxis)
         graph.addOnRangeChangedListener { start: Float, endInclusive: Float, smoothScroll: Boolean ->
             xAxis.setRange(start, endInclusive, smoothScroll)
             popupLine.setRange(start, endInclusive)
@@ -231,6 +249,14 @@ class CurveLineChartView @JvmOverloads constructor(
         graph.removeOnRangeChangedListener(onRangeChangedListener)
     }
 
+    fun addOnYAxisChangedListener(onYAxisChangedListener: ((minY: Float, maxY: Float, smoothScroll: Boolean) -> Unit)) {
+        graph.addOnYAxisChangedListener(onYAxisChangedListener)
+    }
+
+    fun removeOnYAxisChangedListener(onYAxisChangedListener: ((minY: Float, maxY: Float, smoothScroll: Boolean) -> Unit)) {
+        graph.removeOnYAxisChangedListener(onYAxisChangedListener)
+    }
+
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         popupLine.dispatchTouchEvent(event)
         return super.dispatchTouchEvent(event)
@@ -242,9 +268,17 @@ class CurveLineChartView @JvmOverloads constructor(
         val marginTopUsed = popupLine.paddingVerticalUsed.toInt()
         val marginBottomUsed = legendHeightUsed + popupLine.paddingVerticalUsed.toInt()
         graph.marginTop = marginTopUsed
+        grid.marginTop = marginTopUsed
         yAxis.marginTop = marginTopUsed
         measureChildWithMargins(
             graph,
+            widthMeasureSpec,
+            0,
+            heightMeasureSpec,
+            marginBottomUsed
+        )
+        measureChildWithMargins(
+            grid,
             widthMeasureSpec,
             0,
             heightMeasureSpec,

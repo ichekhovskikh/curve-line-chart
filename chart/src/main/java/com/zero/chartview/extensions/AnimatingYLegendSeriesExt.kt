@@ -3,6 +3,7 @@ package com.zero.chartview.extensions
 import android.graphics.Color
 import androidx.annotation.ColorInt
 import com.zero.chartview.model.AnimatingYLegendSeries
+import com.zero.chartview.model.AxisLine
 
 internal fun AnimatingYLegendSeries.setDisappearing() {
     if (animationValue == 1f) {
@@ -17,3 +18,9 @@ internal fun AnimatingYLegendSeries.animatingColor(staticColor: Int): Int =
 
 private val AnimatingYLegendSeries.alpha
     get() = (255 * if (isAppearing) animationValue else 1 - animationValue).toInt()
+
+internal fun List<AnimatingYLegendSeries>.toAxisLines() = flatMap { series ->
+    series.legends.map { legend ->
+        AxisLine(legend.yDrawPixel, series.alpha)
+    }
+}

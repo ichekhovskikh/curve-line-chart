@@ -6,6 +6,7 @@ import androidx.annotation.Px
 import com.zero.chartview.anim.TensionAnimator
 import com.zero.chartview.axis.formatter.AxisFormatter
 import com.zero.chartview.axis.formatter.DefaultAxisFormatter
+import com.zero.chartview.extensions.*
 import com.zero.chartview.extensions.animatingColor
 import com.zero.chartview.extensions.isEqualsOrNull
 import com.zero.chartview.extensions.orZero
@@ -13,6 +14,7 @@ import com.zero.chartview.extensions.setDisappearing
 import com.zero.chartview.model.AnimatingYLegend
 import com.zero.chartview.model.AnimatingYLegendSeries
 import com.zero.chartview.model.AppearingYLegendSeries
+import com.zero.chartview.model.AxisLine
 import com.zero.chartview.model.Size
 import com.zero.chartview.tools.yPixelToValue
 import com.zero.chartview.tools.yValueToPixel
@@ -20,8 +22,8 @@ import kotlin.math.max
 
 internal class YAxisDelegate(
     internal val legendPaint: Paint,
-    internal val linePaint: Paint,
     legendCount: Int,
+    isLegendLinesAvailable: Boolean,
     @Px private val legendMarginStart: Float,
     @Px private val legendMarginBottom: Float,
     private val onUpdate: () -> Unit
@@ -39,6 +41,11 @@ internal class YAxisDelegate(
     internal var legendCount: Int = legendCount
         private set
 
+    internal var isLegendLinesAvailable: Boolean = isLegendLinesAvailable
+        private set
+
+    private var onYAxisLinesChangedListener: ((yAxisLines: List<AxisLine>) -> Unit)? = null
+
     private val tensionAnimator = TensionAnimator { tension, minY, maxY ->
         this.minY = minY
         this.maxY = maxY
@@ -51,7 +58,7 @@ internal class YAxisDelegate(
                 tension
             }
             series.legends.forEach { legend ->
-                legend.interpolatedPosition = yValueToPixel(
+                legend.yDrawPixel = yValueToPixel(
                     legend.position,
                     viewSize.height,
                     minY,
@@ -59,6 +66,8 @@ internal class YAxisDelegate(
                 )
             }
         }
+        val yAxisLines = series.takeIf { this.isLegendLinesAvailable }?.toAxisLines().orEmpty()
+        onYAxisLinesChangedListener?.invoke(yAxisLines)
         onUpdate()
     }.doOnEnd(::removeDisappearingLegendSeries)
 
@@ -71,6 +80,14 @@ internal class YAxisDelegate(
         this.legendCount = legendCount
         onLegendPositionsChanged()
         series.find { it.isAppearing }?.let { setYAxis(it.minY, it.maxY) }
+    }
+
+    fun setLegendLinesAvailable(isAvailable: Boolean) {
+        if (isLegendLinesAvailable == isAvailable) return
+        isLegendLinesAvailable = isAvailable
+
+        val yAxisLines = series.takeIf { isAvailable }?.toAxisLines().orEmpty()
+        onYAxisLinesChangedListener?.invoke(yAxisLines)
     }
 
     fun setOrdinates(ordinates: List<Float>) {
@@ -126,8 +143,14 @@ internal class YAxisDelegate(
                     )
                 )
             )
+            val yAxisLines = series.takeIf { isLegendLinesAvailable }?.toAxisLines().orEmpty()
+            onYAxisLinesChangedListener?.invoke(yAxisLines)
             onUpdate()
         }
+    }
+
+    internal fun setOnYAxisLinesChangedListener(onYAxisLinesChangedListener: ((yAxisLines: List<AxisLine>) -> Unit)?) {
+        this.onYAxisLinesChangedListener = onYAxisLinesChangedListener
     }
 
     fun onMeasure(viewSize: Size) {
@@ -147,46 +170,42 @@ internal class YAxisDelegate(
 
     fun onRestoreInstanceState(
         legendCount: Int?,
+        isLegendLinesAvailable: Boolean?,
         textColor: Int?,
-        lineColor: Int?,
-        textSize: Float?,
-        lineWidth: Float?
+        textSize: Float?
     ) {
         if (this.legendCount == legendCount &&
+            this.isLegendLinesAvailable == isLegendLinesAvailable &&
             legendPaint.color == textColor &&
-            linePaint.color == lineColor &&
-            legendPaint.strokeWidth == textSize &&
-            linePaint.strokeWidth == lineWidth
+            legendPaint.strokeWidth == textSize
         ) return
 
         textColor?.let(legendPaint::setColor)
-        lineColor?.let(linePaint::setColor)
         textSize?.let(legendPaint::setStrokeWidth)
-        lineWidth?.let(linePaint::setStrokeWidth)
-        if (legendCount.isEqualsOrNull(this.legendCount)) {
+        if (legendCount.isEqualsOrNull(this.legendCount) &&
+            isLegendLinesAvailable.isEqualsOrNull(this.isLegendLinesAvailable)
+        ) {
             onUpdate()
         } else {
             legendCount?.let { this.legendCount = it }
+            isLegendLinesAvailable?.let { this.isLegendLinesAvailable = it }
             onLegendPositionsChanged()
             setYAxis(minY, maxY, smoothScroll = false)
         }
     }
 
     fun drawLegends(canvas: Canvas) {
-        canvas.drawYLegends(legendPaint, linePaint)
+        canvas.drawYLegends(legendPaint)
     }
 
-    private fun Canvas.drawYLegends(legendPaint: Paint, linePaint: Paint) {
+    private fun Canvas.drawYLegends(legendPaint: Paint) {
         series.forEach { series ->
-            linePaint.color = series.animatingColor(linePaint.color)
             legendPaint.color = series.animatingColor(legendPaint.color)
             series.legends.forEach { legend ->
-                val yPixel = legend.interpolatedPosition
-                drawLine(0f, yPixel, viewSize.width.toFloat(), yPixel, linePaint)
                 drawText(
                     legend.label,
                     legendMarginStart,
-                    yPixel - legendMarginBottom,
+                    legend.yDrawPixel - legendMarginBottom,
                     legendPaint
                 )
             }
@@ -206,13 +225,12 @@ internal class YAxisDelegate(
         absoluteMaxY: Float = maxY
     ) = map {
         val absoluteDistance = absoluteMaxY - absoluteMinY
-        val zoom =
-            if (yAxisDistance == 0f || absoluteDistance == 0f) 1f else yAxisDistance / absoluteDistance
+        val zoom = if (yAxisDistance == 0f || absoluteDistance == 0f) 1f else yAxisDistance / absoluteDistance
         val absolutePosition = yPixelToValue(it, viewSize.height, absoluteMinY, absoluteMaxY)
         AnimatingYLegend(
             position = absolutePosition,
             label = axisFormatter.format(absolutePosition, zoom),
-            interpolatedPosition = yValueToPixel(
+            yDrawPixel = yValueToPixel(
                 absolutePosition,
                 viewSize.height,
                 localMinY,

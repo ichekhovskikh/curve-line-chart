@@ -4,19 +4,22 @@
         <attr name="lineWidth" format="dimension" />
         <attr name="scrollEnabled" format="boolean" />
 
-        <attr name="yLegendLineWidth" format="dimension" />
+        <attr name="axisLineWidth" format="dimension" />
+        <attr name="axisLineColor" format="color" />
+
         <attr name="yLegendCount" format="integer" />
         <attr name="yLegendTextSize" format="dimension" />
         <attr name="yLegendMarginBottom" format="dimension" />
         <attr name="yLegendMarginStart" format="dimension" />
         <attr name="yLegendTextColor" format="color" />
-        <attr name="yLegendLineColor" format="color" />
+        <attr name="yLegendLinesVisible" format="boolean" />
 
         <attr name="xLegendTextColor" format="color" />
         <attr name="xLegendTextSize" format="dimension" />
         <attr name="xLegendMarginTop" format="dimension" />
         <attr name="xLegendMarginHorizontalPercent" format="fraction" />
         <attr name="xLegendCount" format="integer" />
+        <attr name="xLegendLinesVisible" format="boolean" />
 
         <attr name="popupLineColor" format="color" />
         <attr name="popupLinePointInnerColor" format="color" />
@@ -29,20 +32,25 @@
         <attr name="scrollEnabled" />
     </declare-styleable>
 
+    <declare-styleable name="AxisGridView" parent="CurveLineChartView">
+        <attr name="axisLineColor" />
+        <attr name="axisLineWidth" />
+    </declare-styleable>
+
     <declare-styleable name="XAxisView" parent="CurveLineChartView">
         <attr name="xLegendTextColor" />
         <attr name="xLegendTextSize" />
         <attr name="xLegendMarginTop" />
         <attr name="xLegendMarginHorizontalPercent" />
         <attr name="xLegendCount" />
+        <attr name="xLegendLinesVisible" />
     </declare-styleable>
 
     <declare-styleable name="YAxisView" parent="CurveLineChartView">
         <attr name="yLegendTextColor" />
         <attr name="yLegendTextSize" />
-        <attr name="yLegendLineColor" />
-        <attr name="yLegendLineWidth" />
         <attr name="yLegendCount" />
+        <attr name="yLegendLinesVisible" />
         <attr name="yLegendMarginBottom" />
         <attr name="yLegendMarginStart" />
     </declare-styleable>

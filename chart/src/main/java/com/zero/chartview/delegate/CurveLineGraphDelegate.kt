@@ -39,9 +39,9 @@ internal class CurveLineGraphDelegate(
     private var currentLines = emptyList<CurveLine>()
     private val animatingLines = mutableListOf<AnimatingCurveLine>()
 
-    private var onYAxisChangedListener: ((minY: Float, maxY: Float, smoothScroll: Boolean) -> Unit)? = null
     private val onLinesChangedListeners = mutableListOf<(List<CurveLine>) -> Unit>()
     private val onRangeChangedListeners = mutableListOf<(start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit>()
+    private val onYAxisChangedListeners = mutableListOf<(minY: Float, maxY: Float, smoothScroll: Boolean) -> Unit>()
 
     @Px
     private var lastMotionX = 0f
@@ -60,7 +60,7 @@ internal class CurveLineGraphDelegate(
         this.currentMinY = startY
         this.currentMaxY = endY
         animatingLines.forEach { line ->
-            line.interpolatedPoints = transformAxis(line.curveLine.points, FloatRange(startX, endX))
+            line.drawPixelPoints = transformAxis(line.curveLine.points, FloatRange(startX, endX))
         }
         onUpdate()
     }
@@ -71,11 +71,7 @@ internal class CurveLineGraphDelegate(
 
     fun setRange(range: FloatRange, smoothScroll: Boolean = false) {
         if (this.range == range) return
-        if (!smoothScroll) {
-            this.range = range
-        }
-        updateAxis(newRange = range)
-        onRangeChanged(range, smoothScroll)
+        updateAxis(newRange = range, smoothScroll = smoothScroll)
     }
 
     fun setLines(newLines: List<CurveLine>) {
@@ -122,6 +118,7 @@ internal class CurveLineGraphDelegate(
     private fun updateAxis(
         newLines: List<CurveLine> = currentLines,
         newRange: FloatRange = range,
+        smoothScroll: Boolean = false,
         isAnimate: Boolean = true
     ) {
         val (minY, maxY) = newLines.getMinMaxY(newRange)
@@ -129,9 +126,13 @@ internal class CurveLineGraphDelegate(
             maxYAfterAnimate = maxY
             minYAfterAnimate = minY
             isAnimateYAxis = isAnimate
-            onYAxisChangedListener?.invoke(minY, maxY, isAnimate)
+            onYAxisChanged(minY, maxY, isAnimate)
         }
+        val currentRange = range
         if (isAnimate) {
+            if (!smoothScroll) {
+                range = newRange
+            }
             axisAnimator.reStart(
                 fromXRange = range.interpolateByValues(currentLines.abscissas),
                 toXRange = newRange.interpolateByValues(newLines.abscissas),
@@ -150,12 +151,15 @@ internal class CurveLineGraphDelegate(
             val interpolatedRange = range.interpolateByValues(currentLines.abscissas)
             animatingLines.forEach { line ->
                 line.animationValue = 1f
-                line.interpolatedPoints = transformAxis(
+                line.drawPixelPoints = transformAxis(
                     line.curveLine.points,
                     interpolatedRange
                 )
             }
             onUpdate()
+        }
+        if (newRange != currentRange) {
+            onRangeChanged(newRange, smoothScroll)
         }
     }
 
@@ -175,8 +179,12 @@ internal class CurveLineGraphDelegate(
         onRangeChangedListeners.remove(onRangeChangedListener)
     }
 
-    internal fun setOnYAxisChangedListener(onYAxisChangedListener: ((minY: Float, maxY: Float, smoothScroll: Boolean) -> Unit)?) {
-        this.onYAxisChangedListener = onYAxisChangedListener
+    fun addOnYAxisChangedListener(onYAxisChangedListener: ((minY: Float, maxY: Float, smoothScroll: Boolean) -> Unit)) {
+        onYAxisChangedListeners.add(onYAxisChangedListener)
+    }
+
+    fun removeOnYAxisChangedListener(onYAxisChangedListener: ((minY: Float, maxY: Float, smoothScroll: Boolean) -> Unit)) {
+        onYAxisChangedListeners.remove(onYAxisChangedListener)
     }
 
     private fun onLinesChanged(lines: List<CurveLine>) {
@@ -185,6 +193,10 @@ internal class CurveLineGraphDelegate(
 
     private fun onRangeChanged(range: FloatRange, smoothScroll: Boolean) {
         onRangeChangedListeners.forEach { it(range.start, range.endInclusive, smoothScroll) }
+    }
+
+    private fun onYAxisChanged(minY: Float, maxY: Float, smoothScroll: Boolean) {
+        onYAxisChangedListeners.forEach { it(minY, maxY, smoothScroll) }
     }
 
     fun onTouchEvent(event: MotionEvent) = when (event.actionMasked) {
@@ -249,7 +261,7 @@ internal class CurveLineGraphDelegate(
         animatingLines.forEach { line ->
             path.rewind()
             paint.color = line.animatingColor
-            line.interpolatedPoints.forEachIndexed { index, point ->
+            line.drawPixelPoints.forEachIndexed { index, point ->
                 when (index) {
                     0 -> path.moveTo(point.x, point.y)
                     else -> path.lineTo(point.x, point.y)

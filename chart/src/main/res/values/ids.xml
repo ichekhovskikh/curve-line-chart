@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <item name="curve_line_chart_grid_view" type="id"/>
     <item name="curve_line_graph_view" type="id"/>
     <item name="curve_line_x_axis_view" type="id"/>
     <item name="curve_line_y_axis_view" type="id"/>

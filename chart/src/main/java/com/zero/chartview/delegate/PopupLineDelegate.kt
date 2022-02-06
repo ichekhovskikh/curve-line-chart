@@ -25,7 +25,7 @@ internal class PopupLineDelegate(
 ) {
 
     @Px
-    internal var touchX: Float? = null
+    internal var touchX: Float = NO_POSITION
     private var viewSize = Size()
     private var lines = emptyList<CurveLine>()
     private var popupLine: PopupLine? = null
@@ -44,14 +44,14 @@ internal class PopupLineDelegate(
 
     fun setRange(range: FloatRange) {
         this.range = range
-        touchX = null
+        touchX = NO_POSITION
         onPopupLineChanged()
         onUpdate()
     }
 
     fun setLines(lines: List<CurveLine>) {
         this.lines = lines
-        touchX = null
+        touchX = NO_POSITION
         onPopupLineChanged()
         onUpdate()
     }
@@ -75,7 +75,7 @@ internal class PopupLineDelegate(
             false
         }
         MotionEvent.ACTION_MOVE -> {
-            touchX = null
+            touchX = NO_POSITION
             onPopupLineChanged()
             onUpdate()
             false
@@ -93,7 +93,7 @@ internal class PopupLineDelegate(
     }
 
     private fun calculatePopupLine(): PopupLine? {
-        val touchX = touchX ?: return null
+        if (touchX == NO_POSITION) return null
         val (startValue, endValue) = range.interpolateByLineAbscissas(lines)
         val intersections = lines.getIntersections(touchX, startValue, endValue)
         val intersectionX = intersections.firstOrNull()?.x ?: return null
@@ -135,14 +135,12 @@ internal class PopupLineDelegate(
         pointInnerColor?.let(pointInnerPaint::setColor)
         lineWidth?.let(linePaint::setStrokeWidth)
 
-        if (range.isEqualsOrNull(this.range) && touchX.isEqualsOrNull(this.touchX)) {
-            onUpdate()
-        } else {
-            range?.let { this.range = it }
+        if (range == this.range && !touchX.isEqualsOrNull(this.touchX)) {
+            this.range = range
             touchX?.let { this.touchX = it }
             onPopupLineChanged()
-            onUpdate()
         }
+        onUpdate()
     }
 
     fun drawPopupLine(canvas: Canvas) {
@@ -185,5 +183,9 @@ internal class PopupLineDelegate(
         val xValue = xPixelToValue(xPixel, viewSize.width, minX, maxX)
         val delta = (maxX - minX) * deltaTrackingTouchPercent
         return this.getIntersections(xValue, delta)
+    }
+
+    internal companion object {
+        const val NO_POSITION = -1f
     }
 }

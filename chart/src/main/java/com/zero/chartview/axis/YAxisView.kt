@@ -17,6 +17,7 @@ import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.extensions.getColorCompat
 import com.zero.chartview.extensions.on
 import com.zero.chartview.extensions.takeIfNull
+import com.zero.chartview.model.AxisLine
 import kotlinx.parcelize.Parcelize
 
 internal class YAxisView @JvmOverloads constructor(
@@ -51,18 +52,6 @@ internal class YAxisView @JvmOverloads constructor(
             }
         }
 
-    @get:ColorInt
-    @setparam:ColorInt
-    var lineColor: Int
-        get() = delegate.linePaint.color
-        set(value) {
-            if (delegate.linePaint.color != value) {
-                pendingSavedState.lineColor = value
-                delegate.linePaint.color = value
-                invalidate()
-            }
-        }
-
     @get:Px
     @setparam:Px
     var textSize: Float
@@ -75,18 +64,6 @@ internal class YAxisView @JvmOverloads constructor(
             }
         }
 
-    @get:Px
-    @setparam:Px
-    var lineWidth: Float
-        get() = delegate.linePaint.strokeWidth
-        set(value) {
-            if (delegate.linePaint.strokeWidth != value) {
-                pendingSavedState.lineWidth = value
-                delegate.linePaint.strokeWidth = value
-                invalidate()
-            }
-        }
-
     var legendCount: Int
         get() = delegate.legendCount
         set(value) {
@@ -94,12 +71,17 @@ internal class YAxisView @JvmOverloads constructor(
             delegate.setLegendCount(value)
         }
 
+    var isLegendLinesAvailable: Boolean
+        get() = delegate.isLegendLinesAvailable
+        set(value) {
+            pendingSavedState.isLegendLinesAvailable = value
+            delegate.setLegendLinesAvailable(value)
+        }
+
     init {
         val legendPaint = Paint()
-        val linePaint = Paint().apply {
-            style = Paint.Style.STROKE
-        }
         var legendCount = resources.getInteger(R.integer.y_legend_count_default)
+        var yLegendLinesVisible = true
         var legendMarginStart = resources.getDimension(R.dimen.y_legend_margin_start_default)
         var legendMarginBottom = resources.getDimension(R.dimen.y_legend_margin_bottom_default)
 
@@ -107,6 +89,10 @@ internal class YAxisView @JvmOverloads constructor(
             legendCount = getInteger(
                 R.styleable.YAxisView_yLegendCount,
                 legendCount
+            )
+            yLegendLinesVisible = getBoolean(
+                R.styleable.YAxisView_yLegendLinesVisible,
+                yLegendLinesVisible
             )
             legendMarginStart = getDimension(
                 R.styleable.YAxisView_yLegendMarginStart,
@@ -124,19 +110,11 @@ internal class YAxisView @JvmOverloads constructor(
                 R.styleable.YAxisView_yLegendTextSize,
                 resources.getDimension(R.dimen.y_legend_text_size_default)
             )
-            linePaint.color = getColor(
-                R.styleable.YAxisView_yLegendLineColor,
-                context.getColorCompat(R.color.colorYLegendLine)
-            )
-            linePaint.strokeWidth = getDimension(
-                R.styleable.YAxisView_yLegendLineWidth,
-                resources.getDimension(R.dimen.y_legend_line_width_default)
-            )
         }
         delegate = YAxisDelegate(
             legendPaint,
-            linePaint,
             legendCount,
+            yLegendLinesVisible,
             legendMarginStart,
             legendMarginBottom,
             onUpdate = ::postInvalidateOnAnimation
@@ -149,6 +127,10 @@ internal class YAxisView @JvmOverloads constructor(
 
     fun setYAxis(minY: Float, maxY: Float, smoothScroll: Boolean) {
         delegate.setYAxis(minY, maxY, smoothScroll)
+    }
+
+    internal fun setOnYAxisLinesChangedListener(onYAxisLinesChangedListener: ((yAxisLines: List<AxisLine>) -> Unit)?) {
+        delegate.setOnYAxisLinesChangedListener(onYAxisLinesChangedListener)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -174,25 +156,21 @@ internal class YAxisView @JvmOverloads constructor(
         state.legendCount?.takeIfNull(pendingSavedState.legendCount)?.also {
             pendingSavedState.legendCount = it
         }
+        state.isLegendLinesAvailable?.takeIfNull(pendingSavedState.isLegendLinesAvailable)?.also {
+            pendingSavedState.isLegendLinesAvailable = it
+        }
         state.textColor?.takeIfNull(pendingSavedState.textColor)?.also {
             pendingSavedState.textColor = it
-        }
-        state.lineColor?.takeIfNull(pendingSavedState.lineColor)?.also {
-            pendingSavedState.lineColor = it
         }
         state.textSize?.takeIfNull(pendingSavedState.textSize)?.also {
             pendingSavedState.textSize = it
         }
-        state.lineWidth?.takeIfNull(pendingSavedState.lineWidth)?.also {
-            pendingSavedState.lineWidth = it
-        }
         post {
             delegate.onRestoreInstanceState(
                 pendingSavedState.legendCount,
+                pendingSavedState.isLegendLinesAvailable,
                 pendingSavedState.textColor,
-                pendingSavedState.lineColor,
-                pendingSavedState.textSize,
-                pendingSavedState.lineWidth
+                pendingSavedState.textSize
             )
         }
     }
@@ -201,9 +179,8 @@ internal class YAxisView @JvmOverloads constructor(
     private data class SavedState(
         var superSavedState: Parcelable? = null,
         var legendCount: Int? = null,
+        var isLegendLinesAvailable: Boolean? = null,
         var textColor: Int? = null,
-        var lineColor: Int? = null,
-        var textSize: Float? = null,
-        var lineWidth: Float? = null
+        var textSize: Float? = null
     ) : Parcelable
 }

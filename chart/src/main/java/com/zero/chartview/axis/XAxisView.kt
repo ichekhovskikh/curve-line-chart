@@ -16,6 +16,7 @@ import com.zero.chartview.delegate.XAxisDelegate
 import com.zero.chartview.extensions.*
 import com.zero.chartview.extensions.applyStyledAttributes
 import com.zero.chartview.extensions.getColorCompat
+import com.zero.chartview.model.AxisLine
 import com.zero.chartview.model.FloatRange
 import com.zero.chartview.model.PercentRange
 import kotlinx.parcelize.Parcelize
@@ -71,6 +72,13 @@ internal class XAxisView @JvmOverloads constructor(
             delegate.setLegendCount(value)
         }
 
+    var isLegendLinesAvailable: Boolean
+        get() = delegate.isLegendLinesAvailable
+        set(value) {
+            pendingSavedState.isLegendLinesAvailable = value
+            delegate.setLegendLinesAvailable(value)
+        }
+
     val range get() = delegate.range
 
     @get:Px
@@ -81,12 +89,18 @@ internal class XAxisView @JvmOverloads constructor(
         val legendPaint = Paint()
         var textMarginTop = resources.getDimension(R.dimen.x_legend_margin_top_default)
         var legendCount = resources.getInteger(R.integer.x_legend_count_default)
+        var xLegendLinesVisible = false
         var textMarginHorizontalPercent = resources.getFraction(
             R.fraction.x_legend_margin_horizontal_percent_default,
             1,
             1
         )
         applyStyledAttributes(attrs, R.styleable.XAxisView, defStyleAttr, defStyleRes) {
+            legendCount = getInteger(R.styleable.XAxisView_xLegendCount, legendCount)
+            xLegendLinesVisible = getBoolean(
+                R.styleable.XAxisView_xLegendLinesVisible,
+                xLegendLinesVisible
+            )
             legendPaint.textSize = getDimension(
                 R.styleable.XAxisView_xLegendTextSize,
                 resources.getDimension(R.dimen.x_legend_text_size_default)
@@ -102,11 +116,11 @@ internal class XAxisView @JvmOverloads constructor(
                 1,
                 textMarginHorizontalPercent
             )
-            legendCount = getInteger(R.styleable.XAxisView_xLegendCount, legendCount)
         }
         delegate = XAxisDelegate(
             legendPaint,
             legendCount,
+            xLegendLinesVisible,
             textMarginTop,
             textMarginHorizontalPercent,
             onUpdate = ::postInvalidateOnAnimation
@@ -121,6 +135,10 @@ internal class XAxisView @JvmOverloads constructor(
         val range = PercentRange(start, endInclusive)
         pendingSavedState.range = range
         delegate.setRange(range, smoothScroll)
+    }
+
+    internal fun setOnXAxisLinesChangedListener(onXAxisLinesChangedListener: ((xAxisLines: List<AxisLine>) -> Unit)?) {
+        delegate.setOnXAxisLinesChangedListener(onXAxisLinesChangedListener)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -150,6 +168,9 @@ internal class XAxisView @JvmOverloads constructor(
         state.legendCount?.takeIfNull(pendingSavedState.legendCount)?.also {
             pendingSavedState.legendCount = it
         }
+        state.isLegendLinesAvailable?.takeIfNull(pendingSavedState.isLegendLinesAvailable)?.also {
+            pendingSavedState.isLegendLinesAvailable = it
+        }
         state.textColor?.takeIfNull(pendingSavedState.textColor)?.also {
             pendingSavedState.textColor = it
         }
@@ -160,6 +181,7 @@ internal class XAxisView @JvmOverloads constructor(
             delegate.onRestoreInstanceState(
                 pendingSavedState.range,
                 pendingSavedState.legendCount,
+                pendingSavedState.isLegendLinesAvailable,
                 pendingSavedState.textColor,
                 pendingSavedState.textSize
             )
@@ -171,6 +193,7 @@ internal class XAxisView @JvmOverloads constructor(
         var superSavedState: Parcelable? = null,
         var range: FloatRange? = null,
         var legendCount: Int? = null,
+        var isLegendLinesAvailable: Boolean? = null,
         var textColor: Int? = null,
         var textSize: Float? = null
     ) : Parcelable

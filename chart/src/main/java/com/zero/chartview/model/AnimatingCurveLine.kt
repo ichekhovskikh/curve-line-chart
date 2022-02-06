@@ -6,7 +6,7 @@ internal data class AnimatingCurveLine(
     val curveLine: CurveLine,
     var isAppearing: Boolean,
     var animationValue: Float,
-    var interpolatedPoints: List<PointF> = curveLine.points
+    var drawPixelPoints: List<PointF> = curveLine.points
 )
 
 

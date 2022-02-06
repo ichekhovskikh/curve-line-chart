@@ -9,7 +9,7 @@
     <color name="colorBackground">#1D2733</color>
     <color name="colorXLegendText">#5B6F81</color>
     <color name="colorYLegendText">#5B6F81</color>
-    <color name="colorYLegendLine">#131c26</color>
+    <color name="colorAxisLine">#131c26</color>
     <color name="colorSelectorFrame">#803E5D79</color>
     <color name="colorSelectorFog">#B3141C32</color>
     <color name="colorPopupLine">#B3141C32</color>

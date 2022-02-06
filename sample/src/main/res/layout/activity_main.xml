@@ -32,7 +32,7 @@
                 app:xLegendMarginHorizontalPercent="30%"
                 app:xLegendTextColor="@color/colorXLegendText"
                 app:yLegendTextColor="@color/colorYLegendText"
-                app:yLegendLineColor="@color/colorYLegendLine"
+                app:axisLineColor="@color/colorAxisLine"
                 app:popupLineColor="@color/colorPopupLine"
                 app:popupLinePointInnerColor="@color/colorPopupLinePointInner"
                 app:popupView=".CustomPopupView"
