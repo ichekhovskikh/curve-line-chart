@@ -19,12 +19,12 @@
             android:textColor="@color/colorTitle"
             android:textSize="20sp" />
 
-    <com.zero.chartview.CurveLineChartLayout
+    <com.chekh.chartview.CurveLineChartLayout
             android:id="@+id/clclChartLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-        <com.zero.chartview.CurveLineChartView
+        <com.chekh.chartview.CurveLineChartView
                 android:id="@+id/clcvChart"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
@@ -38,7 +38,7 @@
                 app:popupView=".CustomPopupView"
                 app:scrollEnabled="true" />
 
-        <com.zero.chartview.selector.CurveLineSelectorView
+        <com.chekh.chartview.selector.CurveLineSelectorView
                 android:id="@+id/clsvSelector"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -46,9 +46,9 @@
                 app:selectorFrameColor="@color/colorSelectorFrame"
                 app:selectorFogColor="@color/colorSelectorFog" />
 
-    </com.zero.chartview.CurveLineChartLayout>
+    </com.chekh.chartview.CurveLineChartLayout>
 
-    <com.zero.sample.ChartLabelsView
+    <com.chekh.sample.ChartLabelsView
             android:id="@+id/clvLabels"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
