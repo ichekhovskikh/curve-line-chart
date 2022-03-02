@@ -19,6 +19,9 @@ import com.chekh.chartview.extensions.takeIfNull
 import com.chekh.chartview.model.AxisLine
 import kotlinx.parcelize.Parcelize
 
+/**
+ * This view is a representation of the grid values of the graph axis
+ */
 internal class AxisGridView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
@@ -30,6 +33,9 @@ internal class AxisGridView @JvmOverloads constructor(
 
     private val pendingSavedState = SavedState()
 
+    /**
+     * Color of the axis lines
+     */
     @get:ColorInt
     @setparam:ColorInt
     var lineColor: Int
@@ -42,6 +48,9 @@ internal class AxisGridView @JvmOverloads constructor(
             }
         }
 
+    /**
+     * Width of the axis lines
+     */
     @get:Px
     @setparam:Px
     var lineWidth: Float

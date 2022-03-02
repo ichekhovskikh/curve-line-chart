@@ -4,14 +4,29 @@ import android.graphics.PointF
 import com.chekh.chartview.model.CurveLine
 import com.chekh.chartview.model.FloatRange
 
+/**
+ * @return a distance between start and end
+ */
 val FloatRange.distance get() = endInclusive - start
 
+/**
+ * checks whether [value] is in the range
+ */
 fun FloatRange.contains(value: Float) = value in start..endInclusive
 
+/**
+ * checks that the range is empty
+ */
 fun FloatRange.isEmpty() = start == endInclusive
 
+/**
+ * checks that the range is not empty
+ */
 fun FloatRange.isNotEmpty() = !isEmpty()
 
+/**
+ * shifts the range by [offset]
+ */
 fun FloatRange.offset(offset: Float) = FloatRange(start - offset, endInclusive - offset)
 
 /**

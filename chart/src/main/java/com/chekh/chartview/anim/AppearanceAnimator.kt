@@ -5,6 +5,9 @@ import android.animation.ValueAnimator
 import com.chekh.chartview.BuildConfig
 import com.chekh.chartview.tools.AnimatorListenerAdapter
 
+/**
+ * The animator of the appearance and disappearance of objects
+ */
 internal class AppearanceAnimator(
     var duration: Long = BuildConfig.ANIMATION_DURATION_MS,
     var onUpdate: ((value: Float) -> Unit)? = null

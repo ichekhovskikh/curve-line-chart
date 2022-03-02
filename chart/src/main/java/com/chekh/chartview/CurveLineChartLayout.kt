@@ -8,6 +8,9 @@ import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import com.chekh.chartview.selector.CurveLineSelectorView
 
+/**
+ * This layout combines the work of the [CurveLineChartView] and [CurveLineSelectorView]
+ */
 class CurveLineChartLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,

@@ -7,9 +7,15 @@ import com.chekh.chartview.model.FloatRange
 import com.chekh.chartview.model.MinMax
 import kotlin.math.abs
 
+/**
+ * @return all the abscesses of the curve line
+ */
 val List<CurveLine>.abscissas: List<Float>
     get() = flatMap { line -> line.points.map { it.x } }.distinct()
 
+/**
+ * @return all the ordinates of the curve line
+ */
 val List<CurveLine>.ordinates: List<Float>
     get() = flatMap { line -> line.points.map { it.y } }.distinct()
 

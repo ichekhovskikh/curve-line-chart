@@ -3,6 +3,15 @@ package com.chekh.chartview.axis.formatter
 import java.text.DecimalFormat
 import kotlin.math.abs
 
+/**
+ * This formatter uses a shortened number format:
+ * 1000000000000 -> 1mm
+ * 1000000 -> 1m
+ * 1000 -> 1k
+ * 1 -> 1
+ * 0.000001 -> 1e-6
+ * 0.000000001 -> 1e-9
+ */
 class ShortAxisFormatter : AxisFormatter {
 
     private val decimalFormat = DecimalFormat().apply {

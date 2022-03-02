@@ -21,6 +21,9 @@ import com.chekh.chartview.model.FloatRange
 import com.chekh.chartview.model.PercentRange
 import kotlinx.parcelize.Parcelize
 
+/**
+ * This view is a representation of the abscissa legends of the graph
+ */
 internal class XAxisView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
@@ -32,6 +35,9 @@ internal class XAxisView @JvmOverloads constructor(
 
     private val pendingSavedState = SavedState()
 
+    /**
+     * Formatter for formatting the values of the abscissa axis
+     */
     var axisFormatter: AxisFormatter
         get() = delegate.axisFormatter
         set(value) {
@@ -41,6 +47,9 @@ internal class XAxisView @JvmOverloads constructor(
             }
         }
 
+    /**
+     * Color of the legend text on the abscissa axis
+     */
     @get:ColorInt
     @setparam:ColorInt
     var textColor: Int
@@ -53,6 +62,9 @@ internal class XAxisView @JvmOverloads constructor(
             }
         }
 
+    /**
+     * Legend text size on the abscissa axis
+     */
     @get:Px
     @setparam:Px
     var textSize: Float
@@ -65,6 +77,9 @@ internal class XAxisView @JvmOverloads constructor(
             }
         }
 
+    /**
+     * Number of legends on the abscissa axis
+     */
     var legendCount: Int
         get() = delegate.legendCount
         set(value) {
@@ -72,6 +87,9 @@ internal class XAxisView @JvmOverloads constructor(
             delegate.setLegendCount(value)
         }
 
+    /**
+     * @return true if the lines on the abscissa axis are visible
+     */
     var isLegendLinesAvailable: Boolean
         get() = delegate.isLegendLinesAvailable
         set(value) {
@@ -79,6 +97,9 @@ internal class XAxisView @JvmOverloads constructor(
             delegate.setLegendLinesAvailable(value)
         }
 
+    /**
+     * Vertical area of the graph to display
+     */
     val range get() = delegate.range
 
     @get:Px

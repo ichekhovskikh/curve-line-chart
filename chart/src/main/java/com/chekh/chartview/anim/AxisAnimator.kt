@@ -9,6 +9,9 @@ import com.chekh.chartview.model.FloatRange
 import com.chekh.chartview.model.ZeroRange
 import com.chekh.chartview.tools.AnimatorListenerAdapter
 
+/**
+ * Thr animator for changing axis values
+ */
 internal class AxisAnimator(
     var duration: Long = BuildConfig.ANIMATION_DURATION_MS,
     var onUpdate: ((startX: Float, endX: Float, startY: Float, endY: Float) -> Unit)? = null

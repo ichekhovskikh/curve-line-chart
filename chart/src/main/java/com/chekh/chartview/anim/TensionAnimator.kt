@@ -7,6 +7,9 @@ import android.view.animation.DecelerateInterpolator
 import com.chekh.chartview.BuildConfig
 import com.chekh.chartview.tools.AnimatorListenerAdapter
 
+/**
+ * The animator for stretching objects along two axes
+ */
 internal class TensionAnimator(
     var duration: Long = BuildConfig.ANIMATION_DURATION_MS,
     var onUpdate: ((tension: Float, min: Float, max: Float) -> Unit)? = null

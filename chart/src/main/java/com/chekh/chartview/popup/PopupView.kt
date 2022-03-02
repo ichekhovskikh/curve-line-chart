@@ -12,6 +12,9 @@ import com.chekh.chartview.extensions.getFullClassName
 import com.chekh.chartview.model.IntersectionPoint
 import java.lang.reflect.InvocationTargetException
 
+/**
+ * This view is a representation of the popup window with intersection points
+ */
 abstract class PopupView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
@@ -21,9 +24,9 @@ abstract class PopupView @JvmOverloads constructor(
 
     /**
      * Binding of intersections
-     * [xPixel] the coordinate of the abscissa intersection.
-     * equal null if there are no intersections
-     * [intersections] list of intersections with curve lines
+     * @param xPixel the coordinate of the abscissa intersection.
+     * [xPixel] equals null if there are no intersections.
+     * @param intersections list of intersections with curve lines
      */
     abstract fun bind(@Px xPixel: Float?, intersections: List<IntersectionPoint>)
 
@@ -37,7 +40,7 @@ abstract class PopupView @JvmOverloads constructor(
         )
 
         /**
-         * Instantiate a PopupView, if specified in the attributes
+         * Instantiate a PopupView if specified in the attributes
          */
         operator fun invoke(
             parent: ViewGroup,

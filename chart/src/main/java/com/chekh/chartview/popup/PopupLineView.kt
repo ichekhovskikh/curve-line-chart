@@ -23,6 +23,9 @@ import com.chekh.chartview.model.FloatRange
 import com.chekh.chartview.model.PercentRange
 import kotlinx.parcelize.Parcelize
 
+/**
+ * This view is a representation of the vertical touch line
+ */
 internal class PopupLineView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
@@ -34,6 +37,9 @@ internal class PopupLineView @JvmOverloads constructor(
 
     private val pendingSavedState = SavedState()
 
+    /**
+     * Popup window with intersection points
+     */
     var popupView: PopupView? = null
         set(value) {
             field = value
@@ -46,6 +52,9 @@ internal class PopupLineView @JvmOverloads constructor(
             }
         }
 
+    /**
+     * Color of the vertical touch line
+     */
     @get:ColorInt
     @setparam:ColorInt
     var lineColor: Int
@@ -58,6 +67,9 @@ internal class PopupLineView @JvmOverloads constructor(
             }
         }
 
+    /**
+     * Color of the intersection point on the vertical touch line
+     */
     @get:ColorInt
     @setparam:ColorInt
     var pointInnerColor: Int
@@ -70,6 +82,9 @@ internal class PopupLineView @JvmOverloads constructor(
             }
         }
 
+    /**
+     * Vertical touch line width
+     */
     @get:Px
     @setparam:Px
     var lineWidth: Float

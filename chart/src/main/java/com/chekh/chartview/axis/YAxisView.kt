@@ -20,6 +20,9 @@ import com.chekh.chartview.extensions.takeIfNull
 import com.chekh.chartview.model.AxisLine
 import kotlinx.parcelize.Parcelize
 
+/**
+ * This view is a representation of the ordinate legends of the graph
+ */
 internal class YAxisView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
@@ -31,6 +34,9 @@ internal class YAxisView @JvmOverloads constructor(
 
     private val pendingSavedState = SavedState()
 
+    /**
+     * Formatter for formatting the values of the ordinate axis
+     */
     var axisFormatter: AxisFormatter
         get() = delegate.axisFormatter
         set(value) {
@@ -40,6 +46,9 @@ internal class YAxisView @JvmOverloads constructor(
             }
         }
 
+    /**
+     * Color of the legend text on the ordinate axis
+     */
     @get:ColorInt
     @setparam:ColorInt
     var textColor: Int
@@ -52,6 +61,9 @@ internal class YAxisView @JvmOverloads constructor(
             }
         }
 
+    /**
+     * Legend text size on the ordinate axis
+     */
     @get:Px
     @setparam:Px
     var textSize: Float
@@ -64,6 +76,9 @@ internal class YAxisView @JvmOverloads constructor(
             }
         }
 
+    /**
+     * Number of legends on the ordinate axis
+     */
     var legendCount: Int
         get() = delegate.legendCount
         set(value) {
@@ -71,6 +86,9 @@ internal class YAxisView @JvmOverloads constructor(
             delegate.setLegendCount(value)
         }
 
+    /**
+     * @return true if the lines on the ordinate axis are visible
+     */
     var isLegendLinesAvailable: Boolean
         get() = delegate.isLegendLinesAvailable
         set(value) {

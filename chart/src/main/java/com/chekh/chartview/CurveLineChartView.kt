@@ -18,6 +18,9 @@ import com.chekh.chartview.model.CurveLine
 import com.chekh.chartview.popup.PopupLineView
 import com.chekh.chartview.popup.PopupView
 
+/**
+ * This view draws a curve line graph with axes and popup view
+ */
 class CurveLineChartView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
@@ -31,6 +34,9 @@ class CurveLineChartView @JvmOverloads constructor(
     private val yAxis = YAxisView(context, attrs, defStyleAttr, defStyleRes)
     private val popupLine = PopupLineView(context, attrs, defStyleAttr, defStyleRes)
 
+    /**
+     * Popup window with intersection points
+     */
     var popupView: PopupView?
         get() = popupLine.popupView
         set(value) {
@@ -42,26 +48,41 @@ class CurveLineChartView @JvmOverloads constructor(
             }
         }
 
+    /**
+     * Vertical area of the graph to display
+     */
     val range get() = graph.range
 
+    /**
+     * @return true if manual scrolling is enabled
+     */
     var isScrollEnabled
         get() = graph.isScrollEnabled
         set(value) {
             graph.isScrollEnabled = value
         }
 
+    /**
+     * Formatter for formatting the values of the abscissa axis
+     */
     var xAxisFormatter: AxisFormatter
         get() = xAxis.axisFormatter
         set(value) {
             xAxis.axisFormatter = value
         }
 
+    /**
+     * Formatter for formatting the values of the ordinate axis
+     */
     var yAxisFormatter: AxisFormatter
         get() = yAxis.axisFormatter
         set(value) {
             yAxis.axisFormatter = value
         }
 
+    /**
+     * Color of the legend text on the abscissa axis
+     */
     @get:ColorInt
     @setparam:ColorInt
     var xAxisTextColor: Int
@@ -70,6 +91,9 @@ class CurveLineChartView @JvmOverloads constructor(
             xAxis.textColor = value
         }
 
+    /**
+     * Color of the legend text on the ordinate axis
+     */
     @get:ColorInt
     @setparam:ColorInt
     var yAxisTextColor: Int
@@ -78,6 +102,9 @@ class CurveLineChartView @JvmOverloads constructor(
             yAxis.textColor = value
         }
 
+    /**
+     * Color of the axis lines
+     */
     @get:ColorInt
     @setparam:ColorInt
     var axisLineColor: Int
@@ -86,6 +113,9 @@ class CurveLineChartView @JvmOverloads constructor(
             grid.lineColor = value
         }
 
+    /**
+     * Color of the vertical touch line
+     */
     @get:ColorInt
     @setparam:ColorInt
     var popupLineColor: Int
@@ -94,6 +124,9 @@ class CurveLineChartView @JvmOverloads constructor(
             popupLine.lineColor = value
         }
 
+    /**
+     * Color of the intersection point on the vertical touch line
+     */
     @get:ColorInt
     @setparam:ColorInt
     var popupLinePointInnerColor: Int
@@ -102,6 +135,9 @@ class CurveLineChartView @JvmOverloads constructor(
             popupLine.pointInnerColor = value
         }
 
+    /**
+     * Curve line width
+     */
     @get:Px
     @setparam:Px
     var lineWidth: Float
@@ -110,6 +146,9 @@ class CurveLineChartView @JvmOverloads constructor(
             graph.lineWidth = value
         }
 
+    /**
+     * Vertical touch line width
+     */
     @get:Px
     @setparam:Px
     var popupLineWidth: Float
@@ -118,6 +157,9 @@ class CurveLineChartView @JvmOverloads constructor(
             popupLine.lineWidth = value
         }
 
+    /**
+     * Legend text size on the abscissa axis
+     */
     @get:Px
     @setparam:Px
     var xAxisTextSize: Float
@@ -126,6 +168,9 @@ class CurveLineChartView @JvmOverloads constructor(
             xAxis.textSize = value
         }
 
+    /**
+     * Legend text size on the ordinate axis
+     */
     @get:Px
     @setparam:Px
     var yAxisTextSize: Float
@@ -134,6 +179,9 @@ class CurveLineChartView @JvmOverloads constructor(
             yAxis.textSize = value
         }
 
+    /**
+     * Width of the axis lines
+     */
     @get:Px
     @setparam:Px
     var axisLineWidth: Float
@@ -142,24 +190,36 @@ class CurveLineChartView @JvmOverloads constructor(
             grid.lineWidth = value
         }
 
+    /**
+     * Number of legends on the abscissa axis
+     */
     var xAxisLegendCount: Int
         get() = xAxis.legendCount
         set(value) {
             xAxis.legendCount = value
         }
 
+    /**
+     * Number of legends on the ordinate axis
+     */
     var yAxisLegendCount: Int
         get() = yAxis.legendCount
         set(value) {
             yAxis.legendCount = value
         }
 
+    /**
+     * @return true if the lines on the abscissa axis are visible
+     */
     var isXAxisLegendLinesVisible: Boolean
         get() = xAxis.isLegendLinesAvailable
         set(value) {
             xAxis.isLegendLinesAvailable = value
         }
 
+    /**
+     * @return true if the lines on the ordinate axis are visible
+     */
     var isYAxisLegendLinesVisible: Boolean
         get() = yAxis.isLegendLinesAvailable
         set(value) {
@@ -197,12 +257,25 @@ class CurveLineChartView @JvmOverloads constructor(
         }
     }
 
+    /**
+     * Set a new scroll frame position
+     * @param start the left border of the selected area as a percentage
+     * @param endInclusive the right border of the selected area as a percentage
+     * @param smoothScroll allows to support smooth scrolling
+     */
     fun setRange(start: Float, endInclusive: Float, smoothScroll: Boolean = false) {
         graph.setRange(start, endInclusive, smoothScroll)
     }
 
+    /**
+     * @return current lines
+     */
     fun getLines() = graph.getLines()
 
+    /**
+     * Set a new lines for this [CurveLineChartView]
+     * @param lines to be set
+     */
     fun setLines(lines: List<CurveLine>) {
         graph.setLines(lines)
         popupLine.setLines(lines)
@@ -210,6 +283,10 @@ class CurveLineChartView @JvmOverloads constructor(
         xAxis.setAbscissas(lines.abscissas)
     }
 
+    /**
+     * Add a new line into this [CurveLineChartView]
+     * @param line to be added
+     */
     fun addLine(line: CurveLine) {
         val lines = graph.getLines() + line
         graph.addLine(line)
@@ -218,11 +295,19 @@ class CurveLineChartView @JvmOverloads constructor(
         xAxis.setAbscissas(lines.abscissas)
     }
 
+    /**
+     * Remove a current line from this [CurveLineChartView]
+     * @param index of the line to remove
+     */
     fun removeLine(index: Int) {
         val lines = graph.getLines()
         removeLine(lines[index])
     }
 
+    /**
+     * Remove a current line from this [CurveLineChartView]
+     * @param line to be removed
+     */
     fun removeLine(line: CurveLine) {
         val lines = graph.getLines() - line
         graph.removeLine(line)
@@ -231,26 +316,50 @@ class CurveLineChartView @JvmOverloads constructor(
         xAxis.setAbscissas(lines.abscissas)
     }
 
+    /**
+     * Add a listener that will be notified of any changes in the displayed lines
+     * @param onLinesChangedListener listener to set
+     */
     fun addOnLinesChangedListener(onLinesChangedListener: (List<CurveLine>) -> Unit) {
         graph.addOnLinesChangedListener(onLinesChangedListener)
     }
 
+    /**
+     * Remove a listener that will be notified of any changes in the displayed lines
+     * @param onLinesChangedListener listener to set
+     */
     fun removeOnLinesChangedListener(onLinesChangedListener: (List<CurveLine>) -> Unit) {
         graph.removeOnLinesChangedListener(onLinesChangedListener)
     }
 
+    /**
+     * Add a listener that will be notified of any changes in the displayed area of the graph
+     * @param onRangeChangedListener listener to set
+     */
     fun addOnRangeChangedListener(onRangeChangedListener: (start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit) {
         graph.addOnRangeChangedListener(onRangeChangedListener)
     }
 
+    /**
+     * Remove a listener that was notified of any changes in displayed area of the graph
+     * @param onRangeChangedListener listener to set or null to clear
+     */
     fun removeOnRangeChangedListener(onRangeChangedListener: (start: Float, endInclusive: Float, smoothScroll: Boolean) -> Unit) {
         graph.removeOnRangeChangedListener(onRangeChangedListener)
     }
 
+    /**
+     * Add a listener that will be notified of any changes in displayed maximum or minimum ordinates
+     * @param onYAxisChangedListener listener to set
+     */
     fun addOnYAxisChangedListener(onYAxisChangedListener: ((minY: Float, maxY: Float, smoothScroll: Boolean) -> Unit)) {
         graph.addOnYAxisChangedListener(onYAxisChangedListener)
     }
 
+    /**
+     * Remove a listener that will be notified of any changes in displayed maximum or minimum ordinates
+     * @param onYAxisChangedListener listener to set
+     */
     fun removeOnYAxisChangedListener(onYAxisChangedListener: ((minY: Float, maxY: Float, smoothScroll: Boolean) -> Unit)) {
         graph.removeOnYAxisChangedListener(onYAxisChangedListener)
     }

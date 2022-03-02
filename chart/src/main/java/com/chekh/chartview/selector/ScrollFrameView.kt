@@ -21,6 +21,9 @@ import com.chekh.chartview.model.FloatRange
 import com.chekh.chartview.model.PercentRange
 import kotlinx.parcelize.Parcelize
 
+/**
+ * This view is a representation of the selected vertical area of the graph
+ */
 internal class ScrollFrameView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
