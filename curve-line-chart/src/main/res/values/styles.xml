@@ -1,0 +1,30 @@
+<resources>
+    <dimen name="line_width_default">2dp</dimen>
+
+    <dimen name="axis_line_width_default">1dp</dimen>
+
+    <dimen name="y_legend_margin_start_default">0dp</dimen>
+    <dimen name="y_legend_margin_bottom_default">6dp</dimen>
+    <dimen name="y_legend_text_size_default">13sp</dimen>
+    <integer name="y_legend_count_default">6</integer>
+
+    <dimen name="x_legend_margin_top_default">4dp</dimen>
+    <integer name="x_legend_count_default">5</integer>
+    <fraction name="x_legend_margin_horizontal_percent_default">0%</fraction>
+    <dimen name="x_legend_text_size_default">13sp</dimen>
+
+    <dimen name="frame_corner_radius_default">8dp</dimen>
+    <dimen name="frame_thickness_horizontal_default">2dp</dimen>
+    <dimen name="frame_thickness_vertical_default">14dp</dimen>
+    <fraction name="frame_min_width_percent_default">10%</fraction>
+    <fraction name="frame_max_width_percent_default">100%</fraction>
+    <dimen name="frame_drag_indicator_max_height_default">24dp</dimen>
+    <dimen name="frame_drag_indicator_width_default">4dp</dimen>
+    <dimen name="frame_drag_indicator_corner_radius_default">4dp</dimen>
+
+    <dimen name="popup_line_width">1dp</dimen>
+    <dimen name="point_inner_radius">3dp</dimen>
+    <dimen name="point_outer_radius">5dp</dimen>
+
+    <fraction name="delta_tracking_touch_percent">3%</fraction>
+</resources>

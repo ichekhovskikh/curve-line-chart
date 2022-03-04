@@ -1,57 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        android:background="@color/colorBackground"
-        tools:context=".MainActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    tools:context=".MainActivity"
+    tools:ignore="Overdraw">
 
     <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|start"
-            android:layout_margin="16dp"
-            android:text="@string/sample_title"
-            android:textColor="@color/colorTitle"
-            android:textSize="20sp" />
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|start"
+        android:layout_margin="16dp"
+        android:text="@string/sample_title"
+        android:textColor="@color/colorTitle"
+        android:textSize="20sp" />
 
     <com.chekh.chartview.CurveLineChartLayout
-            android:id="@+id/clclChartLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        android:id="@+id/clclChartLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <com.chekh.chartview.CurveLineChartView
-                android:id="@+id/clcvChart"
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
-                app:yLegendMarginStart="8dp"
-                app:xLegendMarginHorizontalPercent="30%"
-                app:xLegendTextColor="@color/colorXLegendText"
-                app:yLegendTextColor="@color/colorYLegendText"
-                app:axisLineColor="@color/colorAxisLine"
-                app:popupLineColor="@color/colorPopupLine"
-                app:popupLinePointInnerColor="@color/colorPopupLinePointInner"
-                app:popupView=".CustomPopupView"
-                app:scrollEnabled="true" />
+            android:id="@+id/clcvChart"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            app:axisLineColor="@color/colorAxisLine"
+            app:popupLineColor="@color/colorPopupLine"
+            app:popupLinePointInnerColor="@color/colorPopupLinePointInner"
+            app:popupView=".CustomPopupView"
+            app:scrollEnabled="true"
+            app:xLegendMarginHorizontalPercent="30%"
+            app:xLegendTextColor="@color/colorXLegendText"
+            app:yLegendMarginStart="8dp"
+            app:yLegendTextColor="@color/colorYLegendText" />
 
         <com.chekh.chartview.selector.CurveLineSelectorView
-                android:id="@+id/clsvSelector"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="20dp"
-                app:selectorFrameColor="@color/colorSelectorFrame"
-                app:selectorFogColor="@color/colorSelectorFog" />
+            android:id="@+id/clsvSelector"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            app:selectorFogColor="@color/colorSelectorFog"
+            app:selectorFrameColor="@color/colorSelectorFrame" />
 
     </com.chekh.chartview.CurveLineChartLayout>
 
     <com.chekh.sample.ChartLabelsView
-            android:id="@+id/clvLabels"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp" />
-
+        android:id="@+id/clvLabels"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp" />
 </LinearLayout>

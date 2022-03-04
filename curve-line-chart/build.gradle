@@ -1,20 +1,21 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 
 apply from: "dependencies.gradle"
+apply from: "publish.gradle"
 apply from: "$rootDir/gradle/scripts/lint/android-lint.gradle"
 
 android {
     compileSdkVersion androidCompileSdkVersion
 
     defaultConfig {
-        applicationId 'com.chekh.sample'
         minSdkVersion androidMinSdkVersion
         targetSdkVersion androidTargetSdkVersion
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "Long", "ANIMATION_DURATION_MS", "300L"
     }
 
     buildTypes {

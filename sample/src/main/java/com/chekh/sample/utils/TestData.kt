@@ -7,6 +7,7 @@ import com.chekh.chartview.model.CurveLine
 private val greenColor get() = Color.parseColor("#3DC23F")
 private val redColor get() = Color.parseColor("#F34C44")
 
+@Suppress("MagicNumber")
 internal val testLines = listOf(
     CurveLine(
         name = "green",

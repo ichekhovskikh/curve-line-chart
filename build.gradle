@@ -1,18 +1,47 @@
-buildscript {
-    ext.kotlin_version = '1.6.10'
+import io.gitlab.arturbosch.detekt.Detekt
 
+buildscript {
+    ext {
+        kotlinVersion = '1.6.10'
+        gradleVersion = '7.0.4'
+    }
     repositories {
         google()
         mavenCentral()
-        
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.4'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.android.tools.build:gradle:$gradleVersion"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+plugins {
+    id("io.gitlab.arturbosch.detekt").version('1.19.0')
+    id('org.jetbrains.kotlin.jvm').version('1.6.10').apply(false)
 }
 
+repositories {
+    mavenCentral()
+}
+
+def sources = file("settings.gradle")
+        .readLines()
+        .collectNested { line -> (line.toString() =~ /['"](.+)['"]/).findAll() }
+        .flatten()
+        .findAll { line -> !line.isEmpty() }
+        .collectNested { line ->
+            def moduleName = line.replaceAll(":", "").replaceAll("'", "").replaceAll("\"", "")
+            "$projectDir/$moduleName/src/main/java"
+        }
+        .unique()
+
+detekt {
+    parallel = true
+    source = files(sources)
+}
+
+tasks.withType(Detekt).configureEach {
+    reports {
+        xml.required.set(true)
+    }
+}

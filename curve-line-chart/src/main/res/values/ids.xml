@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="curve_line_chart_grid_view" type="id" />
+    <item name="curve_line_graph_view" type="id" />
+    <item name="curve_line_x_axis_view" type="id" />
+    <item name="curve_line_y_axis_view" type="id" />
+    <item name="curve_line_popup_line_view" type="id" />
+
+    <item name="curve_line_selector_graph_view" type="id" />
+    <item name="curve_line_selector_scroll_frame_view" type="id" />
+</resources>

@@ -1,0 +1,31 @@
+apply plugin: 'maven-publish'
+
+task androidSourcesJar(type: Jar) {
+    archiveClassifier.set("sources")
+    from android.sourceSets.main.java.srcDirs
+}
+
+publishing {
+    publications {
+        bar(MavenPublication) {
+            groupId PUBLISH_GROUP_ID
+            artifactId PUBLISH_ARTIFACT_ID
+            version PUBLISH_VERSION
+
+            artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
+            artifact androidSourcesJar
+        }
+    }
+    repositories {
+        maven {
+            name = PUBLISH_NAME
+            url = uri("$PUBLISH_BASE_URL/$PUBLISH_REPOSITORY_OWNER/$PUBLISH_REPOSITORY_ID")
+            credentials {
+                Properties properties = new Properties()
+                properties.load(project.rootProject.file('local.properties').newDataInputStream())
+                username = properties.getProperty('GITHUB_USER_NAME')
+                password = properties.getProperty('GITHUB_TOKEN')
+            }
+        }
+    }
+}

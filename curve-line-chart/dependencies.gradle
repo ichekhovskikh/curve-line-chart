@@ -1,0 +1,39 @@
+ext {
+    versions = [
+            androidMinSdkVersion = 21,
+            androidTargetSdkVersion = 32,
+            androidCompileSdkVersion = 32,
+
+            kotlinVersion = '1.6.10',
+            appcompatVesrion = '1.4.1',
+
+            junitVesrion = '4.13.1',
+            extJunitVesrion = '1.1.3',
+            espressoCoreVesrion = '3.4.0'
+    ]
+    libraries = [
+            kotlin      : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion",
+            appcompat   : "androidx.appcompat:appcompat:$appcompatVesrion"
+    ]
+    testLibraries = [
+            junit       : "junit:junit:$junitVesrion",
+            extJunit    : "androidx.test.ext:junit:$extJunitVesrion",
+            espressoCore: "androidx.test.espresso:espresso-core:$espressoCoreVesrion"
+    ]
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation libraries.kotlin
+    implementation libraries.appcompat
+
+    testImplementation testLibraries.junit
+    androidTestImplementation testLibraries.extJunit
+    androidTestImplementation testLibraries.espressoCore
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorXLegendText">#9DA4AC</color>
+    <color name="colorYLegendText">#9DA4AC</color>
+    <color name="colorAxisLine">#D3DBE7</color>
+    <color name="colorSelectorFrame">#38416990</color>
+    <color name="colorSelectorFog">#14416990</color>
+    <color name="colorFrameDragIndicator">#CCFFFFFF</color>
+    <color name="colorPopupLine">#EBF0F3</color>
+    <color name="colorPopupLinePointInner">#FFFFFF</color>
+</resources>

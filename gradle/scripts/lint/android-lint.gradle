@@ -1,0 +1,10 @@
+android {
+    lint {
+        quiet false
+        abortOnError true
+        warningsAsErrors true
+        checkDependencies false
+        checkReleaseBuilds true
+        lintConfig file("$rootDir/lint-config.xml")
+    }
+}
