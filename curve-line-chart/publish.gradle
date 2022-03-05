@@ -5,6 +5,13 @@ task androidSourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
 }
 
+/**
+ * to publish, you need to add the line below to the curve-line-chart/build.gradle
+ *
+ * apply from: "publish.gradle"
+ *
+ * (disabled due to publishing issues in the jitpack)
+ */
 publishing {
     publications {
         bar(MavenPublication) {
