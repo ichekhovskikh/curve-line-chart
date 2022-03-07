@@ -1,7 +1,7 @@
 # Curve Line Chart
-[![Release](https://img.shields.io/badge/Release-1.0.0-red.svg)](https://jitpack.io/#ichekhovskikh/curve-line-chart)
+[![Release](https://jitpack.io/v/ichekhovskikh/curve-line-chart.svg)](https://jitpack.io/#ichekhovskikh/curve-line-chart)
 [![Kotlin Version](https://img.shields.io/badge/Kotlin-1.6.10-blue.svg)](https://kotlinlang.org)
-[![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21)
+[![API](https://img.shields.io/badge/API-21%2B-red.svg?style=flat)](https://android-arsenal.com/api?level=21)
 
 <table>
     <tr>
@@ -151,7 +151,7 @@ package com.chekh.sample
 
 class CustomPopupView @JvmOverloads constructor(
     context: Context,
-    attrs: AttributeSet,
+    attrs: AttributeSet? = null,
     @AttrRes defStyleAttr: Int = 0,
     @StyleRes defStyleRes: Int = 0
 ) : PopupView(context, attrs, defStyleAttr, defStyleRes) {
@@ -172,7 +172,7 @@ class CustomPopupView @JvmOverloads constructor(
 or from kotlin
 ```kotlin
 findViewById<CurveLineChartView>(R.id.clcvChart).apply {
-    popupView = CustomPopupView(context, attrs)
+    popupView = CustomPopupView(context)
 }
 ```
 
