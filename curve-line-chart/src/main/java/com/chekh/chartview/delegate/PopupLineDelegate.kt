@@ -80,12 +80,17 @@ internal class PopupLineDelegate(
             false
         }
         MotionEvent.ACTION_MOVE -> {
-            touchX = NO_POSITION
-            onPopupLineChanged()
-            onUpdate()
+            abortTouch()
             false
         }
         else -> false
+    }
+
+    fun abortTouch() {
+        if (touchX == NO_POSITION) return
+        touchX = NO_POSITION
+        onPopupLineChanged()
+        onUpdate()
     }
 
     fun onMeasure(viewSize: Size) {

@@ -224,5 +224,5 @@ internal class XAxisDelegate(
 
     private fun Float.toLegendText() = axisFormatter
         .format(this, zoom = 1f / range.distance)
-        .takeIf { it.isNotBlank() }
+        .takeUnless { it.isBlank() }
 }

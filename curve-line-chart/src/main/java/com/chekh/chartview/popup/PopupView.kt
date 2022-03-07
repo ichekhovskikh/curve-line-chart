@@ -17,7 +17,7 @@ import java.lang.reflect.InvocationTargetException
  */
 abstract class PopupView @JvmOverloads constructor(
     context: Context,
-    attrs: AttributeSet,
+    attrs: AttributeSet? = null,
     @AttrRes defStyleAttr: Int = 0,
     @StyleRes defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
@@ -47,11 +47,11 @@ abstract class PopupView @JvmOverloads constructor(
         operator fun invoke(
             parent: ViewGroup,
             className: String?,
-            attrs: AttributeSet,
+            attrs: AttributeSet?,
             @AttrRes defStyleAttr: Int,
             @StyleRes defStyleRes: Int
         ): PopupView? {
-            val fullClassName = className?.takeIf { it.isNotBlank() }?.let {
+            val fullClassName = className?.takeUnless { it.isBlank() }?.let {
                 parent.context.getFullClassName(it)
             } ?: return null
             return try {
@@ -67,7 +67,7 @@ abstract class PopupView @JvmOverloads constructor(
                     } catch (exception: NoSuchMethodException) {
                         exception.initCause(cause)
                         throw IllegalStateException(
-                            "${attrs.positionDescription}: Error creating PopupView: $fullClassName",
+                            "${attrs?.positionDescription}: Error creating PopupView: $fullClassName",
                             exception
                         )
                     }
@@ -75,27 +75,27 @@ abstract class PopupView @JvmOverloads constructor(
                 constructor.newInstance(parent.context, attrs, defStyleAttr, defStyleRes)
             } catch (exception: ClassNotFoundException) {
                 throw IllegalStateException(
-                    "${attrs.positionDescription}: Unable to find PopupView: $fullClassName",
+                    "${attrs?.positionDescription}: Unable to find PopupView: $fullClassName",
                     exception
                 )
             } catch (exception: InvocationTargetException) {
                 throw IllegalStateException(
-                    "${attrs.positionDescription}: Could not instantiate the PopupView: $fullClassName",
+                    "${attrs?.positionDescription}: Could not instantiate the PopupView: $fullClassName",
                     exception
                 )
             } catch (exception: InstantiationException) {
                 throw IllegalStateException(
-                    "${attrs.positionDescription}: Could not instantiate the PopupView: $fullClassName",
+                    "${attrs?.positionDescription}: Could not instantiate the PopupView: $fullClassName",
                     exception
                 )
             } catch (exception: IllegalAccessException) {
                 throw IllegalStateException(
-                    "${attrs.positionDescription}: Cannot access non-public PopupView: $fullClassName",
+                    "${attrs?.positionDescription}: Cannot access non-public PopupView: $fullClassName",
                     exception
                 )
             } catch (exception: ClassCastException) {
                 throw IllegalStateException(
-                    "${attrs.positionDescription}: Class is not a PopupView: $fullClassName",
+                    "${attrs?.positionDescription}: Class is not a PopupView: $fullClassName",
                     exception
                 )
             }

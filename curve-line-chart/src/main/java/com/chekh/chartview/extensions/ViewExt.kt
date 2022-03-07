@@ -10,7 +10,7 @@ import androidx.annotation.StyleRes
 import androidx.annotation.Px
 
 internal inline fun View.applyStyledAttributes(
-    set: AttributeSet,
+    set: AttributeSet?,
     @StyleableRes attrs: IntArray,
     @AttrRes defStyleAttr: Int,
     @StyleRes defStyleRes: Int,
