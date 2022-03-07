@@ -9,14 +9,15 @@ import android.view.VelocityTracker
 import androidx.annotation.Px
 import com.chekh.chartview.anim.AppearanceAnimator
 import com.chekh.chartview.anim.AxisAnimator
-import com.chekh.chartview.extensions.setDisappearing
+import com.chekh.chartview.extensions.animatingColor
+import com.chekh.chartview.extensions.getAbscissaBoundaries
 import com.chekh.chartview.extensions.getMinMaxY
 import com.chekh.chartview.extensions.interpolateByValues
-import com.chekh.chartview.extensions.getAbscissaBoundaries
 import com.chekh.chartview.extensions.contains
 import com.chekh.chartview.extensions.abscissas
 import com.chekh.chartview.extensions.distance
-import com.chekh.chartview.extensions.animatingColor
+import com.chekh.chartview.extensions.setAppearing
+import com.chekh.chartview.extensions.setDisappearing
 import com.chekh.chartview.model.CurveLine
 import com.chekh.chartview.model.BinaryRange
 import com.chekh.chartview.model.FloatRange
@@ -113,7 +114,9 @@ internal class CurveLineGraphDelegate(
         if (current.contains(line)) return
 
         appearanceAnimator.cancel()
-        animatingLines.add(AppearingCurveLine(line))
+        animatingLines
+            .find { it.curveLine == line }?.setAppearing()
+            ?: animatingLines.add(AppearingCurveLine(line))
         appearanceAnimator.start()
         val newLines = current + line
         updateAxis(newLines)

@@ -14,7 +14,7 @@ import com.chekh.chartview.popup.PopupView
 
 class CustomPopupView @JvmOverloads constructor(
     context: Context,
-    attrs: AttributeSet,
+    attrs: AttributeSet? = null,
     @AttrRes defStyleAttr: Int = 0,
     @StyleRes defStyleRes: Int = 0
 ) : PopupView(context, attrs, defStyleAttr, defStyleRes) {

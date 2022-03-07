@@ -4,10 +4,13 @@ import android.graphics.Color
 import androidx.annotation.ColorInt
 import com.chekh.chartview.model.AnimatingCurveLine
 
+internal fun AnimatingCurveLine.setAppearing() {
+    animationValue = 1f - animationValue
+    isAppearing = true
+}
+
 internal fun AnimatingCurveLine.setDisappearing() {
-    if (animationValue == 1f) {
-        animationValue = 0f
-    }
+    animationValue = 1f - animationValue
     isAppearing = false
 }
 

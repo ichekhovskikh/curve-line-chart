@@ -6,9 +6,7 @@ import com.chekh.chartview.model.AnimatingYLegendSeries
 import com.chekh.chartview.model.AxisLine
 
 internal fun AnimatingYLegendSeries.setDisappearing() {
-    if (animationValue == 1f) {
-        animationValue = 0f
-    }
+    animationValue = 1f - animationValue
     isAppearing = false
 }
 
