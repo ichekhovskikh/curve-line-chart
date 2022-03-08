@@ -98,7 +98,11 @@ internal class CurveLineGraphDelegate(
 
         appearanceAnimator.cancel()
         val appearing = newLines.minus(current.toSet())
-        appearing.forEach { line -> animatingLines.add(AppearingCurveLine(line)) }
+        appearing.forEach { line ->
+            animatingLines
+                .find { it.curveLine == line }?.setAppearing()
+                ?: animatingLines.add(AppearingCurveLine(line))
+        }
 
         val disappearing = current.minus(newLines.toSet())
         disappearing.forEach { line ->
